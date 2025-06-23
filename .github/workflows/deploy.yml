@@ -46,7 +46,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload the built app (adjust path to your built app)
-          path: "./apps/web/dist"
+          path: "./apps/web/out"
           # For Next.js static export, use:
           # path: './apps/web/out'
 
