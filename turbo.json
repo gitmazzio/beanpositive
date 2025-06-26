@@ -16,6 +16,12 @@
     "dev": {
       "cache": false,
       "persistent": true
-    }
+    },
+    "prebuild": {
+      "cache": false
+    },
+    "start": { "cache": false },
+    "ios": { "cache": false },
+    "android": { "cache": false }
   }
 }

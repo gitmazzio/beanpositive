@@ -1,38 +1,49 @@
 {
   "expo": {
-    "name": "mobile-app",
-    "slug": "mobile-app",
+    "name": "Bean Positive",
+    "slug": "bean-positive",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/adaptive.png",
     "scheme": "mobileapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/images/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.beanpositive.app",
+      "googleServicesFile": "./services/GoogleService-Info.plist"
     },
     "android": {
+      "googleServicesFile": "./services/google-services.json",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/adaptive.png",
+        "backgroundColor": "#7D8557"
       },
-      "edgeToEdgeEnabled": true
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "edgeToEdgeEnabled": true,
+      "package": "com.beanpositive.app"
     },
     "plugins": [
-      "expo-router"
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#7D8557",
+          "image": "./assets/images/logo-white.png",
+          "imageWidth": 66,
+          "resizeMode": "contain"
+        }
+      ],
+      ["expo-router"],
+      ["@react-native-google-signin/google-signin"]
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "982295ab-9358-400a-b50f-9dfbdb8e2ae8"
+      }
+    },
+    "owner": "teomazzio"
   }
 }

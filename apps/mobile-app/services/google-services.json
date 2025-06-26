@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "532957611936",
+    "project_id": "beanpositive-app",
+    "storage_bucket": "beanpositive-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:532957611936:android:64203f8c7f6ac85016c6c5",
+        "android_client_info": {
+          "package_name": "com.beanpositive.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBIrwy553mmh5XClWji9uRLtF2zm7DxNBE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
