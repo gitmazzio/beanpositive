@@ -1,22 +1,23 @@
+import { AppSafeAreaView } from "@/components/AppSafeAreaView";
+import { useColorScheme } from "@/components/useColorScheme";
+import { AuthProvider, useAuth } from "@/providers";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useState } from "react";
+import { Text, View } from "react-native";
 import "react-native-reanimated";
 import CustomSplashScreen from "../components/CustomSplashScreen";
-import { useColorScheme } from "@/components/useColorScheme";
-import { AuthProvider, useAuth } from "@/providers";
-import { Text, View } from "react-native";
-import { StatusBar } from "expo-status-bar";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import OnboardingScreen from "./(auth)/onboarding";
-import { AppSafeAreaView } from "@/components/AppSafeAreaView";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -29,6 +30,8 @@ SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({
   fade: true,
 });
+
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -88,19 +91,21 @@ export default function RootLayout() {
 
   return (
     <AppSafeAreaView>
-      <AuthProvider>
-        {showSplash && <CustomSplashScreen onFinish={handleSplashFinish} />}
-        {!showSplash && showOnboarding && (
-          <OnboardingScreen onFinish={handleOnboardingFinish} />
-        )}
-        {!showSplash && !showOnboarding && <RootLayoutNav />}
-        <StatusBar
-          style={"dark"}
-          networkActivityIndicatorVisible={false}
-          hidden={showSplash}
-          backgroundColor="#7D8557"
-        />
-      </AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          {showSplash && <CustomSplashScreen onFinish={handleSplashFinish} />}
+          {!showSplash && showOnboarding && (
+            <OnboardingScreen onFinish={handleOnboardingFinish} />
+          )}
+          {!showSplash && !showOnboarding && <RootLayoutNav />}
+          <StatusBar
+            style={"dark"}
+            networkActivityIndicatorVisible={false}
+            hidden={showSplash}
+            backgroundColor="#7D8557"
+          />
+        </AuthProvider>
+      </QueryClientProvider>
     </AppSafeAreaView>
   );
 }

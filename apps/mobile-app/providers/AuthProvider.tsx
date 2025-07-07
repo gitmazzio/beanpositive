@@ -1,47 +1,17 @@
-import { initializeApp } from "firebase/app";
-import {
-  initializeAuth,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signOut,
-  createUserWithEmailAndPassword,
-  User,
-  sendEmailVerification,
-} from "firebase/auth";
-
 import React, {
   createContext,
-  use,
   useContext,
   useEffect,
   useMemo,
   useState,
 } from "react";
-
-// TODO: Replace with your Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyBd839nCzgXPQrAuV0nq_zIZirnQdmL1kw",
-  authDomain: "beanpositive-app.firebaseapp.com",
-  projectId: "beanpositive-app",
-  storageBucket: "beanpositive-app.firebasestorage.app",
-  messagingSenderId: "532957611936",
-  appId: "1:532957611936:web:096ea8d75997ea9116c6c5",
-  measurementId: "G-G01VXCX0Q3",
-};
-
-const app = initializeApp(firebaseConfig);
-
-// Initialize Firebase Authentication and get a reference to the service
-import { getReactNativePersistence } from "@/utils/getReactNativePersistence";
-import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-
-const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage),
-});
+import { supabase } from "@/services/supabase";
+import { Alert } from "react-native";
+import { AuthUser } from "@supabase/supabase-js";
 
 interface AuthContextProps {
-  user: User | null;
+  user: AuthUser | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -53,49 +23,63 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  console.log("LOG loading", loading);
+  console.log("LOG user user", user);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
-
-      console.log("LOG firebaseUser", firebaseUser);
+    supabase.auth.getSession().then(({ data }) => {
+      setUser(data.session?.user ?? null);
       setLoading(false);
     });
-    return unsubscribe;
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
+    return () => {
+      listener?.subscription.unsubscribe();
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
     setLoading(true);
 
-    console.log("LOG", email, password);
-
-    await signInWithEmailAndPassword(auth, email, password);
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    console.log("LOG login", error, session);
     setLoading(false);
-    router.replace("/(tabs)"); // Redirect to home after login
+    if (error) throw error;
+    if (!session)
+      Alert.alert("Please check your inbox for email verification!");
+    router.replace("/(tabs)");
   };
 
   const logout = async () => {
     setLoading(true);
-    await signOut(auth);
+    const { error } = await supabase.auth.signOut();
     setLoading(false);
+    if (error) throw error;
   };
 
   const register = async (email: string, password: string) => {
     setLoading(true);
-    const response = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-    // await user.sendEmailVerification()
-
-    await sendEmailVerification(response.user);
-
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signUp({ email, password });
+    setLoading(false);
+    if (error) throw error;
+    if (!session)
+      Alert.alert("Please check your inbox for email verification!");
     setLoading(false);
   };
 
@@ -115,7 +99,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-
   if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 };

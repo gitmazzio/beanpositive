@@ -4,61 +4,14 @@ import HorizontalLine from "@/components/commons/HorizontalLine";
 import Link from "@/components/commons/Link";
 import StyledText from "@/components/commons/StyledText";
 import { PageView } from "@/components/Themed";
-import { FontAwesome6 } from "@expo/vector-icons";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useRouter } from "expo-router";
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithCredential,
-} from "firebase/auth";
 import { useState } from "react";
-import { Alert, Image, Platform, StyleSheet } from "react-native";
+import { Alert, Image, StyleSheet } from "react-native";
 import { useAuth } from "../../providers/AuthProvider";
 
-GoogleSignin.configure({
-  webClientId:
-    "532957611936-0icd54pbm5qnns195tpus3154nvn4b4d.apps.googleusercontent.com",
-});
-
 export default function Login() {
-  const { login, loading } = useAuth();
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-
-  const onGoogleButtonPress = async () => {
-    try {
-      await GoogleSignin.hasPlayServices({
-        showPlayServicesUpdateDialog: true,
-      });
-      const signInResult = await GoogleSignin.signIn();
-
-      console.log("LOG", signInResult);
-
-      if (signInResult.type === "success") {
-        // use signInResponse.data
-
-        // Use idToken directly from signInResult
-        const idToken = signInResult.data.idToken;
-        if (!idToken) {
-          // User closed modal or did not complete sign-in
-          setError("Google sign-in was cancelled or failed.");
-          return;
-        }
-        const googleCredential = GoogleAuthProvider.credential(idToken);
-        const auth = getAuth();
-        await signInWithCredential(auth, googleCredential);
-      }
-
-      if (signInResult.type === "cancelled") {
-        return;
-      }
-    } catch (err: any) {
-      setError(err.message || "Google login failed");
-      Alert.alert("Google Login Error", err.message || "Google login failed");
-    }
-  };
 
   const handleLogin = async () => {
     setError("");
@@ -83,7 +36,7 @@ export default function Login() {
       <StyledText kind="body" textAlign="center">
         {`Con un account personale potrai tenere traccia\ne conservare tutti i tuoi momenti`}
       </StyledText>
-      {Platform.OS === "ios" ? (
+      {/* {Platform.OS === "ios" ? (
         <Button
           kind="tertiary"
           prefixIcon={<FontAwesome6 name="apple" size={20} color={"#686260"} />}
@@ -96,7 +49,7 @@ export default function Login() {
         prefixIcon={<FontAwesome6 name="google" size={20} color={"#686260"} />}
         title="Continua con Google"
         onPress={onGoogleButtonPress}
-      />
+      /> */}
       <HorizontalLine color="#E0E0E0" thickness={1} marginVertical={0} />
       <Button
         kind="primary"
