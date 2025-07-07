@@ -1,4 +1,4 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import {
   DarkTheme,
   DefaultTheme,
@@ -33,7 +33,10 @@ SplashScreen.setOptions({
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-    ...FontAwesome.font,
+    DynaPuff: require("../assets/fonts/DynaPuff.ttf"),
+    FigtreeItalic: require("../assets/fonts/Figtree-Italic.ttf"),
+    Figtree: require("../assets/fonts/Figtree-Regular.ttf"),
+    ...FontAwesome6.font,
   });
   const [showSplash, setShowSplash] = useState(true);
   const [appReady, setAppReady] = useState(false);
@@ -113,6 +116,8 @@ function RootLayoutNav() {
       </View>
     );
   }
+
+  console.log("LOG", user);
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>

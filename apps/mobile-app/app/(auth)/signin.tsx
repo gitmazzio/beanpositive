@@ -9,34 +9,31 @@ import { useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text } from "react-native";
 
 export default function Register() {
-  const { loading, register } = useAuth();
+  const { loading, login } = useAuth();
   const [email, setEmail] = useState<string | null>(null);
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const [registering, setRegistering] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  console.log("LOG register", register);
+  console.log("LOG login", login);
 
-  const handleRegister = async () => {
-    setError("");
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
+  const handleSignIn = async () => {
+    if (!email) {
       return;
     }
-    setRegistering(true);
+    setError("");
+    setIsLoading(true);
     try {
-      const user = await register(email, password);
+      await login(email, password);
 
-      Alert.alert("Success", "Registration successful!");
+      Alert.alert("Success", "Sign in successful!");
     } catch (err: any) {
-      setError(err.message || "Registration failed");
+      setError(err.message || "Sign in failed");
     } finally {
-      setRegistering(false);
+      setIsLoading(false);
     }
   };
 
-  // TODO missing hook form to validate
   return (
     <PageView>
       <Header
@@ -47,9 +44,9 @@ export default function Register() {
           }
         }}
       ></Header>
-      <StyledText kind="h1">Crea il tuo account</StyledText>
+      <StyledText kind="h1">Accedi su Bean Positive</StyledText>
       <StyledText kind="body">
-        Conserva ogni singolo momento creando un account su Bean Positive
+        Usa i tuoi dati per accedere a Bean Positive.
       </StyledText>
       <TextInput
         placeholder="Email"
@@ -66,24 +63,17 @@ export default function Register() {
         value={password}
         onChangeText={setPassword}
       />
-      <TextInput
-        placeholder="Confirm Password"
-        style={styles.input}
-        secureTextEntry
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-      />
       {error ? (
         <Text style={{ color: "red", marginBottom: 8 }}>{error}</Text>
       ) : null}
-      {registering || loading ? (
+      {isLoading || loading ? (
         <ActivityIndicator size="large" color="#000" />
       ) : (
         <Button
           kind="primary"
-          title="Register"
-          onPress={handleRegister}
-          disabled={!email}
+          title="Accedi"
+          onPress={handleSignIn}
+          disabled={!email || !password}
         />
       )}
     </PageView>

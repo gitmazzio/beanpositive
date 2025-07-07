@@ -71,6 +71,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const login = async (email: string, password: string) => {
     setLoading(true);
+
+    console.log("LOG", email, password);
+
     await signInWithEmailAndPassword(auth, email, password);
     setLoading(false);
     router.replace("/(tabs)"); // Redirect to home after login

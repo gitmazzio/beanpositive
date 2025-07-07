@@ -1,13 +1,13 @@
-import { StyleSheet, Button } from "react-native";
+import { Button, StyleSheet, View } from "react-native";
 
 import EditScreenInfo from "@/components/EditScreenInfo";
-import { Text, View } from "@/components/Themed";
+import { PageView, Text } from "@/components/Themed";
 import { useAuth } from "@/providers";
 
 export default function TabOneScreen() {
   const { logout } = useAuth();
   return (
-    <View style={styles.container}>
+    <PageView style={styles.container}>
       <Text style={styles.title}>Tab One</Text>
       <View
         style={styles.separator}
@@ -16,7 +16,7 @@ export default function TabOneScreen() {
       />
       <EditScreenInfo path="app/(tabs)/index.tsx" />
       <Button title="Logout" onPress={logout} color="#d32f2f" />
-    </View>
+    </PageView>
   );
 }
 

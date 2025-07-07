@@ -1,25 +1,20 @@
-import {
-  GoogleSignin,
-  statusCodes,
-} from "@react-native-google-signin/google-signin";
+import { Button } from "@/components/commons/Button";
+import Flex from "@/components/commons/Flex";
+import HorizontalLine from "@/components/commons/HorizontalLine";
+import Link from "@/components/commons/Link";
+import StyledText from "@/components/commons/StyledText";
+import { PageView } from "@/components/Themed";
+import { FontAwesome6 } from "@expo/vector-icons";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useRouter } from "expo-router";
 import {
   getAuth,
   GoogleAuthProvider,
   signInWithCredential,
 } from "firebase/auth";
-import { useCallback, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  Button,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { useState } from "react";
+import { Alert, Image, Platform, StyleSheet } from "react-native";
 import { useAuth } from "../../providers/AuthProvider";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 GoogleSignin.configure({
   webClientId:
@@ -28,7 +23,6 @@ GoogleSignin.configure({
 
 export default function Login() {
   const { login, loading } = useAuth();
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
@@ -69,76 +63,66 @@ export default function Login() {
   const handleLogin = async () => {
     setError("");
     try {
-      await login(email, password);
+      router.push("/(auth)/register");
+      // await login(email, password);
     } catch (err: any) {
       setError(err.message || "Login failed");
       Alert.alert("Login Error", err.message || "Login failed");
     }
   };
 
-  const handleRegisterRedirect = () => {
-    router.push("/(auth)/register");
-  };
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      <TextInput
-        placeholder="Email"
-        style={styles.input}
-        autoCapitalize="none"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
+    <PageView style={{ gap: 20 }}>
+      <Image
+        source={require("./../../assets/images/login_bean.png")}
+        style={{ width: 125, height: 125, alignSelf: "center" }}
       />
-      <TextInput
-        placeholder="Password"
-        style={styles.input}
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-      {error ? (
-        <Text style={{ color: "red", marginBottom: 8 }}>{error}</Text>
+      <StyledText kind="h1" textAlign="center">
+        Accedi o crea un account
+      </StyledText>
+      <StyledText kind="body" textAlign="center">
+        {`Con un account personale potrai tenere traccia\ne conservare tutti i tuoi momenti`}
+      </StyledText>
+      {Platform.OS === "ios" ? (
+        <Button
+          kind="tertiary"
+          prefixIcon={<FontAwesome6 name="apple" size={20} color={"#686260"} />}
+          title="Continua con Apple"
+          onPress={onGoogleButtonPress}
+        />
       ) : null}
-      {loading ? (
-        <ActivityIndicator size="large" color="#000" />
-      ) : (
-        <Button title="Login" onPress={handleLogin} />
-      )}
       <Button
-        title="Don't have an account? Register"
-        onPress={handleRegisterRedirect}
-        color="#888"
-      />
-      <Button
-        title="Sign in with Google"
+        kind="tertiary"
+        prefixIcon={<FontAwesome6 name="google" size={20} color={"#686260"} />}
+        title="Continua con Google"
         onPress={onGoogleButtonPress}
-        color="#4285F4"
       />
+      <HorizontalLine color="#E0E0E0" thickness={1} marginVertical={0} />
       <Button
+        kind="primary"
+        title="Crea con la tua mail"
+        onPress={handleLogin}
+      />
+      <Flex gap={4}>
+        <StyledText kind="body">Hai già un account?</StyledText>
+        <Link to={"/(auth)/signin"}>Accedi subito</Link>
+      </Flex>
+
+      {/* <Button
         title="test onboarding"
         onPress={async () => {
           await AsyncStorage.removeItem("onboardingSeen");
         }}
-      />
-    </View>
+      /> */}
+    </PageView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 24 },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 24,
-    textAlign: "center",
-  },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
     padding: 12,
-    marginBottom: 16,
   },
 });

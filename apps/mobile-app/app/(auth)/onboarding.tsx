@@ -1,10 +1,15 @@
+import { Button } from "@/components/commons/Button";
+import Flex from "@/components/commons/Flex";
+import { Header } from "@/components/commons/Header";
+import Link from "@/components/commons/Link";
+import StyledText from "@/components/commons/StyledText";
+import { PageView } from "@/components/Themed";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
-  SafeAreaView,
-  StatusBar,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -16,27 +21,31 @@ const { width, height } = Dimensions.get("window");
 const onboardingData = [
   {
     id: 1,
-    title: "Un fagiolo per ogni momento felice",
+    title: "Un fagiolo per ogni\nmomento felice",
     subtitle: "Tratto dal libro di Alois Burkhard",
-    // image: require("./assets/onboarding1.png"), // Replace with your image path
-    backgroundColor: "#F5F1E8",
-    gradientColors: ["#E5E5E5", "#D0D0D0"],
+    image: require("./../../assets/images/onboarding1.png"), // Replace with your image path
   },
   {
     id: 2,
-    title: "Scopri nuovi sapori ogni giorno",
-    subtitle: "Ricette autentiche dalla tradizione",
-    // image: require("./assets/onboarding2.png"), // Replace with your image path
-    backgroundColor: "#F0F8F5",
-    gradientColors: ["#D5E8D4", "#B8D4B8"],
+    title: "La tasca destra\ndel duca",
+    subtitle:
+      "C’era una volta un duca che, ogni mattina, metteva una manciata di fagioli nella tasca destra. Non per mangiarli, ma per qualcosa di molto più prezioso...",
+    image: require("./../../assets/images/onboarding2.png"), // Replace with your image path
   },
   {
     id: 3,
-    title: "Condividi la gioia del buon cibo",
-    subtitle: "Crea momenti speciali con chi ami",
-    // image: require("./assets/onboarding3.png"), // Replace with your image path
-    backgroundColor: "#FFF8F0",
-    gradientColors: ["#F4E4C1", "#E8D5A3"],
+    title: "Ogni momento conta",
+    subtitle:
+      "Ogni volta che qualcosa di bello accadeva (un sorriso, un buon pasto, una parola gentile)...faceva passare un fagiolo nella tasca sinistra.",
+    image: require("./../../assets/images/onboarding3.png"), // Replace with your image path
+  },
+  {
+    id: 4,
+    title: "Bean Positive\nè la tua tasca sinistra",
+    subtitle:
+      "Contando i fagioli nella tasca sinistra, ricordava tutto ciò che aveva reso quel giorno degno di essere vissuto.",
+    extraSubtitle: "Con Bean Positive, anche tu\npuoi fare lo stesso.",
+    image: require("./../../assets/images/onboarding4.png"), // Replace with your image path
   },
 ];
 
@@ -48,15 +57,8 @@ export default function OnboardingScreen({ onFinish }) {
 
   useEffect(() => {
     // Animate progress bar when step changes
-    // const targetProgress = (currentStep + 1) / onboardingData.length;
-
-    let targetProgress = 0.2;
-
-    if (currentStep == 1) {
-      targetProgress = 0.5;
-    } else if (currentStep == 2) {
-      targetProgress = 0.95;
-    }
+    const progressSteps = [0.2, 0.5, 0.7, 0.95];
+    const targetProgress = progressSteps[currentStep];
 
     Animated.timing(progressAnimation, {
       toValue: targetProgress,
@@ -97,29 +99,18 @@ export default function OnboardingScreen({ onFinish }) {
   const isLastStep = currentStep === onboardingData.length - 1;
 
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        { backgroundColor: currentData.backgroundColor },
-      ]}
-    >
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={currentData.backgroundColor}
-      />
-
+    <PageView>
       {/* Header with skip button */}
-      <View style={styles.header}>
-        <View style={styles.headerButton}>
-          {currentStep > 0 ? (
-            <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-              <Text style={styles.backText}>←</Text>
-            </TouchableOpacity>
-          ) : (
-            <View style={styles.backButton} />
-          )}
-        </View>
-        {/* Progress bar */}
+
+      <Header
+        withBack={currentStep > 0}
+        onPressBack={handleBack}
+        leftChildren={
+          <TouchableOpacity onPress={handleSkip}>
+            <Text style={styles.skipText}>Salta</Text>
+          </TouchableOpacity>
+        }
+      >
         <View style={styles.progressContainer}>
           <View style={styles.progressBarBackground}>
             <Animated.View
@@ -135,122 +126,103 @@ export default function OnboardingScreen({ onFinish }) {
             />
           </View>
         </View>
-        <View style={styles.headerButton}>
-          <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
-            <Text style={styles.skipText}>Salta</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      </Header>
 
       {/* Main content */}
-      <View style={styles.content}>
-        {/* Title */}
-        <Text style={styles.title}>{currentData.title}</Text>
+      <Flex
+        direction="column"
+        align="center"
+        justify="flex-start"
+        style={[styles.content]}
+      >
+        <Flex style={{ height: 70 }} align="center" justify="center">
+          <StyledText kind="h1" textAlign="center">
+            {currentData.title}
+          </StyledText>
+        </Flex>
 
-        {/* Image */}
         <View style={styles.imageContainer}>
           {/* Replace this with actual Image component when you have the images */}
+          <Image source={currentData.image} style={styles.image} />
         </View>
 
         {/* Subtitle */}
-        <Text style={styles.subtitle}>{currentData.subtitle}</Text>
-      </View>
-
-      {/* Bottom section */}
-      <View style={styles.bottomSection}>
-        {/* Login link - only show on first step */}
-        {currentStep === 0 && (
-          <View style={styles.loginContainer}>
-            <Text style={styles.loginText}>Hai già un account? </Text>
-            <TouchableOpacity onPress={handleLogin}>
-              <Text style={styles.loginLink}>Accedi subito</Text>
-            </TouchableOpacity>
-          </View>
+        {currentData.subtitle != null && (
+          <StyledText kind="body" textAlign="center">
+            {currentData.subtitle}
+          </StyledText>
         )}
 
-        {/* Continue button */}
-        <TouchableOpacity
-          style={styles.continueButton}
+        {currentData.extraSubtitle != null && (
+          <StyledText
+            kind="body"
+            textAlign="center"
+            style={{
+              fontWeight: 700,
+              color: "#381110",
+              marginTop: 4,
+            }}
+          >
+            {currentData.extraSubtitle}
+          </StyledText>
+        )}
+      </Flex>
+
+      <View>
+        {currentStep === 0 && (
+          <Flex gap={4} style={styles.loginContainer}>
+            <StyledText kind="body">Hai già un account?</StyledText>
+            <Link to="/(auth)/login">Accedi subito</Link>
+          </Flex>
+        )}
+        <Button
+          title={
+            currentStep === 0
+              ? "Leggi la storia"
+              : isLastStep
+                ? "Inizia ora"
+                : "Continua"
+          }
+          kind={isLastStep ? "primary" : "tertiary"}
           onPress={handleContinue}
-        >
-          <Text style={styles.continueButtonText}>
-            {isLastStep ? "Inizia" : "Continua"}
-          </Text>
-        </TouchableOpacity>
+        />
       </View>
-    </SafeAreaView>
+    </PageView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  headerButton: {
-    width: 70,
-  },
-  backButton: {
-    width: 20,
-    height: 20,
-  },
-  backText: {
-    fontSize: 16,
-    color: "#8B7355",
-    fontWeight: "500",
-  },
-  skipButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-  },
   skipText: {
     fontSize: 16,
     color: "#666666",
     fontWeight: "500",
   },
   progressContainer: {
+    flex: 2,
     paddingHorizontal: 20,
     alignItems: "center",
   },
   progressBarBackground: {
     width: 120,
     height: 4,
-    backgroundColor: "#D0D0D0",
+    backgroundColor: "#C8CEB0",
     borderRadius: 2,
     overflow: "hidden",
   },
   progressBarFill: {
     height: "100%",
-    backgroundColor: "#8B7355",
+    backgroundColor: "#404B35",
     borderRadius: 2,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 40,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "600",
-    color: "#2C2C2C",
-    textAlign: "center",
-    lineHeight: 36,
-    marginBottom: 40,
-    fontFamily: "System",
+    marginTop: 8,
   },
   imageContainer: {
-    width: width * 0.7,
-    height: width * 0.7,
     maxWidth: 300,
     maxHeight: 300,
-    marginBottom: 30,
+    marginBottom: 12,
+    marginTop: 12,
   },
   imagePlaceholder: {
     flex: 1,
@@ -264,19 +236,9 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   image: {
-    width: "100%",
-    height: "100%",
+    width: width * 0.75,
+    height: width * 0.75,
     borderRadius: 20,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#666666",
-    textAlign: "center",
-    fontWeight: "400",
-  },
-  bottomSection: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
   },
   loginContainer: {
     flexDirection: "row",

@@ -1,6 +1,13 @@
 import React, { ReactNode } from "react";
-import { Platform, SafeAreaView, StatusBar, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  StatusBar,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { KeyboardDismiss } from "./commons/KeyboardDismiss";
 // import styled from 'styled-components/native'
 // import { colors } from '~/constants/colors'
 
@@ -13,28 +20,6 @@ type Attrs = {
   insets?: { bottom: number; top: number };
 };
 
-const StyledSafeAreaView = ({ children, flex, insets }) => {
-  return (
-    <View
-      style={{
-        flex: 1,
-      }}
-    >
-      {children}
-    </View>
-  );
-};
-
-// const StyledSafeAreaView = styled(View)<Attrs>`
-//   background-color: ${colors.white};
-//   flex: ${({ flex }) => flex};
-//   margin-bottom: ${({ insets }) =>
-//     Platform.OS === "android"
-//       ? `${insets?.bottom}px`
-//       : `-${(insets?.bottom || 0) / 2}px`};
-//   margin-top: ${`${safeAreaPaddingTop}px`};
-// `;
-
 export const AppSafeAreaView: React.FC<Attrs> = ({
   flex = 1,
   children,
@@ -43,11 +28,28 @@ export const AppSafeAreaView: React.FC<Attrs> = ({
   const insets = useSafeAreaInsets();
 
   return (
-    <SafeAreaView style={{ flex }}>
-      {/* <StyledSafeAreaView flex={flex} insets={insets} {...props}>
-        {children}
-      </StyledSafeAreaView> */}
-      {children}
+    <SafeAreaView
+      style={{
+        flex,
+        backgroundColor: "#FEF5E6",
+      }}
+    >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <KeyboardDismiss>
+          <View
+            style={{
+              flex: 1,
+              paddingBottom: insets.bottom === 0 ? 20 : insets.bottom,
+              paddingTop: insets.top === 0 ? 12 : insets.top,
+            }}
+          >
+            {children}
+          </View>
+        </KeyboardDismiss>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
