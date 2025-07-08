@@ -17,7 +17,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import "react-native-reanimated";
 import CustomSplashScreen from "../components/CustomSplashScreen";
-import OnboardingScreen from "./(auth)/onboarding";
+import OnboardingScreen from "./onboarding";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -43,19 +43,11 @@ export default function RootLayout() {
   });
   const [showSplash, setShowSplash] = useState(true);
   const [appReady, setAppReady] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
-
-  useEffect(() => {
-    (async () => {
-      const onboardingSeen = await AsyncStorage.getItem("onboardingSeen");
-      setShowOnboarding(onboardingSeen !== "true");
-    })();
-  }, []);
 
   // Handle app initialization
   useEffect(() => {
@@ -79,13 +71,8 @@ export default function RootLayout() {
     setShowSplash(false);
   }, []);
 
-  const handleOnboardingFinish = useCallback(async () => {
-    await AsyncStorage.setItem("onboardingSeen", "true");
-    setShowOnboarding(false);
-  }, []);
-
   // Don't render anything until fonts are loaded
-  if (!loaded || !appReady || showOnboarding === null) {
+  if (!loaded || !appReady) {
     return null;
   }
 
@@ -94,10 +81,7 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           {showSplash && <CustomSplashScreen onFinish={handleSplashFinish} />}
-          {!showSplash && showOnboarding && (
-            <OnboardingScreen onFinish={handleOnboardingFinish} />
-          )}
-          {!showSplash && !showOnboarding && <RootLayoutNav />}
+          {!showSplash && <RootLayoutNav />}
           <StatusBar
             style={"dark"}
             networkActivityIndicatorVisible={false}
@@ -113,16 +97,24 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const { user, loading } = useAuth();
+  const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
 
-  if (loading) {
+  useEffect(() => {
+    (async () => {
+      const onboardingSeen = await AsyncStorage.getItem("onboardingSeen");
+      setShowOnboarding(onboardingSeen !== "true");
+    })();
+  }, []);
+
+  if (loading || showOnboarding == null) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text>Loading...</Text>
       </View>
     );
   }
-
-  console.log("LOG", user);
+  console.log("LOG showOnboarding", showOnboarding);
+  console.log("LOG user", user);
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
@@ -131,7 +123,7 @@ function RootLayoutNav() {
           <Stack.Screen name="(tabs)" />
         </Stack.Protected>
         <Stack.Protected guard={!user}>
-          <Stack.Screen name="(auth)/onboarding" />
+          {showOnboarding && <Stack.Screen name="onboarding" />}
           <Stack.Screen name="(auth)" />
         </Stack.Protected>
       </Stack>

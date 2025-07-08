@@ -3,34 +3,12 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>532957611936-9hnhegogmvdmtj1a2b0rkgcuk3p9ovll.apps.googleusercontent.com</string>
+	<string>82825591652-82gqjccdjt7aqe9glhh9ahjtrgcgbrgu.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.532957611936-9hnhegogmvdmtj1a2b0rkgcuk3p9ovll</string>
-	<key>ANDROID_CLIENT_ID</key>
-	<string>532957611936-an0o0ja1mqek5n8ihdlccvu9g69uk8rm.apps.googleusercontent.com</string>
-	<key>API_KEY</key>
-	<string>AIzaSyC2ipUAlmDScHGqlx3R_6fIJtCIdbnLxtM</string>
-	<key>GCM_SENDER_ID</key>
-	<string>532957611936</string>
+	<string>com.googleusercontent.apps.82825591652-82gqjccdjt7aqe9glhh9ahjtrgcgbrgu</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.beanpositive.app</string>
-	<key>PROJECT_ID</key>
-	<string>beanpositive-app</string>
-	<key>STORAGE_BUCKET</key>
-	<string>beanpositive-app.firebasestorage.app</string>
-	<key>IS_ADS_ENABLED</key>
-	<false></false>
-	<key>IS_ANALYTICS_ENABLED</key>
-	<false></false>
-	<key>IS_APPINVITE_ENABLED</key>
-	<true></true>
-	<key>IS_GCM_ENABLED</key>
-	<true></true>
-	<key>IS_SIGNIN_ENABLED</key>
-	<true></true>
-	<key>GOOGLE_APP_ID</key>
-	<string>1:532957611936:ios:89ba12421ac7637716c6c5</string>
 </dict>
 </plist>

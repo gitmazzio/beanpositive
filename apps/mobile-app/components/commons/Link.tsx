@@ -8,10 +8,11 @@ import {
   StyleSheet,
   Text,
   TextStyle,
+  TouchableOpacity,
 } from "react-native";
 
 interface LinkProps {
-  to: string;
+  to?: string;
   children: React.ReactNode;
   style?: StyleProp<TextStyle>;
   onPress?: () => void;
@@ -42,9 +43,9 @@ export default function Link({
   };
 
   return (
-    <Pressable onPress={handlePress} accessibilityRole="link">
+    <TouchableOpacity onPress={handlePress} accessibilityRole="link">
       <Text style={[styles.link, style]}>{children}</Text>
-    </Pressable>
+    </TouchableOpacity>
   );
 }
 

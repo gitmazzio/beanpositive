@@ -1,79 +1,94 @@
 import { Button } from "@/components/commons/Button";
+import Flex from "@/components/commons/Flex";
 import { Header } from "@/components/commons/Header";
+import PasswordInput from "@/components/commons/PasswordInput";
 import StyledText from "@/components/commons/StyledText";
 import TextInput from "@/components/commons/TextInput";
 import { PageView } from "@/components/Themed";
 import { useAuth } from "@/providers";
-import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
-import { ActivityIndicator, Alert, StyleSheet, Text } from "react-native";
+import { router } from "expo-router";
+import { FormProvider, useForm } from "react-hook-form";
+import { ActivityIndicator, Alert, ScrollView, StyleSheet } from "react-native";
 
 export default function Register() {
   const { loading, login } = useAuth();
-  const [email, setEmail] = useState<string | null>(null);
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignIn = async () => {
-    if (!email) {
-      return;
-    }
-    setError("");
-    setIsLoading(true);
+  const methods = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const {
+    handleSubmit,
+    formState: { isSubmitting, errors },
+  } = methods;
+
+  const onSubmit = async (data: { email: string; password: string }) => {
     try {
-      await login(email, password);
-
-      Alert.alert("Success", "Sign in successful!");
+      await login(data.email, data.password);
+      Alert.alert("Success", "Registration successful!");
     } catch (err: any) {
-      setError(err.message || "Sign in failed");
-    } finally {
-      setIsLoading(false);
+      console.log("LOG err", err);
+      Alert.alert("Error", "Error signin!");
+      // setError("root", { message: err.message || "Registration failed" });
     }
   };
 
   return (
     <PageView>
-      <Header
-        withBack
-        onPressBack={() => {
-          if (router.canGoBack()) {
-            router.back();
-          }
-        }}
-      ></Header>
-      <StyledText kind="h1">Accedi su Bean Positive</StyledText>
-      <StyledText kind="body">
-        Usa i tuoi dati per accedere a Bean Positive.
-      </StyledText>
-      <TextInput
-        placeholder="Email"
-        style={styles.input}
-        autoCapitalize="none"
-        value={email || ""}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-      />
-      <TextInput
-        placeholder="Password"
-        style={styles.input}
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-      {error ? (
-        <Text style={{ color: "red", marginBottom: 8 }}>{error}</Text>
-      ) : null}
-      {isLoading || loading ? (
-        <ActivityIndicator size="large" color="#000" />
-      ) : (
-        <Button
-          kind="primary"
-          title="Accedi"
-          onPress={handleSignIn}
-          disabled={!email || !password}
-        />
-      )}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+      >
+        <FormProvider {...methods}>
+          <Flex
+            direction="column"
+            gap={16}
+            justify="flex-start"
+            align="stretch"
+          >
+            <Header
+              withBack
+              onPressBack={() => {
+                if (router.canGoBack()) {
+                  router.back();
+                }
+              }}
+            ></Header>
+            <StyledText kind="h1">Accedi su Bean Positive</StyledText>
+            <StyledText kind="body">
+              Usa i tuoi dati per accedere a Bean Positive.
+            </StyledText>
+            <TextInput
+              name="email"
+              label="Email"
+              placeholder="Usa il tuo indirizzo email..."
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+            <PasswordInput
+              name="password"
+              label="La tua password"
+              placeholder="Inserisci qui la tua password..."
+              secureTextEntry
+            />
+            {/* {isSubmitting || loading ? (
+              <ActivityIndicator size="large" color="#000" />
+            ) : ( */}
+            <Button
+              kind="primary"
+              title="Accedi"
+              onPress={handleSubmit(onSubmit)}
+              disabled={
+                isSubmitting || loading || Object.keys(errors)?.length > 0
+              }
+            />
+            {/* )} */}
+          </Flex>
+        </FormProvider>
+      </ScrollView>
     </PageView>
   );
 }

@@ -60,9 +60,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       password,
     });
     setLoading(false);
+
+    console.log("LOG", error, session);
     if (error) throw error;
     if (!session)
-      Alert.alert("Please check your inbox for email verification!");
+      return Alert.alert("Please check your inbox for email verification!");
+
     router.replace("/(tabs)");
   };
 

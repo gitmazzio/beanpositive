@@ -28,6 +28,14 @@ const StyledText: React.FC<StyledTextProps> = ({
 }) => {
   const alignmentStyle = textAlign ? { textAlign } : {};
 
+  if (React.Children.toArray(children).length === 1) {
+    return (
+      <Text style={[styles[kind], alignmentStyle, style]} {...props}>
+        {children}
+      </Text>
+    );
+  }
+
   return (
     <Flex
       align="flex-start"

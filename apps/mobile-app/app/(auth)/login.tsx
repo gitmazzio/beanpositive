@@ -7,7 +7,6 @@ import { PageView } from "@/components/Themed";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert, Image, StyleSheet } from "react-native";
-import { useAuth } from "../../providers/AuthProvider";
 
 export default function Login() {
   const [error, setError] = useState("");
@@ -17,7 +16,6 @@ export default function Login() {
     setError("");
     try {
       router.push("/(auth)/register");
-      // await login(email, password);
     } catch (err: any) {
       setError(err.message || "Login failed");
       Alert.alert("Login Error", err.message || "Login failed");
@@ -56,11 +54,14 @@ export default function Login() {
         title="Crea con la tua mail"
         onPress={handleLogin}
       />
-      <Flex gap={4}>
+      <Flex gap={4} align="center">
         <StyledText kind="body">Hai già un account?</StyledText>
         <Link to={"/(auth)/signin"}>Accedi subito</Link>
       </Flex>
 
+      {/* 
+         // TODO mettere feature flag test
+        */}
       {/* <Button
         title="test onboarding"
         onPress={async () => {

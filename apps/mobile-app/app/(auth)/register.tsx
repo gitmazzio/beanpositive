@@ -1,24 +1,16 @@
 import { Button } from "@/components/commons/Button";
+import Checkbox from "@/components/commons/Checkbox";
+import Flex from "@/components/commons/Flex";
 import { Header } from "@/components/commons/Header";
+import Link from "@/components/commons/Link";
+import PasswordInput from "@/components/commons/PasswordInput";
 import StyledText from "@/components/commons/StyledText";
 import TextInput from "@/components/commons/TextInput";
 import { PageView } from "@/components/Themed";
 import { useAuth } from "@/providers";
-import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { useForm, Controller, FormProvider } from "react-hook-form";
-import Flex from "@/components/commons/Flex";
-import PasswordInput from "@/components/commons/PasswordInput";
-import Checkbox from "@/components/commons/Checkbox";
-import Link from "@/components/commons/Link";
+import { router } from "expo-router";
+import { FormProvider, useForm } from "react-hook-form";
+import { Alert, ScrollView, StyleSheet } from "react-native";
 
 export default function Register() {
   const { loading, register } = useAuth();
@@ -28,24 +20,17 @@ export default function Register() {
       firstName: "",
       email: "",
       password: "",
-      confirmPassword: "",
       acceptTerms: false,
     },
   });
 
   const {
-    control,
     handleSubmit,
     setError,
     formState: { isSubmitting, errors },
   } = methods;
 
   const onSubmit = async (data: any) => {
-    if (data.password !== data.confirmPassword) {
-      setError("confirmPassword", { message: "Passwords do not match" });
-      return;
-    }
-
     try {
       await register(data.email, data.password, {
         firstName: data.firstName,
@@ -56,7 +41,6 @@ export default function Register() {
     }
   };
 
-  // TODO missing hook form to validate
   return (
     <PageView>
       <ScrollView
@@ -136,7 +120,9 @@ export default function Register() {
               kind="primary"
               title="Continua"
               onPress={handleSubmit(onSubmit)}
-              disabled={isSubmitting || loading || errors != null}
+              disabled={
+                isSubmitting || loading || Object.keys(errors)?.length > 0
+              }
             />
           </Flex>
         </FormProvider>

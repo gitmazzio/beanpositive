@@ -4,8 +4,9 @@ import { Header } from "@/components/commons/Header";
 import Link from "@/components/commons/Link";
 import StyledText from "@/components/commons/StyledText";
 import { PageView } from "@/components/Themed";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -23,21 +24,21 @@ const onboardingData = [
     id: 1,
     title: "Un fagiolo per ogni\nmomento felice",
     subtitle: "Tratto dal libro di Alois Burkhard",
-    image: require("./../../assets/images/onboarding1.png"), // Replace with your image path
+    image: require("./../assets/images/onboarding1.png"), // Replace with your image path
   },
   {
     id: 2,
     title: "La tasca destra\ndel duca",
     subtitle:
       "C’era una volta un duca che, ogni mattina, metteva una manciata di fagioli nella tasca destra. Non per mangiarli, ma per qualcosa di molto più prezioso...",
-    image: require("./../../assets/images/onboarding2.png"), // Replace with your image path
+    image: require("./../assets/images/onboarding2.png"), // Replace with your image path
   },
   {
     id: 3,
     title: "Ogni momento conta",
     subtitle:
       "Ogni volta che qualcosa di bello accadeva (un sorriso, un buon pasto, una parola gentile)...faceva passare un fagiolo nella tasca sinistra.",
-    image: require("./../../assets/images/onboarding3.png"), // Replace with your image path
+    image: require("./../assets/images/onboarding3.png"), // Replace with your image path
   },
   {
     id: 4,
@@ -45,15 +46,21 @@ const onboardingData = [
     subtitle:
       "Contando i fagioli nella tasca sinistra, ricordava tutto ciò che aveva reso quel giorno degno di essere vissuto.",
     extraSubtitle: "Con Bean Positive, anche tu\npuoi fare lo stesso.",
-    image: require("./../../assets/images/onboarding4.png"), // Replace with your image path
+    image: require("./../assets/images/onboarding4.png"), // Replace with your image path
   },
 ];
 
 export default function OnboardingScreen({ onFinish }) {
+  console.log("LOG onFinish", onFinish);
+
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
 
   const progressAnimation = useRef(new Animated.Value(0)).current;
+
+  const handleOnboardingFinish = useCallback(async () => {
+    await AsyncStorage.setItem("onboardingSeen", "true");
+  }, []);
 
   useEffect(() => {
     // Animate progress bar when step changes
@@ -79,20 +86,20 @@ export default function OnboardingScreen({ onFinish }) {
     } else {
       // Navigate to main app
       router.push("/(auth)/login"); // Replace with your target route
-      onFinish();
+      handleOnboardingFinish?.();
     }
   };
 
   const handleSkip = () => {
     // Skip to main app
     router.push("/(auth)/login"); // Replace with your target route
-    onFinish();
+    handleOnboardingFinish?.();
   };
 
   const handleLogin = () => {
     // Navigate to login screen
-    router.push("/(auth)/login"); // Replace with your login route
-    onFinish();
+    router.push("/(auth)/signin"); // Replace with your login route
+    handleOnboardingFinish?.();
   };
 
   const currentData = onboardingData[currentStep];
@@ -142,11 +149,9 @@ export default function OnboardingScreen({ onFinish }) {
         </Flex>
 
         <View style={styles.imageContainer}>
-          {/* Replace this with actual Image component when you have the images */}
           <Image source={currentData.image} style={styles.image} />
         </View>
 
-        {/* Subtitle */}
         {currentData.subtitle != null && (
           <StyledText kind="body" textAlign="center">
             {currentData.subtitle}
@@ -170,9 +175,14 @@ export default function OnboardingScreen({ onFinish }) {
 
       <View>
         {currentStep === 0 && (
-          <Flex gap={4} style={styles.loginContainer}>
+          <Flex
+            gap={4}
+            align="center"
+            justify="center"
+            style={styles.loginContainer}
+          >
             <StyledText kind="body">Hai già un account?</StyledText>
-            <Link to="/(auth)/login">Accedi subito</Link>
+            <Link onPress={handleLogin}>Accedi subito</Link>
           </Flex>
         )}
         <Button
@@ -241,8 +251,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   loginContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
     marginBottom: 20,
   },
   loginText: {
