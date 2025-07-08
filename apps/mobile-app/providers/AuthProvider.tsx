@@ -15,7 +15,13 @@ interface AuthContextProps {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
+  register: (
+    email: string,
+    password: string,
+    data?: {
+      firstName?: string;
+    }
+  ) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -26,8 +32,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-
-  console.log("LOG user user", user);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -55,7 +59,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       email,
       password,
     });
-    console.log("LOG login", error, session);
     setLoading(false);
     if (error) throw error;
     if (!session)
@@ -70,12 +73,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     if (error) throw error;
   };
 
-  const register = async (email: string, password: string) => {
+  const register = async (
+    email: string,
+    password: string,
+    data: {
+      firstName: string;
+    }
+  ) => {
     setLoading(true);
     const {
       data: { session },
       error,
-    } = await supabase.auth.signUp({ email, password });
+    } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data, // Add any custom fields here
+      },
+    });
     setLoading(false);
     if (error) throw error;
     if (!session)

@@ -1,5 +1,6 @@
 import React from "react";
-import { StyleSheet, Text, TextProps } from "react-native";
+import { StyleSheet, Text, TextProps, View } from "react-native";
+import Flex from "./Flex";
 
 // Define the available text kinds
 type TextKind =
@@ -28,9 +29,18 @@ const StyledText: React.FC<StyledTextProps> = ({
   const alignmentStyle = textAlign ? { textAlign } : {};
 
   return (
-    <Text style={[styles[kind], alignmentStyle, style]} {...props}>
-      {children}
-    </Text>
+    <Flex
+      align="flex-start"
+      justify="flex-start"
+      direction="row"
+      style={{ flexWrap: "wrap" }}
+    >
+      {React.Children.map(children, (child) => (
+        <Text style={[styles[kind], alignmentStyle, style]} {...props}>
+          {child}
+        </Text>
+      ))}
+    </Flex>
   );
 };
 
@@ -73,7 +83,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     fontWeight: "400",
-    color: "#6a6a6a",
+    color: "#381110",
   },
   button: {
     fontFamily: "Figtree-Medium",

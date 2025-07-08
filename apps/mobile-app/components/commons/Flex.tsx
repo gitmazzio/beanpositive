@@ -18,7 +18,7 @@ interface FlexProps extends ViewProps {
 
 export default function Flex({
   direction = "row",
-  align = "center",
+  align = "stretch",
   justify = "center",
   gap = 0,
   style,

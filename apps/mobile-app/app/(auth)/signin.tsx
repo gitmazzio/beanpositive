@@ -15,8 +15,6 @@ export default function Register() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  console.log("LOG login", login);
-
   const handleSignIn = async () => {
     if (!email) {
       return;

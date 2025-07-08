@@ -15,8 +15,6 @@ export default function TabOneScreen() {
   const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
   const { data: hits, isLoading, error } = useUserHitsByDay(user?.id, today);
 
-  console.log("LOG hits", hits?.length, error, isLoading);
-
   const handleAddRow = async () => {
     if (!user) {
       return;

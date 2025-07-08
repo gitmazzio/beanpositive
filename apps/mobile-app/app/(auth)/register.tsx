@@ -6,86 +6,141 @@ import { PageView } from "@/components/Themed";
 import { useAuth } from "@/providers";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Alert, StyleSheet, Text } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { useForm, Controller, FormProvider } from "react-hook-form";
+import Flex from "@/components/commons/Flex";
+import PasswordInput from "@/components/commons/PasswordInput";
+import Checkbox from "@/components/commons/Checkbox";
+import Link from "@/components/commons/Link";
 
 export default function Register() {
   const { loading, register } = useAuth();
-  const [email, setEmail] = useState<string | null>(null);
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [registering, setRegistering] = useState(false);
 
-  console.log("LOG register", register);
+  const methods = useForm({
+    defaultValues: {
+      firstName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      acceptTerms: false,
+    },
+  });
 
-  const handleRegister = async () => {
-    setError("");
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
+  const {
+    control,
+    handleSubmit,
+    setError,
+    formState: { isSubmitting, errors },
+  } = methods;
+
+  const onSubmit = async (data: any) => {
+    if (data.password !== data.confirmPassword) {
+      setError("confirmPassword", { message: "Passwords do not match" });
       return;
     }
-    setRegistering(true);
-    try {
-      const user = await register(email, password);
 
+    try {
+      await register(data.email, data.password, {
+        firstName: data.firstName,
+      });
       Alert.alert("Success", "Registration successful!");
     } catch (err: any) {
-      setError(err.message || "Registration failed");
-    } finally {
-      setRegistering(false);
+      setError("root", { message: err.message || "Registration failed" });
     }
   };
 
   // TODO missing hook form to validate
   return (
     <PageView>
-      <Header
-        withBack
-        onPressBack={() => {
-          if (router.canGoBack()) {
-            router.back();
-          }
-        }}
-      ></Header>
-      <StyledText kind="h1">Crea il tuo account</StyledText>
-      <StyledText kind="body">
-        Conserva ogni singolo momento creando un account su Bean Positive
-      </StyledText>
-      <TextInput
-        placeholder="Email"
-        style={styles.input}
-        autoCapitalize="none"
-        value={email || ""}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-      />
-      <TextInput
-        placeholder="Password"
-        style={styles.input}
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-      <TextInput
-        placeholder="Confirm Password"
-        style={styles.input}
-        secureTextEntry
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-      />
-      {error ? (
-        <Text style={{ color: "red", marginBottom: 8 }}>{error}</Text>
-      ) : null}
-      {registering || loading ? (
-        <ActivityIndicator size="large" color="#000" />
-      ) : (
-        <Button
-          kind="primary"
-          title="Register"
-          onPress={handleRegister}
-          disabled={!email}
-        />
-      )}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+      >
+        <FormProvider {...methods}>
+          <Flex
+            direction="column"
+            gap={16}
+            justify="flex-start"
+            align="stretch"
+          >
+            <Header
+              withBack
+              onPressBack={() => {
+                if (router.canGoBack()) {
+                  router.back();
+                }
+              }}
+            ></Header>
+            <StyledText kind="h1">Crea il tuo account</StyledText>
+            <StyledText kind="body">
+              Conserva ogni singolo momento creando un account su Bean Positive
+            </StyledText>
+            <Flex align="stretch" direction="column" gap={6}>
+              <TextInput
+                name="firstName"
+                label="Il tuo nome"
+                placeholder="Scrivi il tuo nome..."
+                rules={{ required: "Il nome è obbligatorio" }}
+              />
+
+              <TextInput
+                name="email"
+                label="Email"
+                placeholder="Usa il tuo indirizzo email..."
+                rules={{
+                  required: "Email obbligatoria",
+                  pattern: { value: /^\S+@\S+$/i, message: "Email non valida" },
+                }}
+                autoCapitalize="none"
+                keyboardType="email-address"
+              />
+
+              <PasswordInput
+                name="password"
+                label="La tua password"
+                placeholder="Inserisci qui la tua password..."
+                rules={{
+                  required: "Password obbligatoria",
+                  minLength: { value: 8, message: "Minimo 8 caratteri" },
+                  pattern: {
+                    value:
+                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':\"\\|,.<>/?]).{8,}$/,
+                    message:
+                      "Almeno una minuscola, una maiuscola e un carattere speciale",
+                  },
+                }}
+                hintText="Almeno 8 caratteri, 1 maiuscola, 1 minuscola"
+              />
+
+              <Checkbox
+                name="acceptTerms"
+                label={
+                  <StyledText kind="caption">
+                    Accetto i <Link href="/terms">termini e condizioni</Link> e
+                    la <Link href="/privacy">privacy policy</Link> di Bean
+                    Positive.
+                  </StyledText>
+                }
+                style={{ marginTop: 8 }}
+              />
+            </Flex>
+
+            <Button
+              kind="primary"
+              title="Continua"
+              onPress={handleSubmit(onSubmit)}
+              disabled={isSubmitting || loading || errors != null}
+            />
+          </Flex>
+        </FormProvider>
+      </ScrollView>
     </PageView>
   );
 }
@@ -96,12 +151,5 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 24,
     textAlign: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
   },
 });
