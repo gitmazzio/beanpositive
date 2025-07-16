@@ -1,3 +1,5 @@
+import { supabase } from "@/services/supabase";
+import { type AuthUser } from "@supabase/supabase-js";
 import React, {
   createContext,
   useContext,
@@ -5,10 +7,6 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { useRouter } from "expo-router";
-import { supabase } from "@/services/supabase";
-import { Alert } from "react-native";
-import { AuthUser } from "@supabase/supabase-js";
 
 interface AuthContextProps {
   user: AuthUser | null;
@@ -31,7 +29,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -50,7 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const login = async (email: string, password: string) => {
-    setLoading(true);
+    // setLoading(true);
 
     const {
       data: { session },
@@ -59,14 +56,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       email,
       password,
     });
-    setLoading(false);
 
-    console.log("LOG", error, session);
     if (error) throw error;
-    if (!session)
-      return Alert.alert("Please check your inbox for email verification!");
 
-    router.replace("/(tabs)");
+    // console.log("LOG", session);
+    // TODO CHECK
+    // if (!session) throw "Please check your inbox for email verification!";
   };
 
   const logout = async () => {
@@ -96,8 +91,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     });
     setLoading(false);
     if (error) throw error;
-    if (!session)
-      Alert.alert("Please check your inbox for email verification!");
+    // if (!session)
+    //   Alert.alert("Please check your inbox for email verification!");
     setLoading(false);
   };
 

@@ -39,14 +39,14 @@ export default function Login() {
           kind="tertiary"
           prefixIcon={<FontAwesome6 name="apple" size={20} color={"#686260"} />}
           title="Continua con Apple"
-          onPress={onGoogleButtonPress}
+          // onPress={onGoogleButtonPress}
         />
       ) : null}
       <Button
         kind="tertiary"
         prefixIcon={<FontAwesome6 name="google" size={20} color={"#686260"} />}
         title="Continua con Google"
-        onPress={onGoogleButtonPress}
+        // onPress={onGoogleButtonPress}
       /> */}
       <HorizontalLine color="#E0E0E0" thickness={1} marginVertical={0} />
       <Button

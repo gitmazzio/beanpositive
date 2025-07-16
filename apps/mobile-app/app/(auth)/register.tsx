@@ -35,7 +35,7 @@ export default function Register() {
       await register(data.email, data.password, {
         firstName: data.firstName,
       });
-      Alert.alert("Success", "Registration successful!");
+      router.push("/email-verification");
     } catch (err: any) {
       setError("root", { message: err.message || "Registration failed" });
     }
