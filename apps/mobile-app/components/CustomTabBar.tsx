@@ -1,13 +1,14 @@
-import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import {
-  createBottomTabNavigator,
-  BottomTabBarProps,
-} from "@react-navigation/bottom-tabs";
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { usePocketContext } from "@/app/hooks/usePocketContext";
 import { FontAwesome6, Ionicons } from "@expo/vector-icons";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import {
+  BottomTabBarProps,
+  createBottomTabNavigator,
+} from "@react-navigation/bottom-tabs";
 import type { RouteProp } from "@react-navigation/native";
+import { router } from "expo-router";
+import React from "react";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import StyledText from "./commons/StyledText";
 import { BeanSimple } from "./svg/BeanSimple";
 
@@ -52,10 +53,35 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
   descriptors,
   navigation,
 }) => {
+  const { triggerMutation, isLoadingMutation } = usePocketContext();
+
+  console.log(
+    "LOG isLoadingMutation isLoadingMutation isLoadingMutation",
+    isLoadingMutation
+  );
+
   const handleCustomButtonPress = (): void => {
-    Alert.alert("Custom Button", "Hai premuto il bottone centrale!", [
-      { text: "OK", onPress: () => console.log("OK Pressed") },
-    ]);
+    // Se siamo nella schermata pocket, triggeriamo la mutation
+    if (state.index === 0) {
+      try {
+        triggerMutation();
+      } catch (error) {
+        console.log("pocketContext not available");
+        Alert.alert("Info", "Navigate to pocket to trigger mutations");
+      }
+    } else {
+      // Se non siamo in pocket, navighiamo prima lì
+      // navigation.navigate("pocket");
+      router.replace("/(tabs)");
+      setTimeout(() => {
+        // Piccolo delay per permettere la navigazione
+        try {
+          triggerMutation();
+        } catch (error) {
+          console.log("pocketContext not available after navigation");
+        }
+      }, 100);
+    }
   };
 
   const getIconName = (routeName: keyof RootTabParamList): IconName => {
@@ -69,8 +95,6 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
     }
   };
 
-  console.log("LOG", state.index);
-
   return (
     <View style={styles.tabBar}>
       {state.routes.map((route, index) => {
@@ -78,7 +102,7 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
         const label = options.tabBarLabel || route.name;
         const isFocused = state.index === index;
 
-        const isFocusedPocket = state.index === 0;
+        // const isFocusedPocket = state.index === 0;
 
         const onPress = (): void => {
           const event = navigation.emit({
@@ -110,10 +134,13 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
                 Aggiungi un fagiolo
               </StyledText>
               <TouchableOpacity
-                style={styles.customButton}
+                style={[
+                  styles.customButton,
+                  isLoadingMutation ? { backgroundColor: "#C9B3A4" } : null,
+                ]}
                 onPress={handleCustomButtonPress}
                 activeOpacity={0.8}
-                disabled={!isFocusedPocket}
+                disabled={isLoadingMutation}
               >
                 <View style={styles.customButtonInner}>
                   <BeanSimple />
