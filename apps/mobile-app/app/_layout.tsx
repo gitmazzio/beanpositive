@@ -113,18 +113,16 @@ function RootLayoutNav() {
       </View>
     );
   }
-  console.log("LOG showOnboarding", showOnboarding);
-  console.log("LOG user", user);
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Protected guard={user}>
-          <Stack.Screen name="(tabs)" />
-        </Stack.Protected>
         <Stack.Protected guard={!user}>
           {showOnboarding && <Stack.Screen name="onboarding" />}
           <Stack.Screen name="(auth)" />
+        </Stack.Protected>
+        <Stack.Protected guard={user}>
+          <Stack.Screen name="(tabs)" />
         </Stack.Protected>
       </Stack>
     </ThemeProvider>
