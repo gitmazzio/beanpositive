@@ -31,6 +31,7 @@ export default function RecoverPassword() {
     setError(null);
     try {
       await supabase.auth.resetPasswordForEmail(data.email);
+      router.push("/email-verification");
     } catch (err: any) {
       setError(err.message);
     }
@@ -71,7 +72,7 @@ export default function RecoverPassword() {
           ) : (
             <Button
               kind="primary"
-              title="Invia mail di recupero"
+              title="Invia email di recupero"
               onPress={handleSubmit(onSubmit)}
               disabled={isSubmitting || Object.keys(errors)?.length > 0}
             />

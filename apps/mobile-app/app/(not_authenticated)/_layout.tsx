@@ -17,6 +17,10 @@ export default function AuthLayout() {
         name="email-verification"
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="notification-request"
+        options={{ headerShown: false }}
+      />
     </Stack>
   );
 }

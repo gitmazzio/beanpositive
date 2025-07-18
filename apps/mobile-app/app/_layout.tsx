@@ -123,6 +123,14 @@ function RootLayoutNav() {
         </Stack.Protected>
         <Stack.Protected guard={user}>
           <Stack.Screen name="(tabs)" />
+          {/* Profile screen as a modal */}
+          <Stack.Screen
+            name="profile"
+            options={{
+              presentation: "modal",
+              title: "Profile", // Optional: modal header title
+            }}
+          />
         </Stack.Protected>
       </Stack>
     </ThemeProvider>

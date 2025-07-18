@@ -11,6 +11,7 @@ import {
   IT_ERROR_CODES,
   SupabaseErrorCode,
 } from "@/utils/supabase_error_codes";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -36,6 +37,18 @@ export default function Register() {
     setError(null);
     try {
       await login(data.email, data.password);
+
+      // check push notification first time
+
+      const notificationRequested = await AsyncStorage.getItem(
+        "notificationRequested"
+      );
+
+      console.log("LOG", notificationRequested);
+
+      if (!notificationRequested) {
+        return router.push("/notification-request");
+      }
     } catch (err: any) {
       console.log("LOG", err.code);
       setError(

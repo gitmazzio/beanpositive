@@ -6,11 +6,12 @@ import { PageView } from "@/components/Themed";
 import { useAuth } from "@/providers";
 import { useUserHitsByDay } from "@/queries/mutations/useUserHitsByDay";
 import { usePocketContext } from "../hooks/usePocketContext";
+import { Button } from "@/components/commons/Button";
 
 const { width, height } = Dimensions.get("window");
 
 export default function Homepage() {
-  const { user } = useAuth();
+  const { logout, user } = useAuth();
 
   const {
     rotationPrimaryAnim,

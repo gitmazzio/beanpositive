@@ -3,6 +3,7 @@ import StyledText from "../commons/StyledText";
 import Flex from "../commons/Flex";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useAuth } from "@/providers";
+import { router } from "expo-router";
 
 export const Header = () => {
   const { user } = useAuth();
@@ -35,7 +36,12 @@ export const Header = () => {
           Cosa ti ha reso felice oggi?
         </StyledText>
       </Flex>
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          router.push("/profile");
+        }}
+      >
         <FontAwesome6 name="user" size={20} color="#C7682F" solid />
       </TouchableOpacity>
     </Flex>

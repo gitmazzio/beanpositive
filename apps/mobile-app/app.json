@@ -11,7 +11,16 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.beanpositive.app",
-      "googleServicesFile": "./services/GoogleService-Info.plist"
+      "googleServicesFile": "./services/GoogleService-Info.plist",
+      "infoPlist": {
+        "UIBackgroundModes": ["remote-notification"]
+      },
+      "entitlements": {
+        "aps-environment": "development",
+        "com.apple.security.application-groups": [
+          "group.${ios.bundleIdentifier}.onesignal"
+        ]
+      }
     },
     "android": {
       "googleServicesFile": "./services/google-services.json",
@@ -24,6 +33,12 @@
     },
     "plugins": [
       [
+        "onesignal-expo-plugin",
+        {
+          "mode": "development"
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#7D8557",
@@ -33,7 +48,9 @@
         }
       ],
       ["expo-router"],
-      ["@react-native-google-signin/google-signin"]
+      ["@react-native-google-signin/google-signin"],
+      "expo-notifications",
+      "onesignal-expo-plugin"
     ],
     "experiments": {
       "typedRoutes": true

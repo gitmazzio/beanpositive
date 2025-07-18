@@ -1,13 +1,11 @@
 import { Button } from "@/components/commons/Button";
 import Flex from "@/components/commons/Flex";
-import { Header } from "@/components/commons/Header";
 import StyledText from "@/components/commons/StyledText";
 import { PageView } from "@/components/Themed";
 import { router } from "expo-router";
-import { Dimensions, Image, View } from "react-native";
-// ...other imports...
+import { Dimensions, Image } from "react-native";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 export default function EmailVerification() {
   return (
@@ -28,7 +26,7 @@ export default function EmailVerification() {
               alignSelf: "center",
             }}
           />
-          <StyledText kind="h1">Recupera la password</StyledText>
+          <StyledText kind="h1">Controlla la posta</StyledText>
           <StyledText kind="body">
             Abbiamo inviato un'email all'indirizzo che hai fornito. Per
             completare la registrazione, apri la tua casella di posta e clicca
@@ -46,7 +44,6 @@ export default function EmailVerification() {
           }}
         />
       </Flex>
-      {/* ...existing code... */}
     </PageView>
   );
 }
