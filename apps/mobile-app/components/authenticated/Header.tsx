@@ -10,7 +10,6 @@ export const Header = () => {
 
   const { user_metadata: metadata } = user as any;
 
-  console.log("LOG", user);
   return (
     <Flex style={{ height: 48 }} align="center" justify="space-between">
       <TouchableOpacity style={styles.button} hitSlop={10}>

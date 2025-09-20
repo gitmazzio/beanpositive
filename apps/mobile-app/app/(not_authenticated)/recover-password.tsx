@@ -53,7 +53,7 @@ export default function RecoverPassword() {
           <StyledText kind="h1">Recupera la password</StyledText>
           <StyledText kind="body">
             Invieremo una password temporanea al tuo indirizzo email. Potrai
-            cambiarla una volta effettuato l’accesso.
+            cambiarla una volta effettuato l'accesso.
           </StyledText>
 
           <TextInput

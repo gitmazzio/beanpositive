@@ -71,7 +71,7 @@ export default function RootLayout() {
     setShowSplash(false);
   }, []);
 
-  console.log("LOG", process.env.ONE_SIGNAL_APP_ID);
+  console.log("LOG ONE_SIGNAL_APP_ID", process.env.ONE_SIGNAL_APP_ID);
 
   useEffect(() => {
     // Enable verbose logging for debugging (remove in production)
@@ -118,7 +118,7 @@ function RootLayoutNav() {
     })();
   }, []);
 
-  if (loading || showOnboarding == null) {
+  if (/* loading || */ showOnboarding == null) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text>Loading...</Text>

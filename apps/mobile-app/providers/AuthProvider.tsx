@@ -20,6 +20,7 @@ interface AuthContextProps {
       firstName?: string;
     }
   ) => Promise<void>;
+  setAuthIsLoading: (loading: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -49,19 +50,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const login = async (email: string, password: string) => {
     // setLoading(true);
 
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) throw error;
-
-    // console.log("LOG", session);
-    // TODO CHECK
-    // if (!session) throw "Please check your inbox for email verification!";
   };
 
   const logout = async () => {
@@ -79,21 +73,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   ) => {
     setLoading(true);
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data, // Add any custom fields here
       },
     });
-    setLoading(false);
+
     if (error) throw error;
-    // if (!session)
-    //   Alert.alert("Please check your inbox for email verification!");
-    setLoading(false);
   };
 
   const value = useMemo(
@@ -103,6 +91,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       login,
       logout,
       register,
+      setAuthIsLoading: setLoading,
     }),
     [user, loading]
   );

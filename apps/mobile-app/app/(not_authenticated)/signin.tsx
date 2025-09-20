@@ -45,18 +45,17 @@ export default function Register() {
 
       // check push notification first time
 
-      const notificationRequested = await AsyncStorage.getItem(
-        "notificationRequested"
-      );
+      // const notificationRequested = await AsyncStorage.getItem(
+      //   "notificationRequested"
+      // );
 
-      console.log("LOG", notificationRequested);
+      // console.log("LOG notification requested", notificationRequested);
 
       // if (!notificationRequested) {
       //   return router.push("/notification-request");
       // }
       return router.push("/(authenticated)/(tabs)");
     } catch (err: any) {
-      console.log("LOG", err.code);
       setError(
         IT_ERROR_CODES[err.code as SupabaseErrorCode] ??
           IT_ERROR_CODES["conflict"]

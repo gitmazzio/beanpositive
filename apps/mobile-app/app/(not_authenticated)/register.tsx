@@ -8,12 +8,13 @@ import StyledText from "@/components/commons/StyledText";
 import TextInput from "@/components/commons/TextInput";
 import { PageView } from "@/components/Themed";
 import { useAuth } from "@/providers";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { FormProvider, useForm } from "react-hook-form";
-import { Alert, ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 
 export default function Register() {
-  const { loading, register } = useAuth();
+  const router = useRouter();
+  const { loading, register, setAuthIsLoading } = useAuth();
 
   const methods = useForm({
     defaultValues: {
@@ -32,12 +33,21 @@ export default function Register() {
 
   const onSubmit = async (data: any) => {
     try {
+      setAuthIsLoading(true);
       await register(data.email, data.password, {
         firstName: data.firstName,
       });
-      router.push("/email-verification");
+
+      router.push("/(not_authenticated)/email-verification");
     } catch (err: any) {
       setError("root", { message: err.message || "Registration failed" });
+      // TODO show error message and not navigate user away or show a modal
+      //  setError(
+      //         IT_ERROR_CODES[err.code as SupabaseErrorCode] ??
+      //           IT_ERROR_CODES["conflict"]
+      //       );
+    } finally {
+      setAuthIsLoading(false);
     }
   };
 
