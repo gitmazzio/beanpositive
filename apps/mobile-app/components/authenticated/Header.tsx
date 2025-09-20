@@ -13,7 +13,7 @@ export const Header = () => {
   console.log("LOG", user);
   return (
     <Flex style={{ height: 48 }} align="center" justify="space-between">
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} hitSlop={10}>
         <FontAwesome6 name="hand-holding-heart" size={20} color="#C7682F" />
       </TouchableOpacity>
       <Flex direction="column">
@@ -39,8 +39,9 @@ export const Header = () => {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          router.push("/profile");
+          router.push("/(authenticated)/(profile)");
         }}
+        hitSlop={10}
       >
         <FontAwesome6 name="user" size={20} color="#C7682F" solid />
       </TouchableOpacity>

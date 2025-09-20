@@ -13,7 +13,9 @@
       "bundleIdentifier": "com.beanpositive.app",
       "googleServicesFile": "./services/GoogleService-Info.plist",
       "infoPlist": {
-        "UIBackgroundModes": ["remote-notification"]
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
       },
       "entitlements": {
         "aps-environment": "development",
@@ -33,12 +35,6 @@
     },
     "plugins": [
       [
-        "onesignal-expo-plugin",
-        {
-          "mode": "development"
-        }
-      ],
-      [
         "expo-splash-screen",
         {
           "backgroundColor": "#7D8557",
@@ -47,10 +43,19 @@
           "resizeMode": "contain"
         }
       ],
-      ["expo-router"],
-      ["@react-native-google-signin/google-signin"],
+      [
+        "expo-router"
+      ],
+      [
+        "@react-native-google-signin/google-signin"
+      ],
       "expo-notifications",
-      "onesignal-expo-plugin"
+      [
+        "onesignal-expo-plugin",
+        {
+          "mode": "development"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -58,9 +63,26 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "982295ab-9358-400a-b50f-9dfbdb8e2ae8"
+        "build": {
+          "experimental": {
+            "ios": {
+              "appExtensions": [
+                {
+                  "targetName": "OneSignalNotificationServiceExtension",
+                  "bundleIdentifier": "com.beanpositive.app.OneSignalNotificationServiceExtension",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.com.beanpositive.app.onesignal"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "projectId": "1af51eee-428c-48c1-b9ed-216ad4a46d9c"
       }
     },
-    "owner": "teomazzio"
+    "owner": "beanpositive.app"
   }
 }

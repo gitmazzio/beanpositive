@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "04554c55-7852-43b5-a8ef-1ce9e3efa9cf"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.beanpositive.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    }
+  }
+}

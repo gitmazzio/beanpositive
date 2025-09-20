@@ -21,9 +21,9 @@ export const Header = ({
       <View style={styles.headerButton}>
         {withBack ? (
           <Button
-            kind="tertiary"
+            kind="back"
             prefixIcon={
-              <FontAwesome6 name="arrow-left" size={20} color={"#686260"} />
+              <FontAwesome6 name="arrow-left" size={20} color={"#4D5437"} />
             }
             onPress={onPressBack!}
           />

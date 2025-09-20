@@ -15,7 +15,7 @@ export default function Login() {
   const handleLogin = async () => {
     setError("");
     try {
-      router.push("/(auth)/register");
+      router.push("(not_authenticated)/register");
     } catch (err: any) {
       setError(err.message || "Login failed");
       Alert.alert("Login Error", err.message || "Login failed");
@@ -56,7 +56,7 @@ export default function Login() {
       />
       <Flex gap={4} align="center">
         <StyledText kind="body">Hai già un account?</StyledText>
-        <Link to={"/(auth)/signin"}>Accedi subito</Link>
+        <Link to={"/(not_authenticated)/signin"}>Accedi subito</Link>
       </Flex>
 
       {/* 

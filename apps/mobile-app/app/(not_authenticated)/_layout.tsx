@@ -1,8 +1,6 @@
-import React from "react";
 import { Stack } from "expo-router";
-import { AuthProvider } from "@/providers";
 
-export default function AuthLayout() {
+export default function NotAuthenticatedLayout() {
   return (
     <Stack
       screenOptions={{
@@ -15,10 +13,6 @@ export default function AuthLayout() {
       <Stack.Screen name="recover-password" options={{ headerShown: false }} />
       <Stack.Screen
         name="email-verification"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="notification-request"
         options={{ headerShown: false }}
       />
     </Stack>

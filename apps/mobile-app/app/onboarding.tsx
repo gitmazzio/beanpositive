@@ -85,20 +85,20 @@ export default function OnboardingScreen({ onFinish }) {
       setCurrentStep(currentStep + 1);
     } else {
       // Navigate to main app
-      router.push("/(auth)/login"); // Replace with your target route
+      router.push("/(not_authenticated)/login"); // Replace with your target route
       handleOnboardingFinish?.();
     }
   };
 
   const handleSkip = () => {
     // Skip to main app
-    router.push("/(auth)/login"); // Replace with your target route
+    router.push("/(not_authenticated)/login"); // Replace with your target route
     handleOnboardingFinish?.();
   };
 
   const handleLogin = () => {
     // Navigate to login screen
-    router.push("/(auth)/signin"); // Replace with your login route
+    router.push("/(not_authenticated)/signin"); // Replace with your login route
     handleOnboardingFinish?.();
   };
 

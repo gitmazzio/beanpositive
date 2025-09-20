@@ -3,7 +3,7 @@ import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
 import { type BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Tabs } from "expo-router";
-import { PocketProvider } from "../contexts/PocketContext";
+import { PocketProvider } from "../../contexts/PocketContext";
 import Toast from "react-native-toast-message";
 import { View } from "react-native";
 import { toastConfig } from "@/utils/toastConfig";

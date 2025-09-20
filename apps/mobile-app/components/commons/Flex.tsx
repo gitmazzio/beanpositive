@@ -1,7 +1,7 @@
 import React from "react";
 import { View, ViewProps, StyleSheet, ViewStyle } from "react-native";
 
-interface FlexProps extends ViewProps {
+export interface FlexProps extends ViewProps {
   direction?: "row" | "column";
   align?: "flex-start" | "flex-end" | "center" | "stretch" | "baseline";
   justify?:

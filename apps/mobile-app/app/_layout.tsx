@@ -15,9 +15,9 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useState } from "react";
 import { Text, View } from "react-native";
+import { LogLevel, OneSignal } from "react-native-onesignal";
 import "react-native-reanimated";
 import CustomSplashScreen from "../components/CustomSplashScreen";
-import OnboardingScreen from "./onboarding";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -71,6 +71,18 @@ export default function RootLayout() {
     setShowSplash(false);
   }, []);
 
+  console.log("LOG", process.env.ONE_SIGNAL_APP_ID);
+
+  useEffect(() => {
+    // Enable verbose logging for debugging (remove in production)
+    OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+    // Initialize with your OneSignal App ID
+    OneSignal.initialize(process.env.ONE_SIGNAL_APP_ID as string);
+    // Use this method to prompt for push notifications.
+    // We recommend removing this method after testing and instead use In-App Messages to prompt for notification permission.
+    // OneSignal.Notifications.requestPermission(false);
+  }, []); // Ensure this only runs once on app mount
+
   // Don't render anything until fonts are loaded
   if (!loaded || !appReady) {
     return null;
@@ -119,18 +131,10 @@ function RootLayoutNav() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Protected guard={!user}>
           {showOnboarding && <Stack.Screen name="onboarding" />}
-          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(not_authenticated)" />
         </Stack.Protected>
         <Stack.Protected guard={user}>
-          <Stack.Screen name="(tabs)" />
-          {/* Profile screen as a modal */}
-          <Stack.Screen
-            name="profile"
-            options={{
-              presentation: "modal",
-              title: "Profile", // Optional: modal header title
-            }}
-          />
+          <Stack.Screen name="(authenticated)" />
         </Stack.Protected>
       </Stack>
     </ThemeProvider>

@@ -18,6 +18,11 @@ import { FormProvider, useForm } from "react-hook-form";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet } from "react-native";
 
 export default function Register() {
+  // GoogleSignin.configure({
+  //   scopes: ["https://www.googleapis.com/auth/drive.readonly"],
+  //   webClientId: "YOUR CLIENT ID FROM GOOGLE CONSOLE",
+  // });
+
   const { loading, login } = useAuth();
   const [error, setError] = useState<string | null>(null);
 
@@ -46,9 +51,10 @@ export default function Register() {
 
       console.log("LOG", notificationRequested);
 
-      if (!notificationRequested) {
-        return router.push("/notification-request");
-      }
+      // if (!notificationRequested) {
+      //   return router.push("/notification-request");
+      // }
+      return router.push("/(authenticated)/(tabs)");
     } catch (err: any) {
       console.log("LOG", err.code);
       setError(

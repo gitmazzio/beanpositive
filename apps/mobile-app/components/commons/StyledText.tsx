@@ -11,7 +11,8 @@ type TextKind =
   | "caption"
   | "button"
   | "overline"
-  | "subtitle";
+  | "subtitle"
+  | "headline";
 
 interface StyledTextProps extends TextProps {
   kind: TextKind;
@@ -109,6 +110,13 @@ const styles = StyleSheet.create({
     color: "#8a8a8a",
     textTransform: "uppercase",
     letterSpacing: 1.2,
+  },
+  headline: {
+    fontFamily: "Figtree-Medium",
+    fontSize: 14,
+    lineHeight: 16,
+    fontWeight: "700",
+    color: "#3F4430",
   },
 });
 

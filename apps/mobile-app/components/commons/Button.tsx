@@ -6,7 +6,7 @@ type ButtonProps = {
   title?: string;
   style?: any;
   disabled?: boolean;
-  kind?: "primary" | "secondary" | "tertiary";
+  kind?: "primary" | "secondary" | "tertiary" | "back";
   prefixIcon?: React.ReactNode;
   suffixIcon?: React.ReactNode;
 };
@@ -26,6 +26,9 @@ export const Button = ({
   if (kind === "tertiary") {
     textStyle = styles.tertiaryText;
     buttonStyle = styles.tertiary;
+  }
+  if (kind === "back") {
+    buttonStyle = styles.back;
   }
 
   return (
@@ -92,6 +95,10 @@ const styles = StyleSheet.create({
   tertiaryText: {
     color: "#3A1A10",
   },
+  back: {
+    backgroundColor: "#D4D7BF",
+  },
+  backText: {},
   disabled: {
     backgroundColor: "#C9B3A4",
     borderColor: "#C9B3A4",
