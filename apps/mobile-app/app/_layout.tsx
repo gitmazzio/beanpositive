@@ -18,6 +18,26 @@ import { Text, View } from "react-native";
 // import { LogLevel, OneSignal } from "react-native-onesignal";
 import "react-native-reanimated";
 import CustomSplashScreen from "../components/CustomSplashScreen";
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({
+  dsn: 'https://27e0c8442f1348d52a2bd69d80654f8a@o4510058376200192.ingest.de.sentry.io/4510058382622800',
+
+  // Adds more context data to events (IP address, cookies, user, etc.)
+  // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
+  sendDefaultPii: true,
+
+  // Enable Logs
+  enableLogs: true,
+
+  // Configure Session Replay
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1,
+  integrations: [Sentry.mobileReplayIntegration()],
+
+  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
+  // spotlight: __DEV__,
+});
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -33,7 +53,7 @@ SplashScreen.setOptions({
 
 const queryClient = new QueryClient();
 
-export default function RootLayout() {
+export default Sentry.wrap(function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     DynaPuff: require("../assets/fonts/DynaPuff.ttf"),
@@ -104,7 +124,7 @@ export default function RootLayout() {
       </QueryClientProvider>
     </AppSafeAreaView>
   );
-}
+});
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
