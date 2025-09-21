@@ -1,26 +1,23 @@
 {
   "expo": {
     "name": "Bean Positive",
-    "slug": "bean-positive",
+    "slug": "beanpositive",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/adaptive.png",
     "scheme": "mobileapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "jsEngine": "jsc",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.beanpositive.app",
       "googleServicesFile": "./services/GoogleService-Info.plist",
       "infoPlist": {
-        "UIBackgroundModes": ["remote-notification"],
         "ITSAppUsesNonExemptEncryption": false
       },
       "entitlements": {
-        "aps-environment": "production",
-        "com.apple.security.application-groups": [
-          "group.com.beanpositive.app.onesignal"
-        ]
+        "aps-environment": "production"
       }
     },
     "android": {
@@ -42,42 +39,19 @@
           "resizeMode": "contain"
         }
       ],
-      ["expo-router"],
-      ["@react-native-google-signin/google-signin"],
-      "expo-notifications",
       [
-        "onesignal-expo-plugin",
-        {
-          "mode": "production"
-        }
-      ]
+        "expo-router"
+      ],
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
-      "router": {},
-      "oneSignalAppId": "a358bd1f-d20a-4d49-8e8c-0672d7434cb2",
       "eas": {
-        "build": {
-          "experimental": {
-            "ios": {
-              "appExtensions": [
-                {
-                  "targetName": "OneSignalNotificationServiceExtension",
-                  "bundleIdentifier": "com.beanpositive.app.OneSignalNotificationServiceExtension",
-                  "entitlements": {
-                    "com.apple.security.application-groups": [
-                      "group.com.beanpositive.app.onesignal"
-                    ]
-                  }
-                }
-              ]
-            }
-          }
-        },
-        "projectId": "1af51eee-428c-48c1-b9ed-216ad4a46d9c"
-      }
+        "projectId": "04554c55-7852-43b5-a8ef-1ce9e3efa9cf"
+      },
+      "router": {}
     },
     "owner": "beanpositive.app"
   }

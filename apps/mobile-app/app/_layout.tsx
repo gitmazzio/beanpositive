@@ -15,7 +15,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useState } from "react";
 import { Text, View } from "react-native";
-import { LogLevel, OneSignal } from "react-native-onesignal";
+// import { LogLevel, OneSignal } from "react-native-onesignal";
 import "react-native-reanimated";
 import CustomSplashScreen from "../components/CustomSplashScreen";
 
@@ -71,17 +71,17 @@ export default function RootLayout() {
     setShowSplash(false);
   }, []);
 
-  console.log("LOG ONE_SIGNAL_APP_ID", process.env.ONE_SIGNAL_APP_ID);
+  // console.log("LOG ONE_SIGNAL_APP_ID", process.env.ONE_SIGNAL_APP_ID);
 
-  useEffect(() => {
-    // Enable verbose logging for debugging (remove in production)
-    OneSignal.Debug.setLogLevel(LogLevel.Verbose);
-    // Initialize with your OneSignal App ID
-    OneSignal.initialize(process.env.ONE_SIGNAL_APP_ID as string);
-    // Use this method to prompt for push notifications.
-    // We recommend removing this method after testing and instead use In-App Messages to prompt for notification permission.
-    // OneSignal.Notifications.requestPermission(false);
-  }, []); // Ensure this only runs once on app mount
+  // useEffect(() => {
+  //   // Enable verbose logging for debugging (remove in production)
+  //   OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+  //   // Initialize with your OneSignal App ID
+  //   OneSignal.initialize(process.env.ONE_SIGNAL_APP_ID as string);
+  //   // Use this method to prompt for push notifications.
+  //   // We recommend removing this method after testing and instead use In-App Messages to prompt for notification permission.
+  //   // OneSignal.Notifications.requestPermission(false);
+  // }, []); // Ensure this only runs once on app mount
 
   // Don't render anything until fonts are loaded
   if (!loaded || !appReady) {
