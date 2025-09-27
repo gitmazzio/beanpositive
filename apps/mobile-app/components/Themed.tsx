@@ -12,6 +12,7 @@ import {
 
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "./useColorScheme";
+import { useDeviceType } from "@/app/hooks/useDeviceType";
 
 type ThemeProps = {
   lightColor?: string;
@@ -53,12 +54,18 @@ export const PageView = (props: ViewProps) => {
     { light: lightColor, dark: darkColor },
     "background"
   );
+  const { isIPhoneSE } = useDeviceType();
 
   return (
     <>
       <StatusBar barStyle={"dark-content"} backgroundColor={"#FEF5E6"} />
       <DefaultView
-        style={[styles.container, { backgroundColor }, style]}
+        style={[
+          styles.container,
+          { backgroundColor },
+          isIPhoneSE ? { paddingBottom: 20, paddingTop: 20 } : null,
+          style,
+        ]}
         {...otherProps}
       />
     </>

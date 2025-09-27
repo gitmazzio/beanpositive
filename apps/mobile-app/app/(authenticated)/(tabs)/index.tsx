@@ -6,7 +6,7 @@ import { PageView } from "@/components/Themed";
 import { useAuth } from "@/providers";
 import { useUserHitsByDay } from "@/queries/mutations/useUserHitsByDay";
 import { usePocketContext } from "../../hooks/usePocketContext";
-import { Button } from "@/components/commons/Button";
+import { useDeviceType } from "@/app/hooks/useDeviceType";
 
 const { width, height } = Dimensions.get("window");
 
@@ -26,9 +26,14 @@ export default function Homepage() {
     opacityBean,
   } = usePocketContext();
 
+  const { isIPhoneSE } = useDeviceType();
+  console.log("LOG", width, isIPhoneSE);
+
   // const [hits, setHits] = useState(0);
   const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
-  const { data: hits, error } = useUserHitsByDay(user?.id, today);
+  const { data: hits } = useUserHitsByDay(user?.id, today);
+
+  const pocketScale = isIPhoneSE ? 0.8 : 1;
 
   return (
     <PageView style={styles.container}>
@@ -41,7 +46,7 @@ export default function Homepage() {
           opacity={opacityBean}
         />
         <Pocket
-          scale={0.8}
+          scale={pocketScale}
           animatedRotation={rotationPrimaryAnim}
           animatedScale={scalePrimaryAnim}
           animatedMove={movePrimaryAnim}
@@ -53,7 +58,7 @@ export default function Homepage() {
           hintNumber={hits?.length || 0}
         />
         <Pocket
-          scale={0.7}
+          scale={pocketScale - 0.1}
           animatedRotation={rotationSecondaryAnim}
           animatedScale={scaleSecondaryAnim}
           animatedMove={moveSecondaryAnim}
@@ -80,9 +85,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   pocketContainer: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 50,
   },
   title: {
     fontSize: 20,

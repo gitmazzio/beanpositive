@@ -18,7 +18,8 @@
       },
       "entitlements": {
         "aps-environment": "production"
-      }
+      },
+      "buildNumber": "5"
     },
     "android": {
       "googleServicesFile": "./services/google-services.json",

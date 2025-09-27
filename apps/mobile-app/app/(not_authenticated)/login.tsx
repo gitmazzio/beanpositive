@@ -15,15 +15,14 @@ export default function Login() {
   const handleLogin = async () => {
     setError("");
     try {
-      router.push("(not_authenticated)/register");
+      router.push("/(not_authenticated)/register");
     } catch (err: any) {
       setError(err.message || "Login failed");
-      Alert.alert("Login Error", err.message || "Login failed");
     }
   };
 
   return (
-    <PageView style={{ gap: 20 }}>
+    <PageView style={{ gap: 20, paddingTop: 100 }}>
       <Image
         source={require("./../../assets/images/login_bean.png")}
         style={{ width: 125, height: 125, alignSelf: "center" }}

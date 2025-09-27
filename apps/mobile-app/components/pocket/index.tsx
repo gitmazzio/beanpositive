@@ -1,8 +1,9 @@
-import { Animated, StyleSheet, Text, type ViewStyle } from "react-native";
+import { Animated, StyleSheet, Text, View, type ViewStyle } from "react-native";
 import Svg, { Path } from "react-native-svg";
-import { outputRotation, outputScale, outputTranslateY } from "./animations";
-import { AnimatedNumber } from "./animatedNumber";
 import StyledText from "../commons/StyledText";
+import { AnimatedNumber } from "./animatedNumber";
+import { outputRotation, outputScale, outputTranslateY } from "./animations";
+import BeansMapGeneration from "./BeansMapGeneration";
 
 type Props = {
   width?: number;
@@ -68,7 +69,7 @@ export const Pocket = ({
   `;
 
   // Dashed border path (slightly inset from the original shape)
-  const borderInset = 15 * scale;
+  const borderInset = 25 * scale;
   const borderPath = `
     M ${157.531 * scale} ${(333.811 - borderInset) * scale}
     L ${(277.565 - borderInset) * scale} ${(270.608 - borderInset / 2) * scale}
@@ -140,11 +141,13 @@ export const Pocket = ({
           d={borderPath}
           fill="none"
           stroke={borderColor}
-          strokeWidth={2 * scale}
-          strokeDasharray={`${8 * scale},${4 * scale}`}
+          strokeWidth={3 * scale}
+          strokeDasharray={`${15 * scale},${15 * scale}`}
           transform={`translate(0, ${tabHeight})`}
         />
       </Svg>
+
+      <BeansMapGeneration hints={hintNumber} />
 
       {/* Tab text */}
       <StyledText

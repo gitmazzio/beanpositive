@@ -18,10 +18,11 @@ import { Text, View } from "react-native";
 // import { LogLevel, OneSignal } from "react-native-onesignal";
 import "react-native-reanimated";
 import CustomSplashScreen from "../components/CustomSplashScreen";
-import * as Sentry from '@sentry/react-native';
+import * as Sentry from "@sentry/react-native";
 
 Sentry.init({
-  dsn: 'https://27e0c8442f1348d52a2bd69d80654f8a@o4510058376200192.ingest.de.sentry.io/4510058382622800',
+  enabled: process.env.NODE_ENV === "production",
+  dsn: "https://27e0c8442f1348d52a2bd69d80654f8a@o4510058376200192.ingest.de.sentry.io/4510058382622800",
 
   // Adds more context data to events (IP address, cookies, user, etc.)
   // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
@@ -109,7 +110,7 @@ export default Sentry.wrap(function RootLayout() {
   }
 
   return (
-    <AppSafeAreaView>
+    <AppSafeAreaView isSplashShowing={showSplash}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           {showSplash && <CustomSplashScreen onFinish={handleSplashFinish} />}
@@ -128,7 +129,7 @@ export default Sentry.wrap(function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
 
   useEffect(() => {

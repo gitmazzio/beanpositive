@@ -16,6 +16,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useDeviceType } from "./hooks/useDeviceType";
 
 const { width, height } = Dimensions.get("window");
 
@@ -51,8 +52,6 @@ const onboardingData = [
 ];
 
 export default function OnboardingScreen({ onFinish }) {
-  console.log("LOG onFinish", onFinish);
-
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -106,9 +105,7 @@ export default function OnboardingScreen({ onFinish }) {
   const isLastStep = currentStep === onboardingData.length - 1;
 
   return (
-    <PageView>
-      {/* Header with skip button */}
-
+    <PageView style={isIPhoneSE ? { paddingBottom: 20, paddingTop: 20 } : null}>
       <Header
         withBack={currentStep > 0}
         onPressBack={handleBack}

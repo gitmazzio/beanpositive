@@ -15,23 +15,25 @@ const safeAreaPaddingTop =
   Platform.OS === "android" ? StatusBar.currentHeight : 0;
 
 type Attrs = {
+  isSplashShowing?: boolean;
+  isOnboarding?: boolean;
   flex?: 0 | 1;
   children?: ReactNode;
   insets?: { bottom: number; top: number };
 };
 
 export const AppSafeAreaView: React.FC<Attrs> = ({
+  isSplashShowing,
+  isOnboarding = false,
   flex = 1,
   children,
   ...props
 }) => {
-  const insets = useSafeAreaInsets();
-
   return (
     <SafeAreaView
       style={{
         flex,
-        backgroundColor: "#FEF5E6",
+        backgroundColor: isSplashShowing ? "#7D8557" : "#FEF5E6",
       }}
     >
       <KeyboardAvoidingView
@@ -42,8 +44,6 @@ export const AppSafeAreaView: React.FC<Attrs> = ({
           <View
             style={{
               flex: 1,
-              paddingBottom: insets.bottom === 0 ? 20 : insets.bottom,
-              paddingTop: insets.top === 0 ? 12 : insets.top,
             }}
           >
             {children}

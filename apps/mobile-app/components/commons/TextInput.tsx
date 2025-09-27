@@ -19,6 +19,7 @@ export interface TextInputProps extends RNTextInputProps {
   rules?: object;
   rightIcon?: ReactNode;
   hintText?: string;
+  disabled?: boolean;
 }
 
 export default function TextInput({
@@ -29,6 +30,7 @@ export default function TextInput({
   rules,
   rightIcon,
   hintText,
+  disabled = false,
   ...props
 }: TextInputProps) {
   const [isFocused, setIsFocused] = useState(false);
@@ -62,6 +64,7 @@ export default function TextInput({
                   isFocused ? styles.inputFocused : null,
                   value ? styles.inputValue : null,
                   error ? styles.inputError : null,
+                  disabled ? styles.inputDisabled : null,
                   style,
                 ]}
                 placeholderTextColor="#A0A0A0"
@@ -72,7 +75,8 @@ export default function TextInput({
                   onBlur?.();
                 }}
                 onFocus={() => setIsFocused(true)}
-                selectionColor="#4D8BF7" // Custom caret and selection color
+                selectionColor="#4D8BF7"
+                editable={!disabled}
                 {...props}
               />
               {rightIcon != null && (
@@ -108,6 +112,7 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     backgroundColor: "#fff",
+    fontFamily: "System",
   },
   inputValue: {
     color: "#1C1C1C",
@@ -135,5 +140,10 @@ const styles = StyleSheet.create({
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
+  },
+  inputDisabled: {
+    backgroundColor: "#F2F2F2",
+    color: "#A0A0A0",
+    borderColor: "#E0E0E0",
   },
 });

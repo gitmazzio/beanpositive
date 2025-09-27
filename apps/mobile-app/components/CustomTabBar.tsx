@@ -55,11 +55,6 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
 }) => {
   const { triggerMutation, isLoadingMutation } = usePocketContext();
 
-  console.log(
-    "LOG isLoadingMutation isLoadingMutation isLoadingMutation",
-    isLoadingMutation
-  );
-
   const handleCustomButtonPress = (): void => {
     // Se siamo nella schermata pocket, triggeriamo la mutation
     if (state.index === 0) {
@@ -72,7 +67,7 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
     } else {
       // Se non siamo in pocket, navighiamo prima lì
       // navigation.navigate("pocket");
-      router.replace("/(tabs)");
+      router.replace("/");
       setTimeout(() => {
         // Piccolo delay per permettere la navigazione
         try {
@@ -96,131 +91,116 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
   };
 
   return (
-    <View style={styles.tabBar}>
-      {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
-        const label = options.tabBarLabel || route.name;
-        const isFocused = state.index === index;
+    <View style={{ backgroundColor: "#FEF5E6" }}>
+      <View style={styles.tabBar}>
+        {state.routes.map((route, index) => {
+          const { options } = descriptors[route.key];
+          const label = options.tabBarLabel || route.name;
+          const isFocused = state.index === index;
 
-        // const isFocusedPocket = state.index === 0;
+          // const isFocusedPocket = state.index === 0;
 
-        const onPress = (): void => {
-          const event = navigation.emit({
-            type: "tabPress",
-            target: route.key,
-            canPreventDefault: true,
-          });
+          const onPress = (): void => {
+            const event = navigation.emit({
+              type: "tabPress",
+              target: route.key,
+              canPreventDefault: true,
+            });
 
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
+
+          // Custom button centrale
+          if (index === 1) {
+            return (
+              <View style={styles.tabBarSection} key="custom">
+                <StyledText
+                  kind="body"
+                  style={{
+                    position: "absolute",
+                    top: -70,
+                    fontWeight: 600,
+                    color: "#C7682F",
+                    width: 300,
+                  }}
+                  textAlign="center"
+                >
+                  Aggiungi un fagiolo
+                </StyledText>
+                <TouchableOpacity
+                  style={[
+                    styles.customButton,
+                    isLoadingMutation ? { backgroundColor: "#C9B3A4" } : null,
+                  ]}
+                  onPress={handleCustomButtonPress}
+                  activeOpacity={0.8}
+                  disabled={isLoadingMutation}
+                >
+                  <View style={styles.customButtonInner}>
+                    <BeanSimple />
+                  </View>
+                </TouchableOpacity>
+              </View>
+            );
           }
-        };
 
-        // Custom button centrale
-        if (index === 1) {
           return (
-            <View style={styles.tabBarSection} key="custom">
+            <TouchableOpacity
+              key={index}
+              onPress={onPress}
+              style={styles.tabBarItem}
+              activeOpacity={0.7}
+            >
+              <FontAwesome6
+                name="house"
+                size={20}
+                color={!isFocused ? "#636B45" : "#383C2B"}
+              />
+
               <StyledText
                 kind="body"
-                style={{
-                  position: "absolute",
-                  top: -70,
-                  fontWeight: 600,
-                  color: "#C7682F",
-                  width: 300,
-                }}
-                textAlign="center"
-              >
-                Aggiungi un fagiolo
-              </StyledText>
-              <TouchableOpacity
                 style={[
-                  styles.customButton,
-                  isLoadingMutation ? { backgroundColor: "#C9B3A4" } : null,
+                  styles.tabBarLabel,
+                  { color: !isFocused ? "#636B45" : "#383C2B" },
+                  { fontWeight: isFocused ? "700" : "400" },
                 ]}
-                onPress={handleCustomButtonPress}
-                activeOpacity={0.8}
-                disabled={isLoadingMutation}
               >
-                <View style={styles.customButtonInner}>
-                  <BeanSimple />
-                </View>
-              </TouchableOpacity>
-            </View>
+                {typeof label === "string" ? label : route.name}
+              </StyledText>
+            </TouchableOpacity>
           );
-        }
+        })}
 
-        return (
-          <TouchableOpacity
-            key={index}
-            onPress={onPress}
-            style={styles.tabBarItem}
-            activeOpacity={0.7}
-          >
-            <FontAwesome6
-              name="house"
-              size={20}
-              color={!isFocused ? "#636B45" : "#383C2B"}
-            />
-
-            <StyledText
-              kind="body"
-              style={[
-                styles.tabBarLabel,
-                { color: !isFocused ? "#636B45" : "#383C2B" },
-                { fontWeight: isFocused ? "700" : "400" },
-              ]}
-            >
-              {typeof label === "string" ? label : route.name}
-            </StyledText>
-          </TouchableOpacity>
-        );
-      })}
-
-      {/* Terzo tab per bilanciare il layout */}
-      <TouchableOpacity
-        onPress={() => navigation.navigate("diary")}
-        style={styles.tabBarItem}
-        activeOpacity={0.7}
-      >
-        <FontAwesome6
-          name="book-bookmark"
-          size={20}
-          color={state.index !== 1 ? "#636B45" : "#383C2B"}
-        />
-        <StyledText
-          kind="body"
-          style={[
-            styles.tabBarLabel,
-            { color: state.index !== 1 ? "#636B45" : "#383C2B" },
-            { fontWeight: state.index === 1 ? "700" : "400" },
-          ]}
+        {/* Terzo tab per bilanciare il layout */}
+        <TouchableOpacity
+          onPress={() => navigation.navigate("diary")}
+          style={styles.tabBarItem}
+          activeOpacity={0.7}
         >
-          Diario
-        </StyledText>
-      </TouchableOpacity>
+          <FontAwesome6
+            name="book-bookmark"
+            size={20}
+            color={state.index !== 1 ? "#636B45" : "#383C2B"}
+          />
+          <StyledText
+            kind="body"
+            style={[
+              styles.tabBarLabel,
+              { color: state.index !== 1 ? "#636B45" : "#383C2B" },
+              { fontWeight: state.index === 1 ? "700" : "400" },
+            ]}
+          >
+            Diario
+          </StyledText>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  screenContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F7FAFC",
-  },
-  screenTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#2D3748",
-    marginTop: 16,
-  },
-  screenDescription: {
-    fontSize: 16,
-    color: "#718096",
-    marginTop: 8,
-  },
   tabBar: {
     flexDirection: "row",
     justifyContent: "center",
