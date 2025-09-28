@@ -309,16 +309,16 @@ const COLORS = [
 //     );
 //   }
 // }
-const BeansMapGeneration = ({}: Props) => {
-  // if (hints === 0) {
-  //   return null;
-  // }
+const BeansMapGeneration = ({ hints }: Props) => {
+  if (hints === 0) {
+    return null;
+  }
   const color = useMemo(() => {
     return COLORS[Math.floor(Math.random() * COLORS.length)];
   }, []);
 
   return (
-    <View style={[styles.absolute, styles.container]}>
+    <View style={[styles.absolute]}>
       <View
         style={[
           styles.absolute,
@@ -355,13 +355,7 @@ const BeansMapGeneration = ({}: Props) => {
 const styles = StyleSheet.create({
   absolute: {
     position: "absolute",
-    bottom: 20,
-  },
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f0f0f0",
+    bottom: 0,
   },
   rectangle: {
     backgroundColor: "#ffffff",

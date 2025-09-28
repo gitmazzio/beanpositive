@@ -53,13 +53,13 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
   descriptors,
   navigation,
 }) => {
-  const { triggerMutation, isLoadingMutation } = usePocketContext();
+  const { addNewHint, isLoadingMutation } = usePocketContext();
 
   const handleCustomButtonPress = (): void => {
     // Se siamo nella schermata pocket, triggeriamo la mutation
     if (state.index === 0) {
       try {
-        triggerMutation();
+        addNewHint();
       } catch (error) {
         console.log("pocketContext not available");
         Alert.alert("Info", "Navigate to pocket to trigger mutations");
@@ -71,7 +71,7 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
       setTimeout(() => {
         // Piccolo delay per permettere la navigazione
         try {
-          triggerMutation();
+          addNewHint();
         } catch (error) {
           console.log("pocketContext not available after navigation");
         }

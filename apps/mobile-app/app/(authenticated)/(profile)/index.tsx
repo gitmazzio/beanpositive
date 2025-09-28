@@ -7,6 +7,7 @@ import { useAuth } from "@/providers";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Button, TouchableOpacity } from "react-native";
+import Toast from "react-native-toast-message";
 
 export default function ProfileScreen() {
   const router = useRouter();

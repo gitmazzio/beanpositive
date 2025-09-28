@@ -105,7 +105,7 @@ export default function OnboardingScreen({ onFinish }) {
   const isLastStep = currentStep === onboardingData.length - 1;
 
   return (
-    <PageView style={isIPhoneSE ? { paddingBottom: 20, paddingTop: 20 } : null}>
+    <PageView>
       <Header
         withBack={currentStep > 0}
         onPressBack={handleBack}

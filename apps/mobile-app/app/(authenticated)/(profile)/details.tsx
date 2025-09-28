@@ -7,7 +7,7 @@ import { useAuth } from "@/providers";
 import { supabase } from "@/services/supabase";
 import { router } from "expo-router";
 import { FormProvider, useForm } from "react-hook-form";
-import { Alert, View } from "react-native";
+import Toast from "react-native-toast-message";
 
 export default function ProfileDetails() {
   const { user } = useAuth();
@@ -33,8 +33,14 @@ export default function ProfileDetails() {
       const { error } = await supabase.auth.updateUser({
         data: { firstName: data.firstName },
       });
-      if (error) throw error;
-      // Alert.alert("Successo", "Nome aggiornato!");
+
+      router.back();
+      Toast.show({
+        type: "hintSuccess",
+        text1: "Le modifiche sono state salvate!",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
     } catch (err: any) {
       setError("firstName", { message: err.message || "Errore aggiornamento" });
     }

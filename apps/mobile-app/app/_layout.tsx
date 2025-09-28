@@ -16,9 +16,9 @@ import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 // import { LogLevel, OneSignal } from "react-native-onesignal";
+import * as Sentry from "@sentry/react-native";
 import "react-native-reanimated";
 import CustomSplashScreen from "../components/CustomSplashScreen";
-import * as Sentry from "@sentry/react-native";
 
 Sentry.init({
   enabled: process.env.NODE_ENV === "production",

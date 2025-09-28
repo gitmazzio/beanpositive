@@ -11,7 +11,7 @@ import Toast from "react-native-toast-message";
 
 // Context per comunicare con Pocket
 export type PocketContextType = {
-  triggerMutation: () => void;
+  addNewHint: () => void;
   rotationPrimaryAnim: Animated.Value;
   scalePrimaryAnim: Animated.Value;
   movePrimaryAnim: Animated.Value;
@@ -85,7 +85,7 @@ export const PocketProvider: React.FC<PocketProviderProps> = ({ children }) => {
 
   const contextValue: PocketContextType = useMemo(
     () => ({
-      triggerMutation: handleAddRow,
+      addNewHint: handleAddRow,
       rotationPrimaryAnim,
       scalePrimaryAnim,
       movePrimaryAnim,

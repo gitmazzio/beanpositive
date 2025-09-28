@@ -34,17 +34,6 @@ export default function TabLayout() {
           }}
         />
       </Tabs>
-      <View
-        style={{
-          backgroundColor: "red",
-          position: "absolute",
-          bottom: 85,
-          left: 0,
-          right: 0,
-        }}
-      >
-        <Toast config={toastConfig} />
-      </View>
     </PocketProvider>
   );
 }

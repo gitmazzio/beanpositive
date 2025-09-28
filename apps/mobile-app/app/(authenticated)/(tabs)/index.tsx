@@ -11,7 +11,7 @@ import { useDeviceType } from "@/app/hooks/useDeviceType";
 const { width, height } = Dimensions.get("window");
 
 export default function Homepage() {
-  const { logout, user } = useAuth();
+  const { user } = useAuth();
 
   const {
     rotationPrimaryAnim,
@@ -27,7 +27,6 @@ export default function Homepage() {
   } = usePocketContext();
 
   const { isIPhoneSE } = useDeviceType();
-  console.log("LOG", width, isIPhoneSE);
 
   // const [hits, setHits] = useState(0);
   const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
