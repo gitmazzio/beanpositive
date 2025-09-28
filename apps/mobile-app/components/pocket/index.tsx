@@ -147,7 +147,7 @@ export const Pocket = ({
         />
       </Svg>
 
-      <BeansMapGeneration hints={hintNumber} />
+      {/* <BeansMapGeneration hints={hintNumber} /> */}
 
       {/* Tab text */}
       <StyledText

@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Animated, StyleSheet, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 
 type Props = {
@@ -14,6 +14,36 @@ const BeanSvgComponent = ({ width = 30, height = 32, color = "#B1B79A" }) => {
         fill={color}
       />
     </Svg>
+  );
+};
+
+type AnimatedBeanProps = {
+  duration: number;
+  startTop: number;
+  endBottom: number;
+  color: string;
+};
+
+const AnimatedBean = ({
+  duration = 1500,
+  startTop = 0,
+  endBottom = 0,
+  color,
+}: AnimatedBeanProps) => {
+  const translateY = useRef(new Animated.Value(startTop)).current;
+
+  useEffect(() => {
+    Animated.timing(translateY, {
+      toValue: endBottom,
+      duration,
+      useNativeDriver: true,
+    }).start();
+  }, [endBottom, duration, translateY]);
+
+  return (
+    <Animated.View style={{ transform: [{ translateY }] }}>
+      <BeanSvgComponent color={color} />
+    </Animated.View>
   );
 };
 
@@ -324,11 +354,15 @@ const BeansMapGeneration = ({ hints }: Props) => {
           styles.absolute,
           {
             bottom: 0,
-            // ...position,
           },
         ]}
       >
-        <BeanSvgComponent color={color} />
+        <AnimatedBean
+          duration={1000}
+          startTop={-200}
+          endBottom={0}
+          color={color}
+        />
       </View>
 
       {/* {[...Array(hints).keys()].map((_, index) => {
@@ -356,45 +390,6 @@ const styles = StyleSheet.create({
   absolute: {
     position: "absolute",
     bottom: 0,
-  },
-  rectangle: {
-    backgroundColor: "#ffffff",
-    borderWidth: 2,
-    borderColor: "#333",
-    position: "relative",
-    borderRadius: 8,
-  },
-  bottomAreaIndicator: {
-    position: "absolute",
-    height: 1,
-    backgroundColor: "#ff0000",
-    opacity: 0.3,
-  },
-  dot: {
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  regenerateButton: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-  },
-  button: {
-    backgroundColor: "#007AFF",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "bold",
   },
 });
 
