@@ -1,4 +1,4 @@
-import { usePocketContext } from "@/app/hooks/usePocketContext";
+import usePocketContext from "@/app/hooks/usePocketContext";
 import { FontAwesome6, Ionicons } from "@expo/vector-icons";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import {

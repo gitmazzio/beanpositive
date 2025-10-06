@@ -92,18 +92,6 @@ export default Sentry.wrap(function RootLayout() {
     setShowSplash(false);
   }, []);
 
-  // console.log("LOG ONE_SIGNAL_APP_ID", process.env.ONE_SIGNAL_APP_ID);
-
-  // useEffect(() => {
-  //   // Enable verbose logging for debugging (remove in production)
-  //   OneSignal.Debug.setLogLevel(LogLevel.Verbose);
-  //   // Initialize with your OneSignal App ID
-  //   OneSignal.initialize(process.env.ONE_SIGNAL_APP_ID as string);
-  //   // Use this method to prompt for push notifications.
-  //   // We recommend removing this method after testing and instead use In-App Messages to prompt for notification permission.
-  //   // OneSignal.Notifications.requestPermission(false);
-  // }, []); // Ensure this only runs once on app mount
-
   // Don't render anything until fonts are loaded
   if (!loaded || !appReady) {
     return null;

@@ -1,50 +1,123 @@
 import { Button } from "@/components/commons/Button";
 import Flex from "@/components/commons/Flex";
+import { Header } from "@/components/commons/Header";
 import StyledText from "@/components/commons/StyledText";
+import { NotificationPermissionPrompt } from "@/components/commons/NotificationPermissionPrompt";
 import { PageView } from "@/components/Themed";
-import { router } from "expo-router";
-import { Dimensions, Image, Text } from "react-native";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { Image, StyleSheet, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { oneSignalService } from "@/services/onesignal";
 
-const { width } = Dimensions.get("window");
+export default function NotificationRequest() {
+  const router = useRouter();
+  const [isProcessing, setIsProcessing] = useState(false);
 
-export default function EmailVerification() {
+  const handlePermissionGranted = async () => {
+    setIsProcessing(true);
+    await AsyncStorage.setItem("notificationRequested", "true");
+
+    router.replace("/(authenticated)/(tabs)");
+
+    await oneSignalService.scheduleDailyNotification("daily_one", 8, 30, {
+      title: "Oggi, fai caso ai bei momenti ✨",
+      body: "Anche solo un attimo può diventare un fagiolo da custodire",
+    });
+
+    await oneSignalService.scheduleDailyNotification("daily_two", 21, 0, {
+      title: "Cos'è andato bene oggi? 🫘",
+      body: "Prima di andare a dormire… pensa a quel momento che ti ha fatto sorridere",
+    });
+  };
+
+  const handlePermissionDenied = async () => {
+    setIsProcessing(true);
+    await AsyncStorage.setItem("notificationRequested", "true");
+
+    router.replace("/(authenticated)/(tabs)");
+  };
+
+  const handleSkip = async () => {
+    setIsProcessing(true);
+
+    await AsyncStorage.setItem("notificationRequested", "true");
+
+    // Naviga alle tabs
+    router.replace("/(authenticated)/(tabs)");
+  };
+
   return (
-    <PageView>
+    <PageView style={styles.container}>
+      <Header
+        withBack={false}
+        // rightChildren={
+        //   <Button
+        //     kind="tertiary"
+        //     title="Salta"
+        //     onPress={handleSkip}
+        //     disabled={isProcessing}
+        //     style={styles.skipButton}
+        //   />
+        // }
+      />
+
       <Flex
         direction="column"
-        justify="space-between"
-        style={{
-          height: "100%",
-        }}
+        align="center"
+        justify="center"
+        style={styles.content}
       >
-        <Text>ciaos</Text>
-        {/* <Flex direction="column" gap={16}>
-          <Image
-            source={require("./../../assets/images/marketing-newsletter.png")}
-            style={{
-              width: width * 0.6,
-              height: width * 0.6,
-              alignSelf: "center",
-            }}
-          />
-          <StyledText kind="h1">Controlla la posta</StyledText>
-          <StyledText kind="body">
-            Abbiamo inviato un'email all'indirizzo che hai fornito. Per
-            completare la registrazione, apri la tua casella di posta e clicca
-            sul link di verifica. Dopo aver confermato l'email, potrai accedere
-            all'app. Se non trovi l'email, controlla anche nella cartella Spam o
-            Promozioni.
-          </StyledText>
-        </Flex>
+        <Image
+          source={require("../../assets/images/ask_notifications.png")}
+          style={styles.logo}
+        />
 
-        <Button
-          kind="primary"
-          title="Vai alla schermata di accesso"
-          onPress={() => {
-            router.replace("/(not_authenticated)/login");
-          }}
-        />*/}
+        <StyledText kind="h1" textAlign="center" style={styles.title}>
+          Attiva le notifiche
+        </StyledText>
+
+        <StyledText kind="body" textAlign="center" style={styles.description}>
+          Se abiliti gli avvisi, possiamo ricordarti noi quando mettere da parte
+          i tuoi fagioli durante la settimana
+        </StyledText>
+
+        <NotificationPermissionPrompt
+          onPermissionGranted={handlePermissionGranted}
+          onPermissionDenied={handlePermissionDenied}
+          showOnlyIfNeeded={false}
+          skip={handleSkip}
+          style={styles.promptContainer}
+        />
       </Flex>
     </PageView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 40,
+  },
+  logo: {
+    width: 300,
+    height: 300,
+  },
+  description: {
+    marginTop: 16,
+    marginBottom: 40,
+    lineHeight: 22,
+  },
+  promptContainer: {
+    width: "100%",
+    maxWidth: 400,
+  },
+  skipButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+});

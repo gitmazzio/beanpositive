@@ -6,7 +6,7 @@ type ButtonProps = {
   title?: string;
   style?: any;
   disabled?: boolean;
-  kind?: "primary" | "secondary" | "tertiary" | "back";
+  kind?: "primary" | "secondary" | "tertiary" | "back" | "link";
   prefixIcon?: React.ReactNode;
   suffixIcon?: React.ReactNode;
 };
@@ -22,13 +22,21 @@ export const Button = ({
 }: ButtonProps) => {
   let textStyle = styles.buttonText;
   let buttonStyle = styles.primary;
-  if (kind === "secondary") buttonStyle = styles.secondary;
+  if (kind === "secondary") {
+    buttonStyle = styles.secondary;
+    textStyle = styles.secondaryText;
+  }
   if (kind === "tertiary") {
     textStyle = styles.tertiaryText;
     buttonStyle = styles.tertiary;
   }
   if (kind === "back") {
     buttonStyle = styles.back;
+  }
+
+  if (kind === "link") {
+    buttonStyle = styles.link;
+    textStyle = styles.linkText;
   }
 
   return (
@@ -83,14 +91,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#D57E3A",
   },
   secondary: {
-    backgroundColor: "#F5E9DA",
+    backgroundColor: "#F1D8B7",
     borderWidth: 1,
-    borderColor: "#EAB68F",
+    borderColor: "#F1D8B7",
+  },
+  secondaryText: {
+    color: "#3A1A10",
   },
   tertiary: {
     backgroundColor: "#F1D8B7",
     borderWidth: 1,
     borderColor: "#F1D8B7",
+    color: "#3A1A10",
   },
   tertiaryText: {
     color: "#3A1A10",
@@ -106,5 +118,12 @@ const styles = StyleSheet.create({
   },
   disabledText: {
     color: "white",
+  },
+  link: {
+    backgroundColor: "transparent",
+  },
+  linkText: {
+    color: "#E6483D",
+    fontWeight: 600,
   },
 });

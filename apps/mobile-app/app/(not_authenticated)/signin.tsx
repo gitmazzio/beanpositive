@@ -7,23 +7,20 @@ import StyledText from "@/components/commons/StyledText";
 import TextInput from "@/components/commons/TextInput";
 import { PageView } from "@/components/Themed";
 import { useAuth } from "@/providers";
+import { useNotificationPermissionFlow } from "@/hooks/useNotificationPermissionFlow";
 import {
   IT_ERROR_CODES,
   SupabaseErrorCode,
 } from "@/utils/supabase_error_codes";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { ActivityIndicator, Alert, ScrollView, StyleSheet } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet } from "react-native";
 
-export default function Register() {
-  // GoogleSignin.configure({
-  //   scopes: ["https://www.googleapis.com/auth/drive.readonly"],
-  //   webClientId: "YOUR CLIENT ID FROM GOOGLE CONSOLE",
-  // });
-
+export default function SignIn() {
   const { loading, login } = useAuth();
+  const { checkAndNavigate, isLoading: isCheckingNotifications } =
+    useNotificationPermissionFlow();
   const [error, setError] = useState<string | null>(null);
 
   const methods = useForm({
@@ -43,18 +40,8 @@ export default function Register() {
     try {
       await login(data.email, data.password);
 
-      // check push notification first time
-
-      // const notificationRequested = await AsyncStorage.getItem(
-      //   "notificationRequested"
-      // );
-
-      // console.log("LOG notification requested", notificationRequested);
-
-      // if (!notificationRequested) {
-      //   return router.push("/notification-request");
-      // }
-      return router.push("/(authenticated)/(tabs)");
+      // Controlla i permessi delle notifiche e naviga di conseguenza
+      await checkAndNavigate();
     } catch (err: any) {
       setError(
         IT_ERROR_CODES[err.code as SupabaseErrorCode] ??
@@ -106,7 +93,7 @@ export default function Register() {
               secureTextEntry
             />
             <Link to="/recover-password">Hai dimenticato la password?</Link>
-            {isSubmitting /* || loading */ ? (
+            {isSubmitting || loading || isCheckingNotifications ? (
               <ActivityIndicator size="large" color="#000" />
             ) : (
               <Button
@@ -114,7 +101,10 @@ export default function Register() {
                 title="Accedi"
                 onPress={handleSubmit(onSubmit)}
                 disabled={
-                  isSubmitting || loading || Object.keys(errors)?.length > 0
+                  isSubmitting ||
+                  loading ||
+                  isCheckingNotifications ||
+                  Object.keys(errors)?.length > 0
                 }
               />
             )}

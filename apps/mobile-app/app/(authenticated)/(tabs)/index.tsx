@@ -5,8 +5,8 @@ import { AnimatedBean } from "@/components/pocket/animatedBean";
 import { PageView } from "@/components/Themed";
 import { useAuth } from "@/providers";
 import { useUserHitsByDay } from "@/queries/mutations/useUserHitsByDay";
-import { usePocketContext } from "../../hooks/usePocketContext";
 import { useDeviceType } from "@/app/hooks/useDeviceType";
+import usePocketContext from "@/app/hooks/usePocketContext";
 
 const { width, height } = Dimensions.get("window");
 

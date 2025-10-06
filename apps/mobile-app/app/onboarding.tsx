@@ -16,7 +16,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useDeviceType } from "./hooks/useDeviceType";
 
 const { width, height } = Dimensions.get("window");
 
@@ -97,7 +96,7 @@ export default function OnboardingScreen({ onFinish }) {
 
   const handleLogin = () => {
     // Navigate to login screen
-    router.push("/(not_authenticated)/signin"); // Replace with your login route
+    router.push("/(not_authenticated)/login"); // Replace with your login route
     handleOnboardingFinish?.();
   };
 

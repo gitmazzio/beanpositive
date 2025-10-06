@@ -1,12 +1,13 @@
 // app/profile.tsx
 import { SectionButton } from "@/components/authenticated/profile/SectionButton";
 import { Wrapper } from "@/components/authenticated/profile/Wrapper";
+import { Button } from "@/components/commons/Button";
 import Flex from "@/components/commons/Flex";
 import StyledText from "@/components/commons/StyledText";
 import { useAuth } from "@/providers";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { Button, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
 import Toast from "react-native-toast-message";
 
 export default function ProfileScreen() {
@@ -53,7 +54,7 @@ export default function ProfileScreen() {
         rightIcon="arrow-up-right-from-square"
         disabled
       />
-      <Button title="logout" onPress={logout} />
+      <Button title="Esci dal tuo account" onPress={logout} kind="link" />
     </Wrapper>
   );
 }

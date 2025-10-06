@@ -40,9 +40,7 @@
           "resizeMode": "contain"
         }
       ],
-      [
-        "expo-router"
-      ],
+      ["expo-router"],
       "expo-notifications",
       [
         "@sentry/react-native/expo",
@@ -50,6 +48,12 @@
           "url": "https://sentry.io/",
           "project": "mobile-app",
           "organization": "bean-positive"
+        }
+      ],
+      [
+        "onesignal-expo-plugin",
+        {
+          "mode": "production"
         }
       ]
     ],
