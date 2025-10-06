@@ -39,7 +39,7 @@ const StyledText: React.FC<StyledTextProps> = ({
 
   return (
     <Flex
-      align="flex-start"
+      align="center"
       justify="flex-start"
       direction="row"
       style={{ flexWrap: "wrap" }}

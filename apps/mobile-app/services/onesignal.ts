@@ -7,6 +7,25 @@ import { router } from "expo-router";
 // Configurazione OneSignal
 OneSignal.initialize(process.env.EXPO_PUBLIC_ONESIGNAL_APP_ID!);
 
+const NOTIFICATION_TEXTS = [
+  {
+    id: "daily_one",
+    texts: {
+      title: "Inizio giornata",
+      body: "Fai caso ai tuoi 'bei momenti' di oggi e annotali quando vuoi",
+      sound: "default",
+    },
+  },
+  {
+    id: "dayly_two",
+    texts: {
+      title: "Fine giornata",
+      body: "Hai vissuto bei momenti oggi? Segnali in Bean Positive ✨",
+      sound: "default",
+    },
+  },
+];
+
 // Configurazione delle notifiche Expo
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -107,7 +126,7 @@ export class OneSignalService {
     id: "daily_one" | "daily_two",
     hour: number,
     minute: number,
-    content: Notifications.NotificationContentInput
+    data?: Notifications.NotificationContentInput["data"]
   ): Promise<string | null> {
     try {
       // Cancella l'eventuale notifica precedente con lo stesso id
@@ -125,12 +144,18 @@ export class OneSignalService {
         minute,
       };
 
+      const content = NOTIFICATION_TEXTS.find((item) => item.id === id);
+
+      // Ensure we tag the content with our slot id so we can discover it later
+      const contentWithId: Notifications.NotificationContentInput = {
+        ...content,
+        data: { ...(data as any), slot: id },
+      };
+
       const identifier = await Notifications.scheduleNotificationAsync({
-        content,
+        content: contentWithId,
         trigger,
       });
-
-      console.log("Notification scheduled:", identifier);
 
       this.scheduledNotificationIds[id] = identifier;
       return identifier;
@@ -152,6 +177,18 @@ export class OneSignalService {
         await Notifications.cancelScheduledNotificationAsync(identifier);
         this.scheduledNotificationIds[id] = null;
       }
+      // Also best-effort cancel by inspecting scheduled notifications with data.slot
+      const all = await Notifications.getAllScheduledNotificationsAsync();
+      for (const n of all) {
+        const slot = (n as any)?.content?.data?.slot;
+        if (slot === id) {
+          try {
+            await Notifications.cancelScheduledNotificationAsync(
+              (n as any).identifier
+            );
+          } catch {}
+        }
+      }
     } catch (error) {
       console.error("Error cancelling daily notification:", error);
     }
@@ -168,6 +205,42 @@ export class OneSignalService {
       daily_one: !!this.scheduledNotificationIds.daily_one,
       daily_two: !!this.scheduledNotificationIds.daily_two,
     };
+  }
+
+  /**
+   * Interroga il sistema per capire quali notifiche giornaliere sono attive.
+   * Aggiorna la cache interna e restituisce lo stato.
+   */
+  public async refreshDailyStateFromSystem(): Promise<{
+    daily_one: boolean;
+    daily_two: boolean;
+  }> {
+    try {
+      const all = await Notifications.getAllScheduledNotificationsAsync();
+
+      const found: Record<string, string | null> = {
+        daily_one: null,
+        daily_two: null,
+      };
+      for (const n of all) {
+        const slot = (n as any)?.content?.data?.slot;
+        if (slot === "daily_one" || slot === "daily_two") {
+          found[slot] = (n as any).identifier;
+        }
+      }
+      this.scheduledNotificationIds = {
+        daily_one: found.daily_one,
+        daily_two: found.daily_two,
+      } as any;
+
+      return {
+        daily_one: !!found.daily_one,
+        daily_two: !!found.daily_two,
+      };
+    } catch (error) {
+      console.error("Error refreshing daily notifications state:", error);
+      return this.getDailyNotificationsState();
+    }
   }
 
   /**

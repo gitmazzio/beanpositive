@@ -12,9 +12,10 @@ export const Header = () => {
 
   return (
     <Flex style={{ height: 48 }} align="center" justify="space-between">
-      <TouchableOpacity style={styles.button} hitSlop={10}>
+      <View style={styles.button} />
+      {/* <TouchableOpacity style={styles.button} hitSlop={10}>
         <FontAwesome6 name="hand-holding-heart" size={20} color="#C7682F" />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <Flex direction="column">
         <StyledText
           kind="h1"

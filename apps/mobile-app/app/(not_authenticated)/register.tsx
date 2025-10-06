@@ -10,7 +10,7 @@ import { PageView } from "@/components/Themed";
 import { useAuth } from "@/providers";
 import { useRouter } from "expo-router";
 import { FormProvider, useForm } from "react-hook-form";
-import { ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 export default function Register() {
   const router = useRouter();
@@ -116,11 +116,33 @@ export default function Register() {
               <Checkbox
                 name="acceptTerms"
                 label={
-                  <StyledText kind="caption">
-                    Accetto i <Link href="/terms">termini e condizioni</Link> e
-                    la <Link href="/privacy">privacy policy</Link> di Bean
-                    Positive.
-                  </StyledText>
+                  <Flex
+                    style={{
+                      maxWidth: "95%",
+                    }}
+                  >
+                    <StyledText kind="caption">
+                      Accetto i{" "}
+                      <Link
+                        href="/terms"
+                        style={{
+                          fontSize: 14,
+                        }}
+                      >
+                        termini e condizioni
+                      </Link>{" "}
+                      e la{" "}
+                      <Link
+                        href="/privacy"
+                        style={{
+                          fontSize: 14,
+                        }}
+                      >
+                        privacy policy
+                      </Link>{" "}
+                      di Bean Positive.
+                    </StyledText>
+                  </Flex>
                 }
                 style={{ marginTop: 8 }}
               />

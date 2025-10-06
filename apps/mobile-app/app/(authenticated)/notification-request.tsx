@@ -20,15 +20,9 @@ export default function NotificationRequest() {
 
     router.replace("/(authenticated)/(tabs)");
 
-    await oneSignalService.scheduleDailyNotification("daily_one", 8, 30, {
-      title: "Oggi, fai caso ai bei momenti ✨",
-      body: "Anche solo un attimo può diventare un fagiolo da custodire",
-    });
+    await oneSignalService.scheduleDailyNotification("daily_one", 8, 30);
 
-    await oneSignalService.scheduleDailyNotification("daily_two", 21, 0, {
-      title: "Cos'è andato bene oggi? 🫘",
-      body: "Prima di andare a dormire… pensa a quel momento che ti ha fatto sorridere",
-    });
+    await oneSignalService.scheduleDailyNotification("daily_two", 21, 0);
   };
 
   const handlePermissionDenied = async () => {

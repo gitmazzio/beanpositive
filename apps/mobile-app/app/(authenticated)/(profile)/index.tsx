@@ -41,7 +41,7 @@ export default function ProfileScreen() {
       />
       <StyledText kind="headline">Supporto e Community</StyledText>
       <SectionButton
-        title="Account"
+        title="Aiuto e supporto"
         icon="circle-info"
         url={"/(authenticated)/(profile)"}
         rightIcon="arrow-up-right-from-square"
