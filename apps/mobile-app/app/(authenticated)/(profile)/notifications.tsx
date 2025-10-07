@@ -28,7 +28,7 @@ export default function NotificationsScreen() {
       setSaving(true);
       // Default times: 09:00 for morning, 21:00 for evening
       if (morningEnabled) {
-        await oneSignalService.scheduleDailyNotification("daily_one", 9, 0);
+        await oneSignalService.scheduleDailyNotification("daily_one", 8, 30);
       } else {
         await oneSignalService.cancelDailyNotification("daily_one");
       }

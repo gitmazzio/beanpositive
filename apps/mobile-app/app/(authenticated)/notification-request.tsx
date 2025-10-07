@@ -12,29 +12,23 @@ import { oneSignalService } from "@/services/onesignal";
 
 export default function NotificationRequest() {
   const router = useRouter();
-  const [isProcessing, setIsProcessing] = useState(false);
 
   const handlePermissionGranted = async () => {
-    setIsProcessing(true);
+    await oneSignalService.scheduleDailyNotification("daily_one", 8, 30);
+    await oneSignalService.scheduleDailyNotification("daily_two", 21, 0);
+
     await AsyncStorage.setItem("notificationRequested", "true");
 
     router.replace("/(authenticated)/(tabs)");
-
-    await oneSignalService.scheduleDailyNotification("daily_one", 8, 30);
-
-    await oneSignalService.scheduleDailyNotification("daily_two", 21, 0);
   };
 
   const handlePermissionDenied = async () => {
-    setIsProcessing(true);
     await AsyncStorage.setItem("notificationRequested", "true");
 
     router.replace("/(authenticated)/(tabs)");
   };
 
   const handleSkip = async () => {
-    setIsProcessing(true);
-
     await AsyncStorage.setItem("notificationRequested", "true");
 
     // Naviga alle tabs
@@ -42,7 +36,7 @@ export default function NotificationRequest() {
   };
 
   return (
-    <PageView style={styles.container}>
+    <PageView>
       <Header
         withBack={false}
         // rightChildren={
@@ -89,13 +83,9 @@ export default function NotificationRequest() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   content: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 40,
   },
   logo: {
     width: 300,

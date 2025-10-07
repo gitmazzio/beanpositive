@@ -17,7 +17,7 @@ const NOTIFICATION_TEXTS = [
     },
   },
   {
-    id: "dayly_two",
+    id: "daily_two",
     texts: {
       title: "Fine giornata",
       body: "Hai vissuto bei momenti oggi? Segnali in Bean Positive ✨",
@@ -148,7 +148,7 @@ export class OneSignalService {
 
       // Ensure we tag the content with our slot id so we can discover it later
       const contentWithId: Notifications.NotificationContentInput = {
-        ...content,
+        ...content?.texts,
         data: { ...(data as any), slot: id },
       };
 

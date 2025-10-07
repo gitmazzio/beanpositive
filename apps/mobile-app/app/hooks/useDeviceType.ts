@@ -27,7 +27,7 @@ interface UseDeviceTypeResult {
 const IPHONE_X_HEIGHTS = [812, 844, 852, 896, 926, 932];
 const IPHONE_SE_HEIGHTS = [568, 667];
 
-export function useDeviceType(): UseDeviceTypeResult {
+function useDeviceType(): UseDeviceTypeResult {
   const { height, width } = Dimensions.get("window");
   const h = Math.max(height, width); // per coprire portrait e landscape
 
@@ -65,3 +65,5 @@ export function useDeviceType(): UseDeviceTypeResult {
     deviceType,
   };
 }
+
+export default useDeviceType;

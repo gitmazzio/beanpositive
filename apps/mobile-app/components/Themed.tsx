@@ -12,7 +12,7 @@ import {
 
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "./useColorScheme";
-import { useDeviceType } from "@/app/hooks/useDeviceType";
+import useDeviceType from "@/app/hooks/useDeviceType";
 
 type ThemeProps = {
   lightColor?: string;
