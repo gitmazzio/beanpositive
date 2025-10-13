@@ -1,7 +1,6 @@
-import { OneSignal } from "react-native-onesignal";
-import { Platform, Alert, Linking } from "react-native";
 import * as Notifications from "expo-notifications";
-// import * as Device from "expo-device";
+import { Alert, Linking, Platform } from "react-native";
+import { OneSignal } from "react-native-onesignal";
 import { router } from "expo-router";
 
 // Configurazione OneSignal
@@ -11,16 +10,16 @@ const NOTIFICATION_TEXTS = [
   {
     id: "daily_one",
     texts: {
-      title: "Inizio giornata",
-      body: "Fai caso ai tuoi 'bei momenti' di oggi e annotali quando vuoi",
+      title: "Oggi, fai caso ai bei momenti ✨",
+      body: "Anche solo un attimo può diventare un fagiolo da custodire",
       sound: "default",
     },
   },
   {
     id: "daily_two",
     texts: {
-      title: "Fine giornata",
-      body: "Hai vissuto bei momenti oggi? Segnali in Bean Positive ✨",
+      title: "Cos'è andato bene oggi? 🫘",
+      body: "Prima di andare a dormire… pensa a quel momento che oggi ti ha fatto sorridere",
       sound: "default",
     },
   },
