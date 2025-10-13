@@ -13,7 +13,7 @@ export interface FlexProps extends ViewProps {
     | "space-evenly";
   gap?: number;
   style?: ViewStyle | any;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export default function Flex({

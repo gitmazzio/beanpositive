@@ -1,14 +1,12 @@
-import { Button } from "@/components/commons/Button";
 import Flex from "@/components/commons/Flex";
 import { Header } from "@/components/commons/Header";
-import StyledText from "@/components/commons/StyledText";
 import { NotificationPermissionPrompt } from "@/components/commons/NotificationPermissionPrompt";
+import StyledText from "@/components/commons/StyledText";
 import { PageView } from "@/components/Themed";
-import { useRouter } from "expo-router";
-import { useState } from "react";
-import { Image, StyleSheet, View } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { oneSignalService } from "@/services/onesignal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
+import { Image, StyleSheet } from "react-native";
 
 export default function NotificationRequest() {
   const router = useRouter();

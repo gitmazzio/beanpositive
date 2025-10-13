@@ -5,7 +5,7 @@ import { oneSignalService } from "../services/onesignal";
 
 export interface UseNotificationPermissionFlowReturn {
   isLoading: boolean;
-  checkAndNavigate: () => Promise<void>;
+  checkAndNavigateAfterLogin: () => Promise<void>;
   hasRequestedBefore: boolean | null;
 }
 
@@ -30,7 +30,7 @@ export const useNotificationPermissionFlow =
       }
     };
 
-    const checkAndNavigate = async () => {
+    const checkAndNavigateAfterLogin = async () => {
       try {
         setIsLoading(true);
 
@@ -38,6 +38,10 @@ export const useNotificationPermissionFlow =
         const requested = await AsyncStorage.getItem("notificationRequested");
 
         if (requested === "true") {
+          // se ha notifiche attive allora schedulo
+          await oneSignalService.refreshDailyStateFromSystem();
+          await oneSignalService.scheduleDailyNotification("daily_one", 8, 30);
+          await oneSignalService.scheduleDailyNotification("daily_two", 21, 0);
           // Abbiamo già richiesto i permessi, naviga direttamente alle tabs
           router.replace("/(authenticated)/(tabs)");
           return;
@@ -46,9 +50,11 @@ export const useNotificationPermissionFlow =
         // Controlla se l'utente ha già i permessi
         const hasPermission = await oneSignalService.areNotificationsEnabled();
 
-        console.log("LOG", { requested, hasPermission });
-
         if (hasPermission) {
+          await oneSignalService.refreshDailyStateFromSystem();
+          await oneSignalService.scheduleDailyNotification("daily_one", 8, 30);
+          await oneSignalService.scheduleDailyNotification("daily_two", 21, 0);
+
           // L'utente ha già i permessi, salva che abbiamo controllato e naviga
           await AsyncStorage.setItem("notificationRequested", "true");
           router.replace("/(authenticated)/(tabs)");
@@ -67,7 +73,7 @@ export const useNotificationPermissionFlow =
 
     return {
       isLoading,
-      checkAndNavigate,
+      checkAndNavigateAfterLogin,
       hasRequestedBefore,
     };
   };

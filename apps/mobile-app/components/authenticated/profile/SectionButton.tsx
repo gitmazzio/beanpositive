@@ -3,7 +3,6 @@ import StyledText from "@/components/commons/StyledText";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { Href, router } from "expo-router";
 import { StyleSheet, TouchableOpacity } from "react-native";
-import { opacity } from "react-native-reanimated/lib/typescript/Colors";
 
 type Props = {
   url: Href;

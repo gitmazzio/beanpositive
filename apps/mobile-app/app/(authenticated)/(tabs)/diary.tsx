@@ -1,19 +1,21 @@
+import { Header } from "@/components/authenticated/Header";
+import Flex from "@/components/commons/Flex";
+import { PageView } from "@/components/Themed";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function TabTwoScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
+    <PageView style={styles.container}>
+      <Header />
+      <Flex align="center" justify="center" style={[{ flex: 1 }]} />
       {/* <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" /> */}
-    </View>
+    </PageView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
   },
   title: {
     fontSize: 20,

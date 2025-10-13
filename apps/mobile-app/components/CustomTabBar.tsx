@@ -164,7 +164,7 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
                 style={[
                   styles.tabBarLabel,
                   { color: !isFocused ? "#636B45" : "#383C2B" },
-                  { fontWeight: isFocused ? "700" : "400" },
+                  { fontWeight: isFocused ? "700" : "500" },
                 ]}
               >
                 {typeof label === "string" ? label : route.name}
@@ -189,7 +189,7 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
             style={[
               styles.tabBarLabel,
               { color: state.index !== 1 ? "#636B45" : "#383C2B" },
-              { fontWeight: state.index === 1 ? "700" : "400" },
+              { fontWeight: state.index === 1 ? "700" : "500" },
             ]}
           >
             Diario
@@ -228,8 +228,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   tabBarLabel: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "500",
     marginTop: 4,
   },
   customButton: {

@@ -1,6 +1,8 @@
-import { supabase } from "@/services/supabase";
 import { oneSignalService } from "@/services/onesignal";
+import { supabase } from "@/services/supabase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { type AuthUser } from "@supabase/supabase-js";
+import * as Notifications from "expo-notifications";
 import React, {
   createContext,
   useContext,
@@ -8,7 +10,6 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface AuthContextProps {
   user: AuthUser | null;
@@ -78,6 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = async () => {
     setLoading(true);
+    await Notifications.cancelAllScheduledNotificationsAsync();
 
     // Rimuovi l'ID esterno da OneSignal
     await oneSignalService.removeExternalUserId();

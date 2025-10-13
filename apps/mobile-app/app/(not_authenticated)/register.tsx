@@ -7,12 +7,14 @@ import PasswordInput from "@/components/commons/PasswordInput";
 import StyledText from "@/components/commons/StyledText";
 import TextInput from "@/components/commons/TextInput";
 import { PageView } from "@/components/Themed";
+import { useOpenBrowser } from "@/hooks/useOpenBrowser";
 import { useAuth } from "@/providers";
 import { useRouter } from "expo-router";
 import { FormProvider, useForm } from "react-hook-form";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 
 export default function Register() {
+  const { openBrowser } = useOpenBrowser();
   const router = useRouter();
   const { loading, register, setAuthIsLoading } = useAuth();
 
@@ -124,7 +126,9 @@ export default function Register() {
                     <StyledText kind="caption">
                       Accetto i{" "}
                       <Link
-                        href="/terms"
+                        onPress={() =>
+                          openBrowser("https://www.beanpositive.app/termini")
+                        }
                         style={{
                           fontSize: 14,
                         }}
@@ -133,7 +137,9 @@ export default function Register() {
                       </Link>{" "}
                       e la{" "}
                       <Link
-                        href="/privacy"
+                        onPress={() =>
+                          openBrowser("https://www.beanpositive.app/privacy")
+                        }
                         style={{
                           fontSize: 14,
                         }}

@@ -19,7 +19,7 @@ import { ActivityIndicator, ScrollView, StyleSheet } from "react-native";
 
 export default function SignIn() {
   const { loading, login } = useAuth();
-  const { checkAndNavigate, isLoading: isCheckingNotifications } =
+  const { checkAndNavigateAfterLogin, isLoading: isCheckingNotifications } =
     useNotificationPermissionFlow();
   const [error, setError] = useState<string | null>(null);
 
@@ -41,7 +41,7 @@ export default function SignIn() {
       await login(data.email, data.password);
 
       // Controlla i permessi delle notifiche e naviga di conseguenza
-      await checkAndNavigate();
+      await checkAndNavigateAfterLogin();
     } catch (err: any) {
       setError(
         IT_ERROR_CODES[err.code as SupabaseErrorCode] ??

@@ -19,7 +19,7 @@
       "entitlements": {
         "aps-environment": "production"
       },
-      "buildNumber": "7"
+      "buildNumber": "8"
     },
     "android": {
       "googleServicesFile": "./services/google-services.json",
@@ -31,6 +31,12 @@
       "package": "com.beanpositive.app"
     },
     "plugins": [
+      [
+        "expo-web-browser",
+        {
+          "experimentalLauncherActivity": true
+        }
+      ],
       [
         "expo-splash-screen",
         {
@@ -55,7 +61,8 @@
         {
           "mode": "production"
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
