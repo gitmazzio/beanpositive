@@ -6,7 +6,11 @@ type Props = {
   hints: number;
 };
 
-const BeanSvgComponent = ({ width = 30, height = 32, color = "#B1B79A" }) => {
+export const BeanSvgComponent = ({
+  width = 30,
+  height = 32,
+  color = "#B1B79A",
+}) => {
   return (
     <Svg width={width} height={height} viewBox="0 0 30 32" fill="none">
       <Path

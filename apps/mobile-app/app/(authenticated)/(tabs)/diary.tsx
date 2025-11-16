@@ -1,14 +1,57 @@
 import { Header } from "@/components/authenticated/Header";
-import Flex from "@/components/commons/Flex";
+import Calendar from "@/components/commons/Calendar";
+import DayDetails from "@/components/commons/DayDetails";
 import { PageView } from "@/components/Themed";
-import { StyleSheet, Text, View } from "react-native";
+import { useAuth } from "@/providers";
+import { useUserHitsByMonth } from "@/queries/mutations/useUserHitsByMonth";
+import { useState } from "react";
+import { ScrollView, StyleSheet } from "react-native";
 
 export default function TabTwoScreen() {
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  const { user } = useAuth();
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
+
+  const { data: hits = [], isLoading } = useUserHitsByMonth(
+    user?.id,
+    currentYear,
+    currentMonth
+  );
+
+  const handleDayPress = (date: Date) => {
+    // Create a new date in local timezone to avoid timezone issues
+    const localDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+    setSelectedDate(localDate);
+  };
+
   return (
     <PageView style={styles.container}>
       <Header />
-      <Flex align="center" justify="center" style={[{ flex: 1 }]} />
-      {/* <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" /> */}
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
+        <Calendar
+          onDayPress={handleDayPress}
+          selectedDate={selectedDate ?? undefined}
+          hits={hits}
+          currentDate={currentDate}
+          setCurrentDate={setCurrentDate}
+        />
+        <DayDetails
+          selectedDate={selectedDate}
+          hits={hits}
+          isLoading={isLoading}
+        />
+      </ScrollView>
     </PageView>
   );
 }
@@ -17,13 +60,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: "80%",
+  scrollView: {
+    flex: 1,
   },
 });

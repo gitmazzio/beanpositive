@@ -3,6 +3,7 @@ import { supabase } from "@/services/supabase";
 
 export function useUserHitsByDay(userId?: string, date?: string) {
   // date should be in 'YYYY-MM-DD' format
+
   return useQuery({
     queryKey: ["hits", userId, date],
     queryFn: async () => {
