@@ -1,13 +1,15 @@
-import Flex from "@/components/commons/Flex";
-import StyledText from "@/components/commons/StyledText";
-import { useAuth } from "@/providers";
-import { useUserHitsByDay } from "@/queries/mutations/useUserHitsByDay";
-import { StyleSheet, View } from "react-native";
+import Flex from "@/components/commons/Flex"
+import StyledText from "@/components/commons/StyledText"
+import { useAuth } from "@/providers"
+import { useUserHitsByDay } from "@/queries/mutations/useUserHitsByDay"
+import { FlatList, ScrollView, StyleSheet, View } from "react-native"
+import { isSameDay, parseISO } from "date-fns"
+import { BeanSvgComponent } from "../pocket/BeansMapGeneration"
 
 interface DayDetailsProps {
-  selectedDate: Date | null;
-  hits: any[];
-  isLoading: boolean;
+  selectedDate: Date | null
+  hits: any[]
+  isLoading: boolean
 }
 
 export default function DayDetails({
@@ -15,24 +17,21 @@ export default function DayDetails({
   hits,
   isLoading,
 }: DayDetailsProps) {
-  const { user } = useAuth();
-
-  const dateString = selectedDate
-    ? selectedDate.toISOString().slice(0, 10)
-    : null;
+  const { user } = useAuth()
 
   if (hits?.length === 0) {
-    return null;
+    return null
   }
 
-  console.log("LOG", dateString);
-
-  // filter hits by selectedDate
-  const filteredHits = (hits || [])?.filter((hit) => {
-    return hit.created_at.startsWith(dateString);
-  });
-
-  console.log("LOG", filteredHits);
+  // filter hits by selectedDate using date-fns for reliable date comparison
+  const filteredHits = selectedDate
+    ? (hits || [])?.filter((hit) => {
+        if (!hit.created_at) return false
+        // Parse the UTC date string and compare with selectedDate
+        const hitDate = parseISO(hit.created_at)
+        return isSameDay(hitDate, selectedDate)
+      })
+    : []
 
   if (!selectedDate) {
     return (
@@ -41,16 +40,16 @@ export default function DayDetails({
           Seleziona un giorno per vedere i dettagli
         </StyledText>
       </View>
-    );
+    )
   }
 
   const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = new Date(dateString)
     return date.toLocaleTimeString("it-IT", {
       hour: "2-digit",
       minute: "2-digit",
-    });
-  };
+    })
+  }
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString("it-IT", {
@@ -58,8 +57,8 @@ export default function DayDetails({
       year: "numeric",
       month: "long",
       day: "numeric",
-    });
-  };
+    })
+  }
 
   return (
     <View style={styles.container}>
@@ -73,31 +72,64 @@ export default function DayDetails({
         </StyledText>
       ) : (
         <Flex direction="column" gap={12}>
-          <StyledText kind="subtitle" style={styles.hintsCount}>
-            Fagioli conservati: {hits.length}
-          </StyledText>
+          <Flex direction="row" gap={12} align="center" justify="flex-start">
+            <StyledText
+              kind="body"
+              style={{ color: "#404B35", fontWeight: "500" }}
+            >
+              Fagioli conservati
+            </StyledText>
+            <Flex
+              align="center"
+              justify="center"
+              style={styles.hintsCountLength}
+            >
+              <StyledText
+                kind="body"
+                style={{
+                  color: "#404B35",
+                  fontWeight: "500",
+                }}
+              >
+                {filteredHits.length}
+              </StyledText>
+            </Flex>
+          </Flex>
 
-          {filteredHits.map((hit, index) => (
-            <View key={index} style={styles.hintCard}>
-              <Flex direction="row" align="center" gap={12}>
-                <View style={styles.beanIcon}>
-                  <StyledText kind="caption" style={styles.beanEmoji}>
-                    🫘
-                  </StyledText>
-                </View>
-
+          {/* <FlatList
+            data={filteredHits}
+            keyExtractor={(item, index) => `${item.created_at}-${index}`}
+            renderItem={({ item }) => (
+              <View style={styles.hintCard}>
+                <Flex direction="row" align="center" gap={16}>
+                  <BeanSvgComponent color="#D18754" width={18} height={18} />
+                  <Flex direction="column" style={styles.hintDetails}>
+                    <StyledText kind="body" style={styles.hintTitle}>
+                      Fagiolo
+                    </StyledText>
+                    <StyledText kind="caption" style={styles.hintDetailsText}>
+                      {`${formatTime(item.created_at)} ${item.address ? `• ${item.address}` : ""}`}
+                    </StyledText>
+                  </Flex>
+                </Flex>
+              </View>
+            )}
+            ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
+            showsVerticalScrollIndicator={true}
+          /> */}
+          {filteredHits.map((item) => (
+            <View style={styles.hintCard}>
+              <Flex direction="row" align="center" gap={16}>
+                <BeanSvgComponent color="#D18754" width={18} height={18} />
                 <Flex direction="column" style={styles.hintDetails}>
                   <StyledText kind="body" style={styles.hintTitle}>
                     Fagiolo
                   </StyledText>
-                  <StyledText kind="caption" style={styles.hintTime}>
-                    {formatTime(hit.created_at)}
+                  <StyledText kind="caption" style={styles.hintDetailsText}>
+                    {`${formatTime(item.created_at)} ${item.address ? `• ${item.address}` : ""}`}
                   </StyledText>
-                  {hit.address && (
-                    <StyledText kind="caption" style={styles.hintAddress}>
-                      {hit.address}
-                    </StyledText>
-                  )}
                 </Flex>
               </Flex>
             </View>
@@ -105,13 +137,16 @@ export default function DayDetails({
         </Flex>
       )}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
-    // padding: 16,
     marginVertical: 16,
+  },
+  listContainer: {
+    height: 400,
+    maxHeight: 400,
   },
   placeholderText: {
     textAlign: "center",
@@ -131,17 +166,24 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#4D5437",
   },
-  hintsCount: {
-    color: "#E65100",
-    fontWeight: "600",
-    marginBottom: 8,
+  // hintsCount: {
+  //   marginBottom: 8,
+  // },
+  hintsCountLength: {
+    backgroundColor: "#C4C3AA",
+    borderRadius: 100,
+    color: "#404B35",
+    width: 24,
+    height: 24,
+    justifyContent: "center",
+    alignItems: "center",
   },
   hintCard: {
-    backgroundColor: "#FFF8E1",
-    borderRadius: 8,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
     padding: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: "#FF9800",
+    borderWidth: 2,
+    borderColor: "#eee",
   },
   beanIcon: {
     width: 32,
@@ -158,16 +200,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   hintTitle: {
-    color: "#E65100",
+    color: "#404B35",
     fontWeight: "600",
-    marginBottom: 2,
   },
-  hintTime: {
-    color: "#666",
-    marginBottom: 2,
+  hintDetailsText: {
+    color: "#798A69",
+    fontWeight: "500",
   },
-  hintAddress: {
-    color: "#888",
-    fontStyle: "italic",
-  },
-});
+})

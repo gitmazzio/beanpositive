@@ -1,20 +1,20 @@
-import React, { useState, useMemo } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { useAuth } from "@/providers";
-import { useUserHitsByMonth } from "@/queries/mutations/useUserHitsByMonth";
-import StyledText from "@/components/commons/StyledText";
-import Flex from "@/components/commons/Flex";
-import { FontAwesome6 } from "@expo/vector-icons";
-import { BeanSvgComponent } from "../pocket/BeansMapGeneration";
-import { CalendarDayBorder } from "../svg/CalendarDayBorder";
-import { TodayDayBackground } from "../svg/TodayDayBackground";
+import React, { useState, useMemo } from "react"
+import { StyleSheet, TouchableOpacity, View } from "react-native"
+import { useAuth } from "@/providers"
+import { useUserHitsByMonth } from "@/queries/mutations/useUserHitsByMonth"
+import StyledText from "@/components/commons/StyledText"
+import Flex from "@/components/commons/Flex"
+import { FontAwesome6 } from "@expo/vector-icons"
+import { BeanSvgComponent } from "../pocket/BeansMapGeneration"
+import { CalendarDayBorder } from "../svg/CalendarDayBorder"
+import { TodayDayBackground } from "../svg/TodayDayBackground"
 
 interface CalendarProps {
-  onDayPress?: (date: Date) => void;
-  selectedDate?: Date;
-  hits: any[];
-  currentDate: Date;
-  setCurrentDate: (date: Date) => void;
+  onDayPress?: (date: Date) => void
+  selectedDate?: Date
+  hits: any[]
+  currentDate: Date
+  setCurrentDate: (date: Date) => void
 }
 
 export default function Calendar({
@@ -24,37 +24,37 @@ export default function Calendar({
   currentDate,
   setCurrentDate,
 }: CalendarProps) {
-  const { user } = useAuth();
+  const { user } = useAuth()
 
   // Get account creation date to limit navigation
   const accountCreationDate = user?.created_at
     ? new Date(user.created_at)
-    : new Date();
+    : new Date()
   const minDate = new Date(
     accountCreationDate.getFullYear(),
     accountCreationDate.getMonth(),
     1
-  );
+  )
 
   // Create a map of days with hints for quick lookup
   const hitsByDay = useMemo(() => {
-    const map = new Map<number, number>();
+    const map = new Map<number, number>()
     hits.forEach((hit) => {
-      const day = new Date(hit.created_at).getDate();
-      map.set(day, (map.get(day) || 0) + 1);
-    });
-    return map;
-  }, [hits]);
+      const day = new Date(hit.created_at).getDate()
+      map.set(day, (map.get(day) || 0) + 1)
+    })
+    return map
+  }, [hits])
 
   // Generate calendar days
   const calendarDays = useMemo(() => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
+    const year = currentDate.getFullYear()
+    const month = currentDate.getMonth()
 
-    const firstDay = new Date(year, month, 1);
-    const startDate = new Date(year, month, 1 - firstDay.getDay());
+    const firstDay = new Date(year, month, 1)
+    const startDate = new Date(year, month, 1 - firstDay.getDay())
 
-    const days = [];
+    const days = []
 
     // Generate 42 days (6 weeks) starting from the calculated start date
     for (let i = 0; i < 42; i++) {
@@ -62,12 +62,12 @@ export default function Calendar({
         startDate.getFullYear(),
         startDate.getMonth(),
         startDate.getDate() + i
-      );
-      days.push(dayDate);
+      )
+      days.push(dayDate)
     }
 
-    return days;
-  }, [currentDate]);
+    return days
+  }, [currentDate])
 
   const monthNames = [
     "Gennaio",
@@ -82,53 +82,61 @@ export default function Calendar({
     "Ottobre",
     "Novembre",
     "Dicembre",
-  ];
+  ]
 
-  const dayNames = ["D", "L", "M", "M", "G", "V", "S"];
+  const dayNames = ["D", "L", "M", "M", "G", "V", "S"]
 
   const goToPreviousMonth = () => {
-    const newDate = new Date(currentDate);
-    newDate.setMonth(newDate.getMonth() - 1);
+    const newDate = new Date(currentDate)
+    newDate.setMonth(newDate.getMonth() - 1)
 
     // Check if we can go back (not before account creation)
     if (newDate >= minDate) {
-      setCurrentDate(newDate);
+      setCurrentDate(newDate)
     }
-  };
+  }
 
   const goToNextMonth = () => {
-    const newDate = new Date(currentDate);
-    newDate.setMonth(newDate.getMonth() + 1);
+    const newDate = new Date(currentDate)
+    newDate.setMonth(newDate.getMonth() + 1)
 
     // Don't allow going to future months
-    const today = new Date();
+    const today = new Date()
     if (newDate <= today) {
-      setCurrentDate(newDate);
+      setCurrentDate(newDate)
     }
-  };
+  }
 
   const isCurrentMonth = (date: Date) => {
     return (
       date.getMonth() === currentDate.getMonth() &&
       date.getFullYear() === currentDate.getFullYear()
-    );
-  };
+    )
+  }
 
   const isToday = (date: Date) => {
-    const today = new Date();
+    const today = new Date()
     return (
       date.getDate() === today.getDate() &&
       date.getMonth() === today.getMonth() &&
       date.getFullYear() === today.getFullYear()
-    );
-  };
+    )
+  }
+
+  const isFutureDate = (date: Date) => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const compareDate = new Date(date)
+    compareDate.setHours(0, 0, 0, 0)
+    return compareDate > today
+  }
 
   const canGoPrevious =
     currentDate.getMonth() > minDate.getMonth() &&
-    currentDate.getFullYear() >= minDate.getFullYear();
+    currentDate.getFullYear() >= minDate.getFullYear()
   const canGoNext =
     currentDate.getMonth() < new Date().getMonth() &&
-    currentDate.getFullYear() <= new Date().getFullYear();
+    currentDate.getFullYear() <= new Date().getFullYear()
 
   return (
     <View>
@@ -180,25 +188,24 @@ export default function Calendar({
         {/* Calendar grid */}
         <View style={[styles.calendarGrid]}>
           {calendarDays.map((date, index) => {
-            const day = date.getDate();
-            const hasHints = hitsByDay.has(day) && isCurrentMonth(date);
-            const isCurrentMonthDay = isCurrentMonth(date);
-            const isTodayDay = isToday(date);
+            const day = date.getDate()
+            const hasHints = hitsByDay.has(day) && isCurrentMonth(date)
+            const isCurrentMonthDay = isCurrentMonth(date)
+            const isTodayDay = isToday(date)
+            const isFuture = isFutureDate(date)
 
             const isSelected =
               selectedDate &&
               selectedDate.getDate() === date.getDate() &&
               selectedDate.getMonth() === date.getMonth() &&
-              selectedDate.getFullYear() === date.getFullYear();
+              selectedDate.getFullYear() === date.getFullYear()
 
             return (
               <TouchableOpacity
                 key={index}
                 style={styles.dayCell}
-                onPress={() => {
-                  return onDayPress?.(date);
-                }}
-                disabled={!isCurrentMonthDay}
+                onPress={() => onDayPress?.(date)}
+                disabled={!isCurrentMonthDay || isFuture}
               >
                 {isTodayDay && (
                   <View style={styles.todayDayBackground}>
@@ -217,6 +224,7 @@ export default function Calendar({
                   style={[
                     styles.dayText,
                     !isCurrentMonthDay && styles.otherMonthText,
+                    isFuture && styles.futureDayText,
                     isTodayDay && styles.todayText,
                     isSelected && styles.selectedDayText,
                   ]}
@@ -229,12 +237,12 @@ export default function Calendar({
                   </View>
                 )}
               </TouchableOpacity>
-            );
+            )
           })}
         </View>
       </Flex>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -310,6 +318,9 @@ const styles = StyleSheet.create({
   otherMonthText: {
     color: "#ccc",
   },
+  futureDayText: {
+    color: "#ddd",
+  },
   todayText: {
     color: "#404B35",
     fontWeight: "800",
@@ -340,4 +351,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-});
+})
