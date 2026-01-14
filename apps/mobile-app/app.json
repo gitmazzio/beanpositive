@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/adaptive.png",
-    "scheme": "mobileapp",
+    "scheme": "beanpositive",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "jsEngine": "jsc",
@@ -46,9 +46,7 @@
           "resizeMode": "contain"
         }
       ],
-      [
-        "expo-router"
-      ],
+      ["expo-router"],
       "expo-notifications",
       [
         "@sentry/react-native/expo",

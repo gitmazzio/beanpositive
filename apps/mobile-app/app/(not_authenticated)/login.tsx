@@ -1,25 +1,46 @@
-import { Button } from "@/components/commons/Button";
-import Flex from "@/components/commons/Flex";
-import HorizontalLine from "@/components/commons/HorizontalLine";
-import Link from "@/components/commons/Link";
-import StyledText from "@/components/commons/StyledText";
-import { PageView } from "@/components/Themed";
-import { useRouter } from "expo-router";
-import { useState } from "react";
-import { Alert, Image, StyleSheet } from "react-native";
+import { Button } from "@/components/commons/Button"
+import Flex from "@/components/commons/Flex"
+import HorizontalLine from "@/components/commons/HorizontalLine"
+import Link from "@/components/commons/Link"
+import StyledText from "@/components/commons/StyledText"
+import { PageView } from "@/components/Themed"
+import { FontAwesome6 } from "@expo/vector-icons"
+import { useRouter } from "expo-router"
+import { useState } from "react"
+import { Alert, Image, StyleSheet } from "react-native"
+import { useAuth } from "@/providers"
+import { useNotificationPermissionFlow } from "@/hooks/useNotificationPermissionFlow"
 
 export default function Login() {
-  const [error, setError] = useState("");
-  const router = useRouter();
+  const [error, setError] = useState("")
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+  const router = useRouter()
+  const { loginWithGoogle } = useAuth()
+  const { checkAndNavigateAfterLogin } = useNotificationPermissionFlow()
+
+  const handleGoogleLogin = async () => {
+    setError("")
+    setIsGoogleLoading(true)
+    try {
+      await loginWithGoogle()
+      // Controlla i permessi delle notifiche e naviga di conseguenza
+      await checkAndNavigateAfterLogin()
+    } catch (err: any) {
+      setError(err.message || "Login con Google fallito")
+      Alert.alert("Errore", err.message || "Login con Google fallito")
+    } finally {
+      setIsGoogleLoading(false)
+    }
+  }
 
   const handleLogin = async () => {
-    setError("");
+    setError("")
     try {
-      router.push("/(not_authenticated)/register");
+      router.push("/(not_authenticated)/register")
     } catch (err: any) {
-      setError(err.message || "Login failed");
+      setError(err.message || "Login failed")
     }
-  };
+  }
 
   return (
     <PageView style={{ gap: 20, paddingTop: 100 }}>
@@ -40,13 +61,20 @@ export default function Login() {
           title="Continua con Apple"
           // onPress={onGoogleButtonPress}
         />
-      ) : null}
+      ) : null}*/}
       <Button
         kind="tertiary"
         prefixIcon={<FontAwesome6 name="google" size={20} color={"#686260"} />}
         title="Continua con Google"
-        // onPress={onGoogleButtonPress}
-      /> */}
+        onPress={handleGoogleLogin}
+        disabled={isGoogleLoading}
+      />
+      {error && (
+        <StyledText kind="body" style={{ color: "red", textAlign: "center" }}>
+          {error}
+        </StyledText>
+      )}
+
       <HorizontalLine color="#E0E0E0" thickness={1} marginVertical={0} />
       <Button
         kind="primary"
@@ -68,7 +96,7 @@ export default function Login() {
         }}
       /> */}
     </PageView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -78,4 +106,4 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
   },
-});
+})

@@ -1,15 +1,11 @@
-import { CustomTabBar } from "@/components/CustomTabBar";
-import { useColorScheme } from "@/components/useColorScheme";
-import Colors from "@/constants/Colors";
-import { type BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { Tabs } from "expo-router";
-import { PocketProvider } from "../../contexts/PocketContext";
-import Toast from "react-native-toast-message";
-import { View } from "react-native";
-import { toastConfig } from "@/utils/toastConfig";
+import PocketProvider from "@/app/contexts/PocketContext"
+import { CustomTabBar } from "@/components/CustomTabBar"
+import { useColorScheme } from "@/components/useColorScheme"
+import Colors from "@/constants/Colors"
+import { Tabs } from "expo-router"
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme()
 
   return (
     <PocketProvider>
@@ -19,7 +15,9 @@ export default function TabLayout() {
           headerShown: false,
           tabBarStyle: {},
         }}
-        tabBar={(props: BottomTabBarProps) => <CustomTabBar {...props} />}
+        tabBar={(props) => (
+          <CustomTabBar {...(props as Parameters<typeof CustomTabBar>[0])} />
+        )}
       >
         <Tabs.Screen
           name="index"
@@ -35,5 +33,5 @@ export default function TabLayout() {
         />
       </Tabs>
     </PocketProvider>
-  );
+  )
 }

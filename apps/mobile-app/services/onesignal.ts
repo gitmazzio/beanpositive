@@ -1,29 +1,198 @@
-import * as Notifications from "expo-notifications";
-import { Alert, Linking, Platform } from "react-native";
-import { OneSignal } from "react-native-onesignal";
-import { router } from "expo-router";
+import * as Notifications from "expo-notifications"
+import { Alert, Linking, Platform } from "react-native"
+import { OneSignal } from "react-native-onesignal"
+import { router } from "expo-router"
 
 // Configurazione OneSignal
-OneSignal.initialize(process.env.EXPO_PUBLIC_ONESIGNAL_APP_ID!);
+OneSignal.initialize(process.env.EXPO_PUBLIC_ONESIGNAL_APP_ID!)
 
-const NOTIFICATION_TEXTS = [
+const DAYS_TO_SCHEDULE = 60
+
+// Messaggi per il mattino (daily_one)
+const DAILY_ONE_MESSAGES: Array<{
+  title: string
+  body: string
+  sound?: string
+}> = [
   {
-    id: "daily_one",
-    texts: {
-      title: "Oggi, fai caso ai bei momenti ✨",
-      body: "Anche solo un attimo può diventare un fagiolo da custodire",
-      sound: "default",
-    },
+    title: "Oggi, fai caso ai bei momenti ✨",
+    body: "Anche solo un attimo può diventare un fagiolo da custodire",
+    sound: "default",
   },
   {
-    id: "daily_two",
-    texts: {
-      title: "Cos'è andato bene oggi? 🫘",
-      body: "Prima di andare a dormire… pensa a quel momento che oggi ti ha fatto sorridere",
-      sound: "default",
-    },
+    title: "Buongiorno! 🌅",
+    body: "Inizia la giornata con un sorriso e cerca i piccoli momenti di gioia",
+    sound: "default",
   },
-];
+  {
+    title: "Un nuovo giorno, nuove possibilità 🌱",
+    body: "Cosa ti renderà felice oggi? Tieni gli occhi aperti per i bei momenti",
+    sound: "default",
+  },
+  {
+    title: "Inizia con positività ☀️",
+    body: "Ogni giorno è un'opportunità per raccogliere fagioli positivi",
+    sound: "default",
+  },
+  {
+    title: "Buongiorno! 💫",
+    body: "Oggi cerca almeno un momento che ti faccia sorridere",
+    sound: "default",
+  },
+  {
+    title: "Un nuovo inizio 🌸",
+    body: "Quale bel momento vuoi custodire oggi?",
+    sound: "default",
+  },
+  {
+    title: "Buongiorno! 🌺",
+    body: "Inizia la giornata con gratitudine per i piccoli piaceri",
+    sound: "default",
+  },
+  {
+    title: "Oggi è il giorno perfetto ✨",
+    body: "Cerca i momenti che ti fanno sentire grato",
+    sound: "default",
+  },
+  {
+    title: "Buongiorno! 🦋",
+    body: "Ogni giorno porta con sé qualcosa di bello da notare",
+    sound: "default",
+  },
+  {
+    title: "Inizia con un sorriso 😊",
+    body: "Quale momento positivo vuoi ricordare oggi?",
+    sound: "default",
+  },
+  {
+    title: "Buongiorno! 🌈",
+    body: "Cerca la bellezza nelle piccole cose di oggi",
+    sound: "default",
+  },
+  {
+    title: "Un nuovo giorno da vivere 🌟",
+    body: "Tieni il cuore aperto ai momenti di gioia",
+    sound: "default",
+  },
+  {
+    title: "Buongiorno! 🍀",
+    body: "Oggi, fai attenzione a ciò che ti rende felice",
+    sound: "default",
+  },
+  {
+    title: "Inizia con gratitudine 🙏",
+    body: "Quale bel momento vuoi aggiungere alla tua tasca oggi?",
+    sound: "default",
+  },
+  {
+    title: "Buongiorno! 🌻",
+    body: "Ogni giorno è una nuova opportunità per essere felici",
+    sound: "default",
+  },
+]
+
+// Messaggi per la sera (daily_two)
+const DAILY_TWO_MESSAGES: Array<{
+  title: string
+  body: string
+  sound?: string
+}> = [
+  {
+    title: "Cos'è andato bene oggi? 🫘",
+    body: "Prima di andare a dormire… pensa a quel momento che oggi ti ha fatto sorridere",
+    sound: "default",
+  },
+  {
+    title: "Rifletti sulla giornata 🌙",
+    body: "Quale momento positivo vuoi ricordare prima di dormire?",
+    sound: "default",
+  },
+  {
+    title: "Buonanotte! ✨",
+    body: "Pensa a qualcosa di bello che è successo oggi",
+    sound: "default",
+  },
+  {
+    title: "Raccogli i tuoi fagioli 🌙",
+    body: "Quale bel momento vuoi custodire prima di dormire?",
+    sound: "default",
+  },
+  {
+    title: "Fine giornata 💫",
+    body: "Ripensa a un momento che ti ha reso felice oggi",
+    sound: "default",
+  },
+  {
+    title: "Buonanotte! 🌟",
+    body: "Prima di dormire, pensa a qualcosa per cui sei grato",
+    sound: "default",
+  },
+  {
+    title: "Rifletti con gratitudine 🙏",
+    body: "Quale momento positivo vuoi portare con te nel sonno?",
+    sound: "default",
+  },
+  {
+    title: "Buonanotte! 🌸",
+    body: "Pensa a un bel momento di oggi da custodire",
+    sound: "default",
+  },
+  {
+    title: "Fine giornata con positività ☀️",
+    body: "Quale fagiolo positivo vuoi aggiungere alla tua tasca?",
+    sound: "default",
+  },
+  {
+    title: "Buonanotte! 🌺",
+    body: "Ripensa a qualcosa di bello che è successo oggi",
+    sound: "default",
+  },
+  {
+    title: "Raccogli i momenti positivi 🌙",
+    body: "Prima di dormire, pensa a un momento che ti ha fatto sorridere",
+    sound: "default",
+  },
+  {
+    title: "Buonanotte! 🦋",
+    body: "Quale bel momento vuoi ricordare di questa giornata?",
+    sound: "default",
+  },
+  {
+    title: "Fine giornata con gratitudine 🌈",
+    body: "Pensa a qualcosa per cui essere grato oggi",
+    sound: "default",
+  },
+  {
+    title: "Buonanotte! 🌟",
+    body: "Ripensa a un momento positivo che vuoi custodire",
+    sound: "default",
+  },
+  {
+    title: "Rifletti sulla giornata 🍀",
+    body: "Quale fagiolo positivo vuoi aggiungere prima di dormire?",
+    sound: "default",
+  },
+]
+
+/**
+ * Seleziona un messaggio basato sulla data del giorno
+ * Usa il giorno dell'anno come seed per garantire che lo stesso giorno
+ * abbia sempre lo stesso messaggio, ma vari tra giorni diversi
+ */
+const getMessageForDate = (
+  messages: Array<{ title: string; body: string; sound?: string }>,
+  date: Date = new Date()
+): { title: string; body: string; sound?: string } => {
+  // Calcola il giorno dell'anno (1-365/366)
+  const startOfYear = new Date(date.getFullYear(), 0, 1)
+  const dayOfYear = Math.floor(
+    (date.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24)
+  )
+
+  // Usa il giorno dell'anno come indice per selezionare il messaggio
+  const index = dayOfYear % messages.length
+  return messages[index]
+}
 
 // Configurazione delle notifiche Expo
 Notifications.setNotificationHandler({
@@ -31,48 +200,50 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
-});
+})
 
 export interface NotificationData {
-  type?: string;
-  screen?: string;
-  id?: string;
-  [key: string]: any;
+  type?: string
+  screen?: string
+  id?: string
+  [key: string]: any
 }
 
 export class OneSignalService {
-  private static instance: OneSignalService;
-  private isInitialized = false;
+  private static instance: OneSignalService
+  private isInitialized = false
   private scheduledNotificationIds: Record<string, string | null> = {
     daily_one: null,
     daily_two: null,
-  };
+  }
 
   private constructor() {}
 
   public static getInstance(): OneSignalService {
     if (!OneSignalService.instance) {
-      OneSignalService.instance = new OneSignalService();
+      OneSignalService.instance = new OneSignalService()
     }
-    return OneSignalService.instance;
+    return OneSignalService.instance
   }
 
   /**
    * Inizializza OneSignal e richiede i permessi
    */
   public async initialize(): Promise<void> {
-    if (this.isInitialized) return;
+    if (this.isInitialized) return
 
     try {
       // Configura i listener per le notifiche
-      this.setupNotificationListeners();
+      this.setupNotificationListeners()
 
-      this.isInitialized = true;
-      console.log("OneSignal initialized successfully");
+      this.isInitialized = true
+      console.log("OneSignal initialized successfully")
     } catch (error) {
-      console.error("Error initializing OneSignal:", error);
-      throw error;
+      console.error("Error initializing OneSignal:", error)
+      throw error
     }
   }
 
@@ -83,12 +254,12 @@ export class OneSignalService {
     try {
       if (Platform.OS === "ios") {
         const { status: existingStatus } =
-          await Notifications.getPermissionsAsync();
-        let finalStatus = existingStatus;
+          await Notifications.getPermissionsAsync()
+        let finalStatus = existingStatus
 
         if (existingStatus !== "granted") {
-          const { status } = await Notifications.requestPermissionsAsync();
-          finalStatus = status;
+          const { status } = await Notifications.requestPermissionsAsync()
+          finalStatus = status
         }
 
         if (finalStatus !== "granted") {
@@ -102,24 +273,25 @@ export class OneSignalService {
                 onPress: () => Linking.openSettings(),
               },
             ]
-          );
-          return false;
+          )
+          return false
         }
       }
 
       // Richiede i permessi OneSignal
-      const permission = await OneSignal.Notifications.requestPermission(true);
+      const permission = await OneSignal.Notifications.requestPermission(true)
 
-      return permission;
+      return permission
     } catch (error) {
-      console.error("Error requesting notification permissions:", error);
-      return false;
+      console.error("Error requesting notification permissions:", error)
+      return false
     }
   }
 
   /**
-   * Schedula una notifica locale giornaliera all'orario specificato (ora:minuti)
-   * Restituisce l'id della notifica schedulata
+   * Schedula notifiche giornaliere per i prossimi giorni con messaggi variati
+   * Programma le notifiche per i prossimi 60 giorni con messaggi diversi ogni giorno
+   * Restituisce l'id dell'ultima notifica schedulata
    */
   public async scheduleDailyNotification(
     id: "daily_one" | "daily_two",
@@ -128,39 +300,54 @@ export class OneSignalService {
     data?: Notifications.NotificationContentInput["data"]
   ): Promise<string | null> {
     try {
-      // Cancella l'eventuale notifica precedente con lo stesso id
-      const existing = this.scheduledNotificationIds[id];
-      if (existing) {
-        try {
-          await Notifications.cancelScheduledNotificationAsync(existing);
-        } catch {}
+      // Cancella tutte le notifiche precedenti con lo stesso slot
+      await this.cancelDailyNotification(id)
+
+      const messages =
+        id === "daily_one" ? DAILY_ONE_MESSAGES : DAILY_TWO_MESSAGES
+      const today = new Date()
+      today.setHours(hour, minute, 0, 0)
+
+      // Se l'orario di oggi è già passato, inizia da domani
+      if (today.getTime() < Date.now()) {
+        today.setDate(today.getDate() + 1)
       }
 
-      const trigger: Notifications.DailyTriggerInput = {
-        type: Notifications.SchedulableTriggerInputTypes.DAILY,
-        channelId: Platform.OS === "android" ? "default" : undefined,
-        hour,
-        minute,
-      };
+      // Programma le notifiche per i prossimi 60 giorni
+      let lastIdentifier: string | null = null
 
-      const content = NOTIFICATION_TEXTS.find((item) => item.id === id);
+      for (let day = 0; day < DAYS_TO_SCHEDULE; day++) {
+        const notificationDate = new Date(today)
+        // Aggiungi giorni usando millisecondi per garantire date consecutive corrette
+        notificationDate.setTime(today.getTime() + day * 24 * 60 * 60 * 1000)
 
-      // Ensure we tag the content with our slot id so we can discover it later
-      const contentWithId: Notifications.NotificationContentInput = {
-        ...content?.texts,
-        data: { ...(data as any), slot: id },
-      };
+        // Seleziona il messaggio per questa data specifica
+        const selectedMessage = getMessageForDate(messages, notificationDate)
 
-      const identifier = await Notifications.scheduleNotificationAsync({
-        content: contentWithId,
-        trigger,
-      });
+        const trigger: Notifications.DateTriggerInput = {
+          type: Notifications.SchedulableTriggerInputTypes.DATE,
+          date: notificationDate,
+        }
 
-      this.scheduledNotificationIds[id] = identifier;
-      return identifier;
+        const contentWithId: Notifications.NotificationContentInput = {
+          ...selectedMessage,
+          data: { ...(data as any), slot: id },
+        }
+
+        const identifier = await Notifications.scheduleNotificationAsync({
+          content: contentWithId,
+          trigger,
+        })
+
+        lastIdentifier = identifier
+      }
+
+      // Salva l'ultimo identifier per riferimento
+      this.scheduledNotificationIds[id] = lastIdentifier
+      return lastIdentifier
     } catch (error) {
-      console.error("Error scheduling daily notification:", error);
-      return null;
+      console.error("Error scheduling daily notification:", error)
+      return null
     }
   }
 
@@ -171,25 +358,25 @@ export class OneSignalService {
     id: "daily_one" | "daily_two"
   ): Promise<void> {
     try {
-      const identifier = this.scheduledNotificationIds[id];
+      const identifier = this.scheduledNotificationIds[id]
       if (identifier) {
-        await Notifications.cancelScheduledNotificationAsync(identifier);
-        this.scheduledNotificationIds[id] = null;
+        await Notifications.cancelScheduledNotificationAsync(identifier)
+        this.scheduledNotificationIds[id] = null
       }
       // Also best-effort cancel by inspecting scheduled notifications with data.slot
-      const all = await Notifications.getAllScheduledNotificationsAsync();
+      const all = await Notifications.getAllScheduledNotificationsAsync()
       for (const n of all) {
-        const slot = (n as any)?.content?.data?.slot;
+        const slot = (n as any)?.content?.data?.slot
         if (slot === id) {
           try {
             await Notifications.cancelScheduledNotificationAsync(
               (n as any).identifier
-            );
+            )
           } catch {}
         }
       }
     } catch (error) {
-      console.error("Error cancelling daily notification:", error);
+      console.error("Error cancelling daily notification:", error)
     }
   }
 
@@ -197,13 +384,13 @@ export class OneSignalService {
    * Restituisce lo stato locale di attivazione delle due notifiche
    */
   public getDailyNotificationsState(): {
-    daily_one: boolean;
-    daily_two: boolean;
+    daily_one: boolean
+    daily_two: boolean
   } {
     return {
       daily_one: !!this.scheduledNotificationIds.daily_one,
       daily_two: !!this.scheduledNotificationIds.daily_two,
-    };
+    }
   }
 
   /**
@@ -211,34 +398,34 @@ export class OneSignalService {
    * Aggiorna la cache interna e restituisce lo stato.
    */
   public async refreshDailyStateFromSystem(): Promise<{
-    daily_one: boolean;
-    daily_two: boolean;
+    daily_one: boolean
+    daily_two: boolean
   }> {
     try {
-      const all = await Notifications.getAllScheduledNotificationsAsync();
+      const all = await Notifications.getAllScheduledNotificationsAsync()
 
       const found: Record<string, string | null> = {
         daily_one: null,
         daily_two: null,
-      };
+      }
       for (const n of all) {
-        const slot = (n as any)?.content?.data?.slot;
+        const slot = (n as any)?.content?.data?.slot
         if (slot === "daily_one" || slot === "daily_two") {
-          found[slot] = (n as any).identifier;
+          found[slot] = (n as any).identifier
         }
       }
       this.scheduledNotificationIds = {
         daily_one: found.daily_one,
         daily_two: found.daily_two,
-      } as any;
+      } as any
 
       return {
         daily_one: !!found.daily_one,
         daily_two: !!found.daily_two,
-      };
+      }
     } catch (error) {
-      console.error("Error refreshing daily notifications state:", error);
-      return this.getDailyNotificationsState();
+      console.error("Error refreshing daily notifications state:", error)
+      return this.getDailyNotificationsState()
     }
   }
 
@@ -248,19 +435,19 @@ export class OneSignalService {
   private setupNotificationListeners(): void {
     // Listener per quando l'app è aperta e riceve una notifica
     OneSignal.Notifications.addEventListener("click", (event) => {
-      console.log("OneSignal: notification clicked:", event);
-      this.handleNotificationClick(event.notification);
-    });
+      console.log("OneSignal: notification clicked:", event)
+      this.handleNotificationClick(event.notification)
+    })
 
     // Listener per quando l'app è in background e riceve una notifica
     OneSignal.Notifications.addEventListener(
       "foregroundWillDisplay",
       (event) => {
-        console.log("OneSignal: notification received in foreground:", event);
+        console.log("OneSignal: notification received in foreground:", event)
         // Qui puoi decidere se mostrare o meno la notifica
-        event.getNotification().display();
+        event.getNotification().display()
       }
-    );
+    )
   }
 
   /**
@@ -268,13 +455,13 @@ export class OneSignalService {
    */
   private handleNotificationClick(notification: any): void {
     try {
-      const data: NotificationData = notification.additionalData || {};
-      console.log("Notification data:", data);
+      const data: NotificationData = notification.additionalData || {}
+      console.log("Notification data:", data)
 
       // Gestisce i deeplink basati sui dati della notifica
-      this.handleDeepLink(data);
+      this.handleDeepLink(data)
     } catch (error) {
-      console.error("Error handling notification click:", error);
+      console.error("Error handling notification click:", error)
     }
   }
 
@@ -287,40 +474,40 @@ export class OneSignalService {
         switch (data.type) {
           case "navigate":
             // Naviga a una schermata specifica
-            router.push(data.screen as any);
-            break;
+            router.push(data.screen as any)
+            break
 
           case "profile":
             // Naviga al profilo utente
-            router.push("/(authenticated)/(profile)");
-            break;
+            router.push("/(authenticated)/(profile)")
+            break
 
           case "pocket":
             // Naviga a una pocket specifica
             if (data.id) {
-              router.push(`/(authenticated)/(tabs)/pocket/${data.id}`);
+              router.push(`/(authenticated)/(tabs)/pocket/${data.id}`)
             } else {
-              router.push("/(authenticated)/(tabs)");
+              router.push("/(authenticated)/(tabs)")
             }
-            break;
+            break
 
           case "settings":
             // Naviga alle impostazioni
-            router.push("/(authenticated)/(profile)/settings");
-            break;
+            router.push("/(authenticated)/(profile)/settings")
+            break
 
           default:
             // Naviga alla schermata principale
-            router.push("/(authenticated)/(tabs)");
+            router.push("/(authenticated)/(tabs)")
         }
       } else {
         // Se non ci sono dati specifici, naviga alla schermata principale
-        router.push("/(authenticated)/(tabs)");
+        router.push("/(authenticated)/(tabs)")
       }
     } catch (error) {
-      console.error("Error handling deep link:", error);
+      console.error("Error handling deep link:", error)
       // Fallback alla schermata principale
-      router.push("/(authenticated)/(tabs)");
+      router.push("/(authenticated)/(tabs)")
     }
   }
 
@@ -329,10 +516,10 @@ export class OneSignalService {
    */
   public async setUserTag(key: string, value: string): Promise<void> {
     try {
-      OneSignal.User.addTag(key, value);
-      console.log(`Tag set: ${key} = ${value}`);
+      OneSignal.User.addTag(key, value)
+      console.log(`Tag set: ${key} = ${value}`)
     } catch (error) {
-      console.error("Error setting user tag:", error);
+      console.error("Error setting user tag:", error)
     }
   }
 
@@ -341,10 +528,10 @@ export class OneSignalService {
    */
   public async setUserTags(tags: Record<string, string>): Promise<void> {
     try {
-      OneSignal.User.addTags(tags);
-      console.log("Tags set:", tags);
+      OneSignal.User.addTags(tags)
+      console.log("Tags set:", tags)
     } catch (error) {
-      console.error("Error setting user tags:", error);
+      console.error("Error setting user tags:", error)
     }
   }
 
@@ -353,10 +540,10 @@ export class OneSignalService {
    */
   public async setExternalUserId(userId: string): Promise<void> {
     try {
-      OneSignal.login(userId);
-      console.log("External user ID set:", userId);
+      OneSignal.login(userId)
+      console.log("External user ID set:", userId)
     } catch (error) {
-      console.error("Error setting external user ID:", error);
+      console.error("Error setting external user ID:", error)
     }
   }
 
@@ -365,10 +552,10 @@ export class OneSignalService {
    */
   public async removeExternalUserId(): Promise<void> {
     try {
-      OneSignal.logout();
-      console.log("External user ID removed");
+      OneSignal.logout()
+      console.log("External user ID removed")
     } catch (error) {
-      console.error("Error removing external user ID:", error);
+      console.error("Error removing external user ID:", error)
     }
   }
 
@@ -377,11 +564,11 @@ export class OneSignalService {
    */
   public async getDeviceId(): Promise<string | null> {
     try {
-      const deviceState = await OneSignal.User.getOnesignalId();
-      return deviceState;
+      const deviceState = await OneSignal.User.getOnesignalId()
+      return deviceState
     } catch (error) {
-      console.error("Error getting device ID:", error);
-      return null;
+      console.error("Error getting device ID:", error)
+      return null
     }
   }
 
@@ -390,11 +577,11 @@ export class OneSignalService {
    */
   public async areNotificationsEnabled(): Promise<boolean> {
     try {
-      const permission = await OneSignal.Notifications.getPermissionAsync();
-      return permission;
+      const permission = await OneSignal.Notifications.getPermissionAsync()
+      return permission
     } catch (error) {
-      console.error("Error checking notification permission:", error);
-      return false;
+      console.error("Error checking notification permission:", error)
+      return false
     }
   }
 
@@ -403,7 +590,7 @@ export class OneSignalService {
    */
   public async promptForNotifications(): Promise<void> {
     try {
-      const hasPermission = await this.areNotificationsEnabled();
+      const hasPermission = await this.areNotificationsEnabled()
 
       if (!hasPermission) {
         Alert.alert(
@@ -414,17 +601,17 @@ export class OneSignalService {
             {
               text: "Abilita",
               onPress: async () => {
-                await this.requestPermissions();
+                await this.requestPermissions()
               },
             },
           ]
-        );
+        )
       }
     } catch (error) {
-      console.error("Error prompting for notifications:", error);
+      console.error("Error prompting for notifications:", error)
     }
   }
 }
 
 // Esporta un'istanza singleton
-export const oneSignalService = OneSignalService.getInstance();
+export const oneSignalService = OneSignalService.getInstance()
