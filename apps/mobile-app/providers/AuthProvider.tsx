@@ -59,14 +59,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         // Gestisce OneSignal quando l'utente si logga/logout
         if (session?.user) {
           // Utente loggato - imposta l'ID esterno e i tag
-          await oneSignalService.setExternalUserId(session.user.id)
-          await oneSignalService.setUserTags({
-            email: session.user.email || "",
-            created_at: session.user.created_at,
-          })
+          try {
+            await oneSignalService.setExternalUserId(session.user.id)
+            await oneSignalService.setUserTags({
+              email: session.user.email || "",
+              created_at: session.user.created_at,
+            })
+          } catch (oneSignalError) {
+            // Non bloccare il flusso se OneSignal fallisce
+            console.error("OneSignal error (non-blocking):", oneSignalError)
+          }
         } else {
           // Utente disconnesso - rimuovi l'ID esterno
-          await oneSignalService.removeExternalUserId()
+          try {
+            await oneSignalService.removeExternalUserId()
+          } catch (oneSignalError) {
+            // Non bloccare il flusso se OneSignal fallisce
+            console.error("OneSignal error (non-blocking):", oneSignalError)
+          }
         }
       }
     )
@@ -108,17 +118,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // Apri il browser per l'autenticazione
       const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo)
 
-      if (result.type === "success" && result.url) {
-        // Estrai i parametri dalla URL di callback
-        const url = new URL(result.url)
-        const code = url.searchParams.get("code")
-        const errorParam = url.searchParams.get("error")
-
-        if (errorParam) {
-          throw new Error(`OAuth error: ${errorParam}`)
+      if (result.type === "success") {
+        if (!result.url) {
+          throw new Error("OAuth callback URL is missing")
         }
 
-        if (code) {
+        try {
+          // Estrai i parametri dalla URL di callback
+          const url = new URL(result.url)
+          const code = url.searchParams.get("code")
+          const errorParam = url.searchParams.get("error")
+
+          if (errorParam) {
+            throw new Error(`OAuth error: ${errorParam}`)
+          }
+
+          if (!code || code.trim() === "") {
+            throw new Error("Invalid or empty authorization code")
+          }
+
           // Scambia il codice con la sessione
           const { data: sessionData, error: exchangeError } =
             await supabase.auth.exchangeCodeForSession(code)
@@ -129,17 +147,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           if (!sessionData.session) {
             throw new Error("No session returned after code exchange")
           }
-        } else {
-          // Se non c'è un codice, prova a ottenere la sessione direttamente
-          // (potrebbe essere già stata impostata da Supabase)
-          const { data: sessionData, error: sessionError } =
-            await supabase.auth.getSession()
-
-          if (sessionError || !sessionData.session) {
-            throw new Error(
-              "No authorization code returned and no active session"
-            )
+        } catch (urlError: any) {
+          if (urlError instanceof TypeError) {
+            throw new Error("Invalid callback URL received from OAuth provider")
           }
+          throw urlError
         }
       } else if (result.type === "cancel") {
         throw new Error("Authentication cancelled by user")
@@ -154,11 +166,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const loginWithApple = async () => {
     try {
-      // Verifica che Apple Authentication sia disponibile (solo su iOS)
-      if (Platform.OS !== "ios") {
-        throw new Error("Apple Sign In is only available on iOS")
-      }
-
       const isAvailable = await AppleAuthentication.isAvailableAsync()
       if (!isAvailable) {
         throw new Error("Apple Sign In is not available on this device")
@@ -188,9 +195,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!data.session) {
         throw new Error("No session returned after Apple authentication")
       }
+
+      // Salva il nome se disponibile (solo al primo login)
+      if (credential.fullName) {
+        const fullName = [
+          credential.fullName.givenName,
+          credential.fullName.familyName,
+        ]
+          .filter(Boolean)
+          .join(" ")
+
+        if (fullName) {
+          try {
+            await supabase.auth.updateUser({
+              data: {
+                full_name: fullName,
+                given_name: credential.fullName.givenName || undefined,
+                family_name: credential.fullName.familyName || undefined,
+              },
+            })
+          } catch (updateError) {
+            // Non bloccare il flusso se l'aggiornamento del nome fallisce
+            console.error("Error updating user name (non-blocking):", updateError)
+          }
+        }
+      }
     } catch (error: any) {
       // Gestisci l'errore di cancellazione dell'utente
-      if (error.code === "ERR_REQUEST_CANCELED") {
+      if (
+        error.code === "ERR_REQUEST_CANCELED" ||
+        error.code === "ERR_CANCELED" ||
+        error.message?.toLowerCase().includes("cancel")
+      ) {
         throw new Error("Authentication cancelled by user")
       }
       console.error("Apple login error:", error)

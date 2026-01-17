@@ -15,37 +15,68 @@ export default function Login() {
   const [error, setError] = useState("")
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isAppleLoading, setIsAppleLoading] = useState(false)
+  const [isAuthenticating, setIsAuthenticating] = useState(false)
   const router = useRouter()
-  const { loginWithGoogle, loginWithApple } = useAuth()
+  const { user, loginWithGoogle, loginWithApple } = useAuth()
   const { checkAndNavigateAfterLogin } = useNotificationPermissionFlow()
 
   const handleGoogleLogin = async () => {
+    // Prevenire login simultanei
+    if (isAuthenticating || isGoogleLoading || isAppleLoading) return
+
+    // Se l'utente è già loggato, naviga direttamente
+    if (user) {
+      await checkAndNavigateAfterLogin()
+      return
+    }
+
     setError("")
     setIsGoogleLoading(true)
+    setIsAuthenticating(true)
     try {
       await loginWithGoogle()
       // Controlla i permessi delle notifiche e naviga di conseguenza
       await checkAndNavigateAfterLogin()
     } catch (err: any) {
-      setError(err.message || "Login con Google fallito")
-      Alert.alert("Errore", err.message || "Login con Google fallito")
+      const errorMessage = err.message || "Login con Google fallito"
+      setError(errorMessage)
+      // Non mostrare alert per cancellazione utente
+      if (!errorMessage.includes("cancelled")) {
+        Alert.alert("Errore", errorMessage)
+      }
     } finally {
       setIsGoogleLoading(false)
+      setIsAuthenticating(false)
     }
   }
 
   const handleAppleLogin = async () => {
+    // Prevenire login simultanei
+    if (isAuthenticating || isGoogleLoading || isAppleLoading) return
+
+    // Se l'utente è già loggato, naviga direttamente
+    if (user) {
+      await checkAndNavigateAfterLogin()
+      return
+    }
+
     setError("")
     setIsAppleLoading(true)
+    setIsAuthenticating(true)
     try {
       await loginWithApple()
       // Controlla i permessi delle notifiche e naviga di conseguenza
       await checkAndNavigateAfterLogin()
     } catch (err: any) {
-      setError(err.message || "Login con Apple fallito")
-      Alert.alert("Errore", err.message || "Login con Apple fallito")
+      const errorMessage = err.message || "Login con Apple fallito"
+      setError(errorMessage)
+      // Non mostrare alert per cancellazione utente
+      if (!errorMessage.includes("cancelled")) {
+        Alert.alert("Errore", errorMessage)
+      }
     } finally {
       setIsAppleLoading(false)
+      setIsAuthenticating(false)
     }
   }
 
@@ -70,22 +101,22 @@ export default function Login() {
       <StyledText kind="body" textAlign="center">
         {`Con un account personale potrai tenere traccia\ne conservare tutti i tuoi momenti`}
       </StyledText>
-      {Platform.OS === "ios" ? (
-        <Button
-          kind="tertiary"
-          prefixIcon={<FontAwesome6 name="apple" size={20} color={"#686260"} />}
-          title="Continua con Apple"
-          onPress={handleAppleLogin}
-          disabled={isAppleLoading}
-        />
-      ) : null}
       <Button
         kind="tertiary"
         prefixIcon={<FontAwesome6 name="google" size={20} color={"#686260"} />}
         title="Continua con Google"
         onPress={handleGoogleLogin}
         disabled={isGoogleLoading}
-      />
+        />
+        {Platform.OS === "ios" ? (
+          <Button
+            kind="tertiary"
+            prefixIcon={<FontAwesome6 name="apple" size={20} color={"#686260"} />}
+            title="Continua con Apple"
+            onPress={handleAppleLogin}
+            disabled={isAppleLoading}
+          />
+        ) : null}
       {error && (
         <StyledText kind="body" style={{ color: "red", textAlign: "center" }}>
           {error}
