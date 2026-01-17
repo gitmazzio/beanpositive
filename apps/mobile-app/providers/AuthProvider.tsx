@@ -2,9 +2,11 @@ import { oneSignalService } from "@/services/onesignal"
 import { supabase } from "@/services/supabase"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { type AuthUser } from "@supabase/supabase-js"
+import * as AppleAuthentication from "expo-apple-authentication"
 import * as AuthSession from "expo-auth-session"
 import * as WebBrowser from "expo-web-browser"
 import * as Notifications from "expo-notifications"
+import { Platform } from "react-native"
 import React, {
   createContext,
   useContext,
@@ -21,6 +23,7 @@ interface AuthContextProps {
   loading: boolean
   login: (email: string, password: string) => Promise<void>
   loginWithGoogle: () => Promise<void>
+  loginWithApple: () => Promise<void>
   logout: () => Promise<void>
   register: (
     email: string,
@@ -149,6 +152,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }
 
+  const loginWithApple = async () => {
+    try {
+      // Verifica che Apple Authentication sia disponibile (solo su iOS)
+      if (Platform.OS !== "ios") {
+        throw new Error("Apple Sign In is only available on iOS")
+      }
+
+      const isAvailable = await AppleAuthentication.isAvailableAsync()
+      if (!isAvailable) {
+        throw new Error("Apple Sign In is not available on this device")
+      }
+
+      // Richiedi le credenziali Apple
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      })
+
+      if (!credential.identityToken) {
+        throw new Error("No identity token returned from Apple")
+      }
+
+      // Usa l'identity token per autenticarsi con Supabase
+      const { data, error } = await supabase.auth.signInWithIdToken({
+        provider: "apple",
+        token: credential.identityToken,
+      })
+
+      if (error) throw error
+
+      // La sessione viene gestita automaticamente da onAuthStateChange
+      if (!data.session) {
+        throw new Error("No session returned after Apple authentication")
+      }
+    } catch (error: any) {
+      // Gestisci l'errore di cancellazione dell'utente
+      if (error.code === "ERR_REQUEST_CANCELED") {
+        throw new Error("Authentication cancelled by user")
+      }
+      console.error("Apple login error:", error)
+      throw error
+    }
+  }
+
   const logout = async () => {
     setLoading(true)
     await Notifications.cancelAllScheduledNotificationsAsync()
@@ -193,11 +242,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       loading,
       login,
       loginWithGoogle,
+      loginWithApple,
       logout,
       register,
       setAuthIsLoading: setLoading,
     }),
-    [user, loading, login, loginWithGoogle, logout, register]
+    [user, loading, login, loginWithGoogle, loginWithApple, logout, register]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

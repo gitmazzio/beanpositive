@@ -7,15 +7,16 @@ import { PageView } from "@/components/Themed"
 import { FontAwesome6 } from "@expo/vector-icons"
 import { useRouter } from "expo-router"
 import { useState } from "react"
-import { Alert, Image, StyleSheet } from "react-native"
+import { Alert, Image, Platform, StyleSheet } from "react-native"
 import { useAuth } from "@/providers"
 import { useNotificationPermissionFlow } from "@/hooks/useNotificationPermissionFlow"
 
 export default function Login() {
   const [error, setError] = useState("")
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+  const [isAppleLoading, setIsAppleLoading] = useState(false)
   const router = useRouter()
-  const { loginWithGoogle } = useAuth()
+  const { loginWithGoogle, loginWithApple } = useAuth()
   const { checkAndNavigateAfterLogin } = useNotificationPermissionFlow()
 
   const handleGoogleLogin = async () => {
@@ -30,6 +31,21 @@ export default function Login() {
       Alert.alert("Errore", err.message || "Login con Google fallito")
     } finally {
       setIsGoogleLoading(false)
+    }
+  }
+
+  const handleAppleLogin = async () => {
+    setError("")
+    setIsAppleLoading(true)
+    try {
+      await loginWithApple()
+      // Controlla i permessi delle notifiche e naviga di conseguenza
+      await checkAndNavigateAfterLogin()
+    } catch (err: any) {
+      setError(err.message || "Login con Apple fallito")
+      Alert.alert("Errore", err.message || "Login con Apple fallito")
+    } finally {
+      setIsAppleLoading(false)
     }
   }
 
@@ -54,14 +70,15 @@ export default function Login() {
       <StyledText kind="body" textAlign="center">
         {`Con un account personale potrai tenere traccia\ne conservare tutti i tuoi momenti`}
       </StyledText>
-      {/* {Platform.OS === "ios" ? (
+      {Platform.OS === "ios" ? (
         <Button
           kind="tertiary"
           prefixIcon={<FontAwesome6 name="apple" size={20} color={"#686260"} />}
           title="Continua con Apple"
-          // onPress={onGoogleButtonPress}
+          onPress={handleAppleLogin}
+          disabled={isAppleLoading}
         />
-      ) : null}*/}
+      ) : null}
       <Button
         kind="tertiary"
         prefixIcon={<FontAwesome6 name="google" size={20} color={"#686260"} />}

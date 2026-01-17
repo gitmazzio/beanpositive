@@ -12,12 +12,14 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.beanpositive.app",
+      "deploymentTarget": "15.1",
       "googleServicesFile": "./services/GoogleService-Info.plist",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
       "entitlements": {
-        "aps-environment": "production"
+        "aps-environment": "production",
+        "com.apple.developer.applesignin": ["Default"]
       },
       "buildNumber": "10"
     },
@@ -62,7 +64,8 @@
           "mode": "production"
         }
       ],
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-apple-authentication"
     ],
     "experiments": {
       "typedRoutes": true
