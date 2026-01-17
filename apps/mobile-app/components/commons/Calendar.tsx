@@ -1,10 +1,8 @@
-import React, { useState, useMemo } from "react"
-import { StyleSheet, TouchableOpacity, View } from "react-native"
-import { useAuth } from "@/providers"
-import { useUserHitsByMonth } from "@/queries/mutations/useUserHitsByMonth"
-import StyledText from "@/components/commons/StyledText"
 import Flex from "@/components/commons/Flex"
+import StyledText from "@/components/commons/StyledText"
 import { FontAwesome6 } from "@expo/vector-icons"
+import { useMemo } from "react"
+import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { BeanSvgComponent } from "../pocket/BeansMapGeneration"
 import { CalendarDayBorder } from "../svg/CalendarDayBorder"
 import { TodayDayBackground } from "../svg/TodayDayBackground"
@@ -14,7 +12,11 @@ interface CalendarProps {
   selectedDate?: Date
   hits: any[]
   currentDate: Date
-  setCurrentDate: (date: Date) => void
+  onPreviousMonth: () => void
+  onNextMonth: () => void
+  canGoPrevious: boolean
+  canGoNext: boolean
+  hitsByDay: Map<number, number>
 }
 
 export default function Calendar({
@@ -22,30 +24,14 @@ export default function Calendar({
   selectedDate,
   hits,
   currentDate,
-  setCurrentDate,
+  onPreviousMonth,
+  onNextMonth,
+  canGoPrevious,
+  canGoNext,
+  hitsByDay,
 }: CalendarProps) {
-  const { user } = useAuth()
-
-  // Get account creation date to limit navigation
-  const accountCreationDate = user?.created_at
-    ? new Date(user.created_at)
-    : new Date()
-    
-  const minDate = new Date(
-    accountCreationDate.getFullYear(),
-    accountCreationDate.getMonth(),
-    1
-  )
-
   // Create a map of days with hints for quick lookup
-  const hitsByDay = useMemo(() => {
-    const map = new Map<number, number>()
-    hits.forEach((hit) => {
-      const day = new Date(hit.created_at).getDate()
-      map.set(day, (map.get(day) || 0) + 1)
-    })
-    return map
-  }, [hits])
+
 
   // Generate calendar days
   const calendarDays = useMemo(() => {
@@ -87,27 +73,6 @@ export default function Calendar({
 
   const dayNames = ["D", "L", "M", "M", "G", "V", "S"]
 
-  const goToPreviousMonth = () => {
-    const newDate = new Date(currentDate)
-    newDate.setMonth(newDate.getMonth() - 1)
-
-    // Check if we can go back (not before account creation)
-    if (newDate >= minDate) {
-      setCurrentDate(newDate)
-    }
-  }
-
-  const goToNextMonth = () => {
-    const newDate = new Date(currentDate)
-    newDate.setMonth(newDate.getMonth() + 1)
-
-    // Don't allow going to future months
-    const today = new Date()
-    if (newDate <= today) {
-      setCurrentDate(newDate)
-    }
-  }
-
   const isCurrentMonth = (date: Date) => {
     return (
       date.getMonth() === currentDate.getMonth() &&
@@ -133,22 +98,6 @@ export default function Calendar({
   }
 
 
-  const previousMonthDate = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth() - 1,
-    1
-  )
-  const nextMonthDate = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth() + 1,
-    1
-  )
-  const today = new Date()
-  const todayMonthStart = new Date(today.getFullYear(), today.getMonth(), 1)
-
-  const canGoPrevious = previousMonthDate >= minDate
-  const canGoNext = nextMonthDate <= todayMonthStart
-
   return (
     <View>
       <Flex
@@ -157,10 +106,7 @@ export default function Calendar({
         align="center"
         style={styles.header}
       >
-          <TouchableOpacity
-            onPress={goToPreviousMonth}
-            disabled={!canGoPrevious}
-          >
+          <TouchableOpacity onPress={onPreviousMonth} disabled={!canGoPrevious}>
             <FontAwesome6
               name="chevron-left"
               color={!canGoPrevious ? "#ccc" : "#404B35"}
@@ -172,7 +118,7 @@ export default function Calendar({
           {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
         </StyledText>
 
-          <TouchableOpacity onPress={goToNextMonth} disabled={!canGoNext}>
+          <TouchableOpacity onPress={onNextMonth} disabled={!canGoNext}>
             <FontAwesome6
               name="chevron-right"
               color={!canGoNext ? "#ccc" : "#404B35"}

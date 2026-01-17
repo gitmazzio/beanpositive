@@ -4,7 +4,7 @@ import DayDetails from "@/components/commons/DayDetails"
 import { PageView } from "@/components/Themed"
 import { useAuth } from "@/providers"
 import { useUserHitsByMonth } from "@/queries/mutations/useUserHitsByMonth"
-import { useEffect, useState } from "react"
+import { useMemo, useState } from "react"
 import { ScrollView, StyleSheet } from "react-native"
 
 export default function TabTwoScreen() {
@@ -12,7 +12,6 @@ export default function TabTwoScreen() {
 
   const { user } = useAuth()
   const [currentDate, setCurrentDate] = useState(new Date())
-
 
   const currentYear = currentDate.getFullYear()
   const currentMonth = currentDate.getMonth() + 1
@@ -33,10 +32,67 @@ export default function TabTwoScreen() {
     setSelectedDate(localDate)
   }
 
-  useEffect(() => {
-    handleDayPress(new Date())
-  }, [])
+  const accountCreationDate = user?.created_at
+    ? new Date(user.created_at)
+    : new Date()
+  const minMonthDate = new Date(
+    accountCreationDate.getFullYear(),
+    accountCreationDate.getMonth(),
+    1
+  )
+  const today = new Date()
+  const todayMonthStart = new Date(today.getFullYear(), today.getMonth(), 1)
 
+  const previousMonthDate = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() - 1,
+    1
+  )
+  const nextMonthDate = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() + 1,
+    1
+  )
+
+  const canGoPrevious = previousMonthDate >= minMonthDate
+  const canGoNext = nextMonthDate <= todayMonthStart
+
+  const handlePreviousMonth = () => {
+    if (!canGoPrevious) {
+      return
+    }
+
+    const newDate = new Date(currentDate)
+    newDate.setMonth(newDate.getMonth() - 1)
+    setCurrentDate(newDate)
+    setSelectedDate(null) // Reset selected date when changing month
+  }
+
+  const handleNextMonth = () => {
+    if (!canGoNext) {
+      return
+    }
+
+    const newDate = new Date(currentDate)
+    newDate.setMonth(newDate.getMonth() + 1)
+    setCurrentDate(newDate)
+    setSelectedDate(null) // Reset selected date when changing month
+  }
+
+  const hitsByDay = useMemo(() => {
+    const map = new Map<number, number>()
+     hits.filter((hit) => {
+      if (!hit.created_at) return false
+      const hitDate = new Date(hit.created_at)
+      return hitDate.getMonth() === currentDate.getMonth() && hitDate.getFullYear() === currentDate.getFullYear()
+    })
+    .forEach((hit) => {
+      const day = new Date(hit.created_at).getDate()
+      map.set(day, (map.get(day) || 0) + 1)
+    })
+    return map
+  }, [hits, currentDate])
+  
   return (
     <PageView style={styles.container}>
       <Header />
@@ -46,9 +102,13 @@ export default function TabTwoScreen() {
         selectedDate={selectedDate ?? undefined}
         hits={hits}
         currentDate={currentDate}
-        setCurrentDate={setCurrentDate}
+        onPreviousMonth={handlePreviousMonth}
+        onNextMonth={handleNextMonth}
+        canGoPrevious={canGoPrevious}
+        canGoNext={canGoNext}
+        hitsByDay={hitsByDay}
       />
-      <ScrollView
+       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         nestedScrollEnabled={true}
@@ -58,6 +118,8 @@ export default function TabTwoScreen() {
           selectedDate={selectedDate}
           hits={hits}
           isLoading={isLoading}
+          currentDate={currentDate} 
+          hitsByDay={hitsByDay}
         />
       </ScrollView>
     </PageView>

@@ -1,28 +1,24 @@
 import Flex from "@/components/commons/Flex"
 import StyledText from "@/components/commons/StyledText"
-import { useAuth } from "@/providers"
-import { useUserHitsByDay } from "@/queries/mutations/useUserHitsByDay"
-import { FlatList, ScrollView, StyleSheet, View } from "react-native"
 import { isSameDay, parseISO } from "date-fns"
+import { StyleSheet, View } from "react-native"
 import { BeanSvgComponent } from "../pocket/BeansMapGeneration"
 
 interface DayDetailsProps {
   selectedDate: Date | null
   hits: any[]
   isLoading: boolean
+  currentDate: Date
+  hitsByDay: Map<number, number>
 }
 
 export default function DayDetails({
   selectedDate,
   hits,
   isLoading,
+  currentDate,  
+  hitsByDay,
 }: DayDetailsProps) {
-  const { user } = useAuth()
-
-  if (hits?.length === 0) {
-    return null
-  }
-
   // filter hits by selectedDate using date-fns for reliable date comparison
   const filteredHits = selectedDate
     ? (hits || [])?.filter((hit) => {
@@ -33,16 +29,6 @@ export default function DayDetails({
       })
     : []
 
-  if (!selectedDate) {
-    return (
-      <View style={styles.container}>
-        <StyledText kind="body" style={styles.placeholderText}>
-          Seleziona un giorno per vedere i dettagli
-        </StyledText>
-      </View>
-    )
-  }
-
   const formatTime = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleTimeString("it-IT", {
@@ -51,13 +37,33 @@ export default function DayDetails({
     })
   }
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString("it-IT", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
+  // const formatDate = (date: Date) => {
+  //   return date.toLocaleDateString("it-IT", {
+  //     weekday: "long",
+  //     year: "numeric",
+  //     month: "long",
+  //     day: "numeric",
+  //   })
+  // }
+
+  if(hitsByDay.size === 0 && new Date(currentDate).getMonth() !== new Date().getMonth()) {
+    return (
+      <View style={styles.container}>
+        <StyledText kind="caption" style={styles.noHintsText}>
+          Nessun fagiolo conservato in questo mese
+        </StyledText>
+      </View>
+    )
+  }
+
+  if (!selectedDate) {
+    return (
+      <View style={styles.container}>
+        <StyledText kind="caption" style={styles.placeholderText}>
+          Seleziona un giorno per vedere i dettagli
+        </StyledText>
+      </View>
+    )
   }
 
   return (
@@ -68,7 +74,7 @@ export default function DayDetails({
         </StyledText>
       ) : filteredHits.length === 0 ? (
         <StyledText kind="caption" style={styles.noHintsText}>
-          {`Nessun fagiolo conservato ${formatDate(selectedDate)}`}
+          {`Nessun fagiolo conservato in questo giorno`}
         </StyledText>
       ) : (
         <Flex direction="column" gap={12}>
@@ -151,7 +157,6 @@ const styles = StyleSheet.create({
   placeholderText: {
     textAlign: "center",
     color: "#666",
-    fontStyle: "italic",
   },
   dateTitle: {
     color: "#404B35",
