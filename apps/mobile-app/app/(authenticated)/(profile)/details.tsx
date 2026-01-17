@@ -35,6 +35,10 @@ export default function ProfileDetails() {
         data: { firstName: data.firstName },
       });
 
+      if (error) {
+        throw error;
+      }
+
       // router.back();
       Toast.show({
         type: "hintSuccess",
@@ -44,6 +48,10 @@ export default function ProfileDetails() {
       });
     } catch (err: any) {
       void triggerErrorHaptic();
+      Toast.show({
+        type: "error",
+        text1: err.message || "Errore aggiornamento",
+      });
       setError("firstName", { message: err.message || "Errore aggiornamento" });
     }
   };

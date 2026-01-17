@@ -9,6 +9,8 @@ import { router } from "expo-router";
 import { FormProvider, useForm } from "react-hook-form";
 import { Alert } from "react-native";
 import TextInput from "@/components/commons/TextInput";
+import Toast from "react-native-toast-message";
+import { triggerErrorHaptic } from "@/utils/haptics";
 
 export default function Account() {
   const { user } = useAuth();
@@ -48,6 +50,11 @@ export default function Account() {
       Alert.alert("Successo", "Password aggiornata!");
       methods.reset();
     } catch (err: any) {
+      void triggerErrorHaptic();
+      Toast.show({
+        type: "error",
+        text1: err.message || "Errore aggiornamento",
+      });
       setError("newPassword", {
         message: err.message || "Errore aggiornamento",
       });

@@ -6,7 +6,7 @@ import HorizontalLine from "@/components/commons/HorizontalLine";
 import StyledText from "@/components/commons/StyledText";
 import { oneSignalService } from "@/services/onesignal";
 import { useHapticsPreference } from "@/hooks/useHapticsPreference";
-import { triggerSelectionHaptic } from "@/utils/haptics";
+import { triggerErrorHaptic, triggerSelectionHaptic } from "@/utils/haptics";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import Toast from "react-native-toast-message";
@@ -63,6 +63,12 @@ export default function NotificationsScreen() {
         text1: "Le modifiche sono state salvate!",
         position: "top",
         visibilityTime: 2000,
+      });
+    } catch (error: any) {
+      void triggerErrorHaptic();
+      Toast.show({
+        type: "error",
+        text1: error?.message || "Errore nel salvataggio delle notifiche",
       });
     } finally {
       setSaving(false);

@@ -53,16 +53,17 @@ export const Pocket = ({
   // Tab dimensions
   const tabWidth = 160 * scale;
   const tabHeight = 30 * scale;
+  const tabRadius = 15 * scale;
 
   // Tab path (positioned above the shield)
   const tabPath = `
-    M ${(scaledWidth - tabWidth) / 2 + 5} ${-tabHeight}
-    L ${(scaledWidth + tabWidth) / 2 - 5} ${-tabHeight}
-    Q ${(scaledWidth + tabWidth) / 2} ${-tabHeight} ${(scaledWidth + tabWidth) / 2} ${-tabHeight + 5}
+    M ${(scaledWidth - tabWidth) / 2 + tabRadius} ${-tabHeight}
+    L ${(scaledWidth + tabWidth) / 2 - tabRadius} ${-tabHeight}
+    Q ${(scaledWidth + tabWidth) / 2} ${-tabHeight} ${(scaledWidth + tabWidth) / 2} ${-tabHeight + tabRadius}
     L ${(scaledWidth + tabWidth) / 2} 0
     L ${(scaledWidth - tabWidth) / 2} 0
-    L ${(scaledWidth - tabWidth) / 2} ${-tabHeight + 5}
-    Q ${(scaledWidth - tabWidth) / 2} ${-tabHeight} ${(scaledWidth - tabWidth) / 2 + 5} ${-tabHeight}
+    L ${(scaledWidth - tabWidth) / 2} ${-tabHeight + tabRadius}
+    Q ${(scaledWidth - tabWidth) / 2} ${-tabHeight} ${(scaledWidth - tabWidth) / 2 + tabRadius} ${-tabHeight}
     Z
   `;
 
@@ -153,8 +154,8 @@ export const Pocket = ({
         style={[
           styles.tabText,
           {
-            top: -2 * scale,
-            fontSize: 18 * scale,
+            top: scale,
+            fontSize: 16 * scale,
             width: tabWidth,
             color: tabTextColor,
           },
