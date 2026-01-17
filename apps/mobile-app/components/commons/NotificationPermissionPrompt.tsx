@@ -3,6 +3,7 @@ import { View, StyleSheet, Alert } from "react-native";
 import { Button } from "./Button";
 import { oneSignalService } from "../../services/onesignal";
 import StyledText from "./StyledText";
+import { triggerErrorHaptic } from "@/utils/haptics";
 
 interface NotificationPermissionPromptProps {
   onPermissionGranted?: () => void;
@@ -47,10 +48,12 @@ export const NotificationPermissionPrompt: React.FC<
         onPermissionGranted?.();
       } else {
         setHasPermission(false);
+        void triggerErrorHaptic();
         onPermissionDenied?.();
       }
     } catch (error) {
       console.error("Error requesting notification permission:", error);
+      void triggerErrorHaptic();
       onPermissionDenied?.();
     } finally {
       setIsLoading(false);

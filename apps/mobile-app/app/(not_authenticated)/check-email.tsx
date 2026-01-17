@@ -39,7 +39,7 @@ export default function CheckEmail() {
           kind="primary"
           title="Vai alla schermata di accesso"
           onPress={() => {
-            router.replace("/(not_authenticated)/login");
+            router.push("/(not_authenticated)/login");
           }}
         />
       </Flex>

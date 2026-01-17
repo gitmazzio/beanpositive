@@ -1,5 +1,6 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
 import StyledText from "./StyledText";
+import { triggerConfirmHaptic } from "@/utils/haptics";
 
 type ButtonProps = {
   onPress: () => void;
@@ -9,6 +10,7 @@ type ButtonProps = {
   kind?: "primary" | "secondary" | "tertiary" | "back" | "link";
   prefixIcon?: React.ReactNode;
   suffixIcon?: React.ReactNode;
+  haptics?: boolean;
 };
 
 export const Button = ({
@@ -19,6 +21,7 @@ export const Button = ({
   kind = "primary",
   prefixIcon,
   suffixIcon,
+  haptics = true,
 }: ButtonProps) => {
   let textStyle = styles.buttonText;
   let buttonStyle = styles.primary;
@@ -39,10 +42,21 @@ export const Button = ({
     textStyle = styles.linkText;
   }
 
+  const handlePress = () => {
+    if (disabled) {
+      return;
+    }
+
+    if (haptics) {
+      void triggerConfirmHaptic();
+    }
+    onPress();
+  };
+
   return (
     <TouchableOpacity
       accessibilityRole="button"
-      onPress={onPress}
+      onPress={handlePress}
       disabled={disabled}
       style={[
         styles.buttonContainer,

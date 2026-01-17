@@ -30,10 +30,17 @@ export default function RecoverPassword() {
   const onSubmit = async (data: { email: string }) => {
     setError(null);
     try {
-      await supabase.auth.resetPasswordForEmail(data.email);
-      router.push("/email-verification");
+      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+        redirectTo: "beanpositiveapp://reset-password",
+      });
+
+      if (error) throw error;
+
+      router.push("/(not_authenticated)/check-email");
     } catch (err: any) {
-      setError(err.message);
+      const errorMessage =
+        err.message || "Errore nell'invio dell'email di recupero";
+      setError(errorMessage);
     }
   };
 
@@ -52,8 +59,9 @@ export default function RecoverPassword() {
           ></Header>
           <StyledText kind="h1">Recupera la password</StyledText>
           <StyledText kind="body">
-            Invieremo una password temporanea al tuo indirizzo email. Potrai
-            cambiarla una volta effettuato l'accesso.
+            Invieremo un'email con un link per reimpostare la tua password.
+            Clicca sul link nell'email per creare una nuova password. Se non
+            trovi l'email, controlla anche nella cartella Spam o Promozioni.
           </StyledText>
 
           <TextInput
@@ -64,9 +72,17 @@ export default function RecoverPassword() {
             keyboardType="email-address"
             rules={{
               required: "Email obbligatoria",
-              pattern: { value: /^\S+@\S+$/i, message: "Email non valida" },
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i,
+                message: "Email non valida",
+              },
             }}
           />
+          {error && (
+            <StyledText kind="caption" style={{ color: "red" }}>
+              {error}
+            </StyledText>
+          )}
           {isSubmitting /* || loading */ ? (
             <ActivityIndicator size="large" color="#000" />
           ) : (

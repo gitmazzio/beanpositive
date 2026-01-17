@@ -30,6 +30,7 @@ export default function Calendar({
   const accountCreationDate = user?.created_at
     ? new Date(user.created_at)
     : new Date()
+    
   const minDate = new Date(
     accountCreationDate.getFullYear(),
     accountCreationDate.getMonth(),
@@ -131,12 +132,22 @@ export default function Calendar({
     return compareDate > today
   }
 
-  const canGoPrevious =
-    currentDate.getMonth() > minDate.getMonth() &&
-    currentDate.getFullYear() >= minDate.getFullYear()
-  const canGoNext =
-    currentDate.getMonth() < new Date().getMonth() &&
-    currentDate.getFullYear() <= new Date().getFullYear()
+
+  const previousMonthDate = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() - 1,
+    1
+  )
+  const nextMonthDate = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() + 1,
+    1
+  )
+  const today = new Date()
+  const todayMonthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+
+  const canGoPrevious = previousMonthDate >= minDate
+  const canGoNext = nextMonthDate <= todayMonthStart
 
   return (
     <View>
@@ -146,31 +157,29 @@ export default function Calendar({
         align="center"
         style={styles.header}
       >
-        <StyledText kind="h3" style={styles.monthTitle}>
-          {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-        </StyledText>
-
-        <Flex direction="row" gap={8}>
           <TouchableOpacity
             onPress={goToPreviousMonth}
             disabled={!canGoPrevious}
           >
             <FontAwesome6
               name="chevron-left"
-              color={!canGoPrevious ? "#eee" : "#404B35"}
+              color={!canGoPrevious ? "#ccc" : "#404B35"}
               size={20}
               solid
             />
           </TouchableOpacity>
+        <StyledText kind="subtitle" style={styles.monthTitle}>
+          {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+        </StyledText>
+
           <TouchableOpacity onPress={goToNextMonth} disabled={!canGoNext}>
             <FontAwesome6
               name="chevron-right"
-              color={!canGoNext ? "#eee" : "#404B35"}
+              color={!canGoNext ? "#ccc" : "#404B35"}
               size={20}
               solid
             />
           </TouchableOpacity>
-        </Flex>
       </Flex>
 
       <Flex direction="column" style={styles.container}>

@@ -5,6 +5,7 @@ import StyledText from "@/components/commons/StyledText";
 import TextInput from "@/components/commons/TextInput";
 import { useAuth } from "@/providers";
 import { supabase } from "@/services/supabase";
+import { triggerErrorHaptic } from "@/utils/haptics";
 import { router } from "expo-router";
 import { FormProvider, useForm } from "react-hook-form";
 import Toast from "react-native-toast-message";
@@ -34,7 +35,7 @@ export default function ProfileDetails() {
         data: { firstName: data.firstName },
       });
 
-      router.back();
+      // router.back();
       Toast.show({
         type: "hintSuccess",
         text1: "Le modifiche sono state salvate!",
@@ -42,6 +43,7 @@ export default function ProfileDetails() {
         visibilityTime: 2000,
       });
     } catch (err: any) {
+      void triggerErrorHaptic();
       setError("firstName", { message: err.message || "Errore aggiornamento" });
     }
   };

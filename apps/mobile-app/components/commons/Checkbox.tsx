@@ -1,28 +1,26 @@
-import React, { useState } from "react";
-import {
-  Pressable,
-  View,
-  Text,
-  StyleSheet,
-  StyleSheetProperties,
-  ViewStyle,
-} from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
-import Flex from "./Flex";
+import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import { Pressable, StyleSheet, TextStyle, View, ViewStyle } from "react-native";
+import Flex from "./Flex";
 import StyledText from "./StyledText";
+import { triggerSelectionHaptic } from "@/utils/haptics";
 
 interface CheckboxProps {
   name: string;
   label?: React.ReactNode; // Can be string, JSX, or include <Link>
   disabled?: boolean;
   style?: ViewStyle;
+  rules?: object;
+  labelStyle?: ViewStyle;
 }
 
 export default function Checkbox({
   label,
   disabled,
   name,
+  rules,
+  labelStyle,
   ...props
 }: CheckboxProps) {
   const {
@@ -42,12 +40,19 @@ export default function Checkbox({
     >
       <Controller
         control={control}
-        name="acceptTerms"
-        rules={{ required: "Devi accettare i termini e la privacy" }}
+        name={name}
+        rules={rules}
         render={({ field: { value, onChange } }) => (
           <Flex gap={8} direction="row" justify="flex-start" align="flex-start">
             <Pressable
-              onPress={() => !disabled && onChange?.(!value)}
+              onPress={() => {
+                if (disabled) {
+                  return;
+                }
+
+                void triggerSelectionHaptic();
+                onChange?.(!value);
+              }}
               style={({ pressed }) => [
                 styles.container,
                 disabled && { opacity: 0.5 },
@@ -61,7 +66,7 @@ export default function Checkbox({
                 {value && <FontAwesome name="check" size={16} color="#fff" />}
               </View>
             </Pressable>
-            {label != null && <View>{label}</View>}
+            {label != null && <View style={[labelStyle]}>{label}</View>}
           </Flex>
         )}
       />

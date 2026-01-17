@@ -45,7 +45,8 @@ export default function SignIn() {
     } catch (err: any) {
       setError(
         IT_ERROR_CODES[err.code as SupabaseErrorCode] ??
-          IT_ERROR_CODES["conflict"]
+          err.message ??
+          "Errore durante l'accesso. Riprova."
       );
     }
   };
@@ -83,7 +84,10 @@ export default function SignIn() {
               keyboardType="email-address"
               rules={{
                 required: "Email obbligatoria",
-                pattern: { value: /^\S+@\S+$/i, message: "Email non valida" },
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i,
+                  message: "Email non valida",
+                },
               }}
             />
             <PasswordInput
@@ -91,8 +95,13 @@ export default function SignIn() {
               label="La tua password"
               placeholder="Inserisci qui la tua password..."
               secureTextEntry
+              rules={{
+                required: "Password obbligatoria",
+              }}
             />
-            <Link to="/recover-password">Hai dimenticato la password?</Link>
+            <Link to="/(not_authenticated)/recover-password">
+              Hai dimenticato la password?
+            </Link>
             {isSubmitting || loading || isCheckingNotifications ? (
               <ActivityIndicator size="large" color="#000" />
             ) : (

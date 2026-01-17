@@ -2,8 +2,6 @@ import React from "react";
 import { Stack } from "expo-router";
 import { AuthProvider } from "@/providers";
 import { View } from "react-native";
-import Toast from "react-native-toast-message";
-import { toastConfig } from "@/utils/toastConfig";
 
 export const unstable_settings = {
   // Ensure any route can link back to `/`
@@ -30,7 +28,6 @@ export default function AuthLayout() {
           options={{ headerShown: false, presentation: "modal" }}
         />
       </Stack>
-      <Toast config={toastConfig} />
     </>
   );
 }

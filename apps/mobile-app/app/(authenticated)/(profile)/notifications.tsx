@@ -5,14 +5,21 @@ import { Header } from "@/components/commons/Header";
 import HorizontalLine from "@/components/commons/HorizontalLine";
 import StyledText from "@/components/commons/StyledText";
 import { oneSignalService } from "@/services/onesignal";
+import { useHapticsPreference } from "@/hooks/useHapticsPreference";
+import { triggerSelectionHaptic } from "@/utils/haptics";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
+import Toast from "react-native-toast-message";
 import { StyleSheet, Switch } from "react-native";
 
 export default function NotificationsScreen() {
   const [morningEnabled, setMorningEnabled] = useState(false);
   const [eveningEnabled, setEveningEnabled] = useState(false);
+  const [initialMorningEnabled, setInitialMorningEnabled] = useState(false);
+  const [initialEveningEnabled, setInitialEveningEnabled] = useState(false);
   const [saving, setSaving] = useState(false);
+  const { isEnabled: hapticsEnabled, isLoading: hapticsLoading, setEnabled } =
+    useHapticsPreference();
 
   useEffect(() => {
     (async () => {
@@ -20,10 +27,20 @@ export default function NotificationsScreen() {
 
       setMorningEnabled(state.daily_one);
       setEveningEnabled(state.daily_two);
+      setInitialMorningEnabled(state.daily_one);
+      setInitialEveningEnabled(state.daily_two);
     })();
   }, []);
 
   const handleSave = async () => {
+    const hasChanges =
+      morningEnabled !== initialMorningEnabled ||
+      eveningEnabled !== initialEveningEnabled;
+
+    if (!hasChanges) {
+      return;
+    }
+
     try {
       setSaving(true);
       // Default times: 09:00 for morning, 21:00 for evening
@@ -38,9 +55,37 @@ export default function NotificationsScreen() {
       } else {
         await oneSignalService.cancelDailyNotification("daily_two");
       }
+
+      setInitialMorningEnabled(morningEnabled);
+      setInitialEveningEnabled(eveningEnabled);
+      Toast.show({
+        type: "hintSuccess",
+        text1: "Le modifiche sono state salvate!",
+        position: "top",
+        visibilityTime: 2000,
+      });
     } finally {
       setSaving(false);
     }
+  };
+
+  const hasChanges =
+    morningEnabled !== initialMorningEnabled ||
+    eveningEnabled !== initialEveningEnabled;
+
+  const handleMorningToggle = (value: boolean) => {
+    void triggerSelectionHaptic();
+    setMorningEnabled(value);
+  };
+
+  const handleEveningToggle = (value: boolean) => {
+    void triggerSelectionHaptic();
+    setEveningEnabled(value);
+  };
+
+  const handleHapticsToggle = async (value: boolean) => {
+    void triggerSelectionHaptic();
+    await setEnabled(value);
   };
 
   return (
@@ -69,7 +114,7 @@ export default function NotificationsScreen() {
           <Flex style={styles.switchRow}>
             <Switch
               value={morningEnabled}
-              onValueChange={setMorningEnabled}
+              onValueChange={handleMorningToggle}
               trackColor={{ false: "#E0E0E0", true: "#7D8557" }}
               thumbColor="#FFFFFF"
               style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
@@ -95,7 +140,34 @@ export default function NotificationsScreen() {
           <Flex style={styles.switchRow}>
             <Switch
               value={eveningEnabled}
-              onValueChange={setEveningEnabled}
+              onValueChange={handleEveningToggle}
+              trackColor={{ false: "#E0E0E0", true: "#7D8557" }}
+              thumbColor="#FFFFFF"
+              style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+            />
+          </Flex>
+        </Flex>
+      </Flex>
+
+      <Flex style={styles.container} direction="column">
+        <Flex direction="row" justify="space-between" align="center">
+          <Flex
+            direction="column"
+            gap={8}
+            style={{
+              maxWidth: "85%",
+            }}
+          >
+            <StyledText kind="headline">Feedback aptico</StyledText>
+            <StyledText kind="body">
+              Attiva o disattiva le vibrazioni durante l’uso dell’app.
+            </StyledText>
+          </Flex>
+          <Flex style={styles.switchRow}>
+            <Switch
+              value={hapticsEnabled ?? true}
+              onValueChange={handleHapticsToggle}
+              disabled={hapticsLoading}
               trackColor={{ false: "#E0E0E0", true: "#7D8557" }}
               thumbColor="#FFFFFF"
               style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
@@ -108,7 +180,7 @@ export default function NotificationsScreen() {
         kind="secondary"
         title={saving ? "Salvataggio..." : "Conferma modifiche"}
         onPress={handleSave}
-        disabled={saving}
+        disabled={saving || !hasChanges}
       />
     </Wrapper>
   );

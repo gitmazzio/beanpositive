@@ -59,10 +59,8 @@ export const Pocket = ({
     M ${(scaledWidth - tabWidth) / 2 + 5} ${-tabHeight}
     L ${(scaledWidth + tabWidth) / 2 - 5} ${-tabHeight}
     Q ${(scaledWidth + tabWidth) / 2} ${-tabHeight} ${(scaledWidth + tabWidth) / 2} ${-tabHeight + 5}
-    L ${(scaledWidth + tabWidth) / 2} ${-5}
-    Q ${(scaledWidth + tabWidth) / 2} 0 ${(scaledWidth + tabWidth) / 2 - 5} 0
-    L ${(scaledWidth - tabWidth) / 2 + 5} 0
-    Q ${(scaledWidth - tabWidth) / 2} 0 ${(scaledWidth - tabWidth) / 2} ${-5}
+    L ${(scaledWidth + tabWidth) / 2} 0
+    L ${(scaledWidth - tabWidth) / 2} 0
     L ${(scaledWidth - tabWidth) / 2} ${-tabHeight + 5}
     Q ${(scaledWidth - tabWidth) / 2} ${-tabHeight} ${(scaledWidth - tabWidth) / 2 + 5} ${-tabHeight}
     Z

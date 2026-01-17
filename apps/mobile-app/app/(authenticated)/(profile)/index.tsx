@@ -9,6 +9,7 @@ import { useAuth } from "@/providers";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { ScrollView, TouchableOpacity } from "react-native";
+import { triggerConfirmHaptic } from "@/utils/haptics";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -23,7 +24,13 @@ export default function ProfileScreen() {
       <Wrapper gap={16}>
         <Flex direction="row" align="center" justify="space-between">
           <StyledText kind="h1">Il tuo profilo</StyledText>
-          <TouchableOpacity onPress={() => router.back()} hitSlop={10}>
+          <TouchableOpacity
+            onPress={() => {
+              void triggerConfirmHaptic();
+              router.back();
+            }}
+            hitSlop={10}
+          >
             <FontAwesome6 name="xmark" size={20} />
           </TouchableOpacity>
         </Flex>
@@ -43,6 +50,11 @@ export default function ProfileScreen() {
           title="Account"
           icon="gear"
           url={"/(authenticated)/(profile)/account"}
+        />
+        <SectionButton
+          title="Haptics (demo)"
+          icon="bolt"
+          url={"/(authenticated)/(profile)/haptics"}
         />
         <StyledText kind="headline">Supporto e Community</StyledText>
         <SectionButton

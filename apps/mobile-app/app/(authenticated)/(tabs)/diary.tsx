@@ -13,6 +13,7 @@ export default function TabTwoScreen() {
   const { user } = useAuth()
   const [currentDate, setCurrentDate] = useState(new Date())
 
+
   const currentYear = currentDate.getFullYear()
   const currentMonth = currentDate.getMonth() + 1
 
@@ -66,6 +67,7 @@ export default function TabTwoScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    gap: 32,
   },
   scrollView: {
     flex: 1,

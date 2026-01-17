@@ -3,6 +3,7 @@ import StyledText from "@/components/commons/StyledText";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { Href, router } from "expo-router";
 import { StyleSheet, TouchableOpacity } from "react-native";
+import { triggerConfirmHaptic } from "@/utils/haptics";
 
 type Props = {
   url: Href;
@@ -10,6 +11,7 @@ type Props = {
   icon?: string;
   rightIcon?: string;
   disabled?: boolean;
+  haptics?: boolean;
 };
 
 export const SectionButton = ({
@@ -18,9 +20,21 @@ export const SectionButton = ({
   icon,
   rightIcon,
   disabled = false,
+  haptics = true,
 }: Props) => {
+  const handlePress = () => {
+    if (disabled) {
+      return;
+    }
+
+    if (haptics) {
+      void triggerConfirmHaptic();
+    }
+    router.push(url);
+  };
+
   return (
-    <TouchableOpacity onPress={() => router.push(url)} disabled={disabled}>
+    <TouchableOpacity onPress={handlePress} disabled={disabled}>
       <Flex
         direction="row"
         justify="space-between"

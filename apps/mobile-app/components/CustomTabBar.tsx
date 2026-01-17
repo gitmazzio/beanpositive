@@ -11,6 +11,7 @@ import React from "react";
 import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import StyledText from "./commons/StyledText";
 import { BeanSimple } from "./svg/BeanSimple";
+import { triggerConfirmHaptic } from "@/utils/haptics";
 
 // Definizione dei tipi per le rotte
 type RootTabParamList = {
@@ -56,6 +57,7 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
   const { addNewHint, isLoadingMutation } = usePocketContext();
 
   const handleCustomButtonPress = (): void => {
+    void triggerConfirmHaptic();
     // Se siamo nella schermata pocket, triggeriamo la mutation
     if (state.index === 0) {
       try {
@@ -101,6 +103,7 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
           // const isFocusedPocket = state.index === 0;
 
           const onPress = (): void => {
+            void triggerConfirmHaptic();
             const event = navigation.emit({
               type: "tabPress",
               target: route.key,
@@ -175,7 +178,10 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
 
         {/* Terzo tab per bilanciare il layout */}
         <TouchableOpacity
-          onPress={() => navigation.navigate("diary")}
+          onPress={() => {
+            void triggerConfirmHaptic();
+            navigation.navigate("diary");
+          }}
           style={styles.tabBarItem}
           activeOpacity={0.7}
         >

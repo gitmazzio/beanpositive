@@ -4,6 +4,7 @@ import Flex from "../commons/Flex";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useAuth } from "@/providers";
 import { router } from "expo-router";
+import { triggerConfirmHaptic } from "@/utils/haptics";
 
 export const Header = () => {
   const { user } = useAuth();
@@ -16,7 +17,7 @@ export const Header = () => {
       {/* <TouchableOpacity style={styles.button} hitSlop={10}>
         <FontAwesome6 name="hand-holding-heart" size={20} color="#C7682F" />
       </TouchableOpacity> */}
-      <Flex direction="column">
+      <Flex direction="column" align="center" >
         <StyledText
           kind="h1"
           style={{
@@ -39,6 +40,7 @@ export const Header = () => {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
+          void triggerConfirmHaptic();
           router.push("/(authenticated)/(profile)");
         }}
         hitSlop={10}

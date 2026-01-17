@@ -9,6 +9,10 @@ import TextInput from "@/components/commons/TextInput";
 import { PageView } from "@/components/Themed";
 import { useOpenBrowser } from "@/hooks/useOpenBrowser";
 import { useAuth } from "@/providers";
+import {
+  IT_ERROR_CODES,
+  SupabaseErrorCode,
+} from "@/utils/supabase_error_codes";
 import { useRouter } from "expo-router";
 import { FormProvider, useForm } from "react-hook-form";
 import { ScrollView, StyleSheet } from "react-native";
@@ -30,10 +34,21 @@ export default function Register() {
   const {
     handleSubmit,
     setError,
+    watch,
     formState: { isSubmitting, errors },
   } = methods;
 
+  const acceptTerms = watch("acceptTerms");
+
   const onSubmit = async (data: any) => {
+    // Valida che i termini siano accettati
+    if (!data.acceptTerms) {
+      setError("acceptTerms", {
+        message: "Devi accettare i termini e condizioni per continuare",
+      });
+      return;
+    }
+
     try {
       setAuthIsLoading(true);
       await register(data.email, data.password, {
@@ -42,12 +57,11 @@ export default function Register() {
 
       router.push("/(not_authenticated)/email-verification");
     } catch (err: any) {
-      setError("root", { message: err.message || "Registration failed" });
-      // TODO show error message and not navigate user away or show a modal
-      //  setError(
-      //         IT_ERROR_CODES[err.code as SupabaseErrorCode] ??
-      //           IT_ERROR_CODES["conflict"]
-      //       );
+      const errorMessage =
+        IT_ERROR_CODES[err.code as SupabaseErrorCode] ??
+        err.message ??
+        "Errore durante la registrazione";
+      setError("root", { message: errorMessage });
     } finally {
       setAuthIsLoading(false);
     }
@@ -78,7 +92,7 @@ export default function Register() {
             <StyledText kind="body">
               Conserva ogni singolo momento creando un account su Bean Positive
             </StyledText>
-            <Flex align="stretch" direction="column" gap={6}>
+            <Flex align="stretch" direction="column" gap={8}>
               <TextInput
                 name="firstName"
                 label="Il tuo nome"
@@ -92,7 +106,10 @@ export default function Register() {
                 placeholder="Usa il tuo indirizzo email..."
                 rules={{
                   required: "Email obbligatoria",
-                  pattern: { value: /^\S+@\S+$/i, message: "Email non valida" },
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i,
+                    message: "Email non valida",
+                  },
                 }}
                 autoCapitalize="none"
                 keyboardType="email-address"
@@ -105,18 +122,26 @@ export default function Register() {
                 rules={{
                   required: "Password obbligatoria",
                   minLength: { value: 8, message: "Minimo 8 caratteri" },
-                  pattern: {
-                    value:
-                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':\"\\|,.<>/?]).{8,}$/,
-                    message:
-                      "Almeno una minuscola, una maiuscola e un carattere speciale",
+                  validate: {
+                    hasLowerCase: (value: string) =>
+                      /[a-z]/.test(value) ||
+                      "Almeno una lettera minuscola richiesta",
+                    hasUpperCase: (value: string) =>
+                      /[A-Z]/.test(value) ||
+                      "Almeno una lettera maiuscola richiesta",
+                    hasSpecialChar: (value: string) =>
+                      /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(value) ||
+                      "Almeno un carattere speciale richiesto",
                   },
                 }}
-                hintText="Almeno 8 caratteri, 1 maiuscola, 1 minuscola"
+                // hintText="Almeno 8 caratteri, 1 maiuscola, 1 minuscola, 1 carattere speciale"
               />
 
               <Checkbox
                 name="acceptTerms"
+                rules={{
+                  required: "Devi accettare i termini e condizioni per continuare",
+                }}
                 label={
                   <Flex
                     style={{
@@ -154,12 +179,21 @@ export default function Register() {
               />
             </Flex>
 
+            {errors.root && (
+              <StyledText kind="caption" style={{ color: "red" }}>
+                {errors.root.message}
+              </StyledText>
+            )}
+
             <Button
               kind="primary"
               title="Continua"
               onPress={handleSubmit(onSubmit)}
               disabled={
-                isSubmitting || loading || Object.keys(errors)?.length > 0
+                isSubmitting ||
+                loading ||
+                Object.keys(errors)?.length > 0 ||
+                !acceptTerms
               }
             />
           </Flex>

@@ -1,6 +1,8 @@
 import Flex, { FlexProps } from "@/components/commons/Flex";
+import { toastConfig } from "@/utils/toastConfig";
 import { type ReactNode } from "react";
-import { StyleSheet, View } from "react-native";
+import Toast from "react-native-toast-message";
+import { StyleSheet } from "react-native";
 
 type Props = FlexProps & {
   children: ReactNode;
@@ -15,6 +17,7 @@ export const Wrapper = ({ children, ...props }: Props) => {
       {...props}
     >
       {children}
+      <Toast config={toastConfig} />
     </Flex>
   );
 };

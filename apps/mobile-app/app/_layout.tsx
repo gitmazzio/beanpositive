@@ -19,6 +19,8 @@ import { Text, View } from "react-native";
 import * as Sentry from "@sentry/react-native";
 import "react-native-reanimated";
 import CustomSplashScreen from "../components/CustomSplashScreen";
+import Toast from "react-native-toast-message";
+import { toastConfig } from "@/utils/toastConfig";
 
 Sentry.init({
   enabled: process.env.NODE_ENV === "production",
@@ -103,6 +105,7 @@ export default Sentry.wrap(function RootLayout() {
         <AuthProvider>
           {showSplash && <CustomSplashScreen onFinish={handleSplashFinish} />}
           {!showSplash && <RootLayoutNav />}
+          <Toast config={toastConfig} />
           <StatusBar
             style={"dark"}
             networkActivityIndicatorVisible={false}

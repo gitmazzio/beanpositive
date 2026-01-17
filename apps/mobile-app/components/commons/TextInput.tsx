@@ -1,15 +1,13 @@
+import { ReactNode, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import {
-  NativeSyntheticEvent,
   TextInput as RNTextInput,
   TextInputProps as RNTextInputProps,
   StyleSheet,
   Text,
-  TextInputFocusEventData,
-  View,
+  View
 } from "react-native";
 import Flex from "./Flex";
-import { ReactNode, useState } from "react";
 import StyledText from "./StyledText";
 
 export interface TextInputProps extends RNTextInputProps {

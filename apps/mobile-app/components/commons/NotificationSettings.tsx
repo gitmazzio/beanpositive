@@ -3,6 +3,7 @@ import { View, StyleSheet, Switch, Alert } from "react-native";
 import { Button } from "./Button";
 import { useNotifications } from "../../hooks/useNotifications";
 import StyledText from "./StyledText";
+import { triggerSelectionHaptic } from "@/utils/haptics";
 
 interface NotificationSettingsProps {
   style?: any;
@@ -25,6 +26,7 @@ export const NotificationSettings: React.FC<NotificationSettingsProps> = ({
   }, [hasPermission]);
 
   const handleToggle = async (value: boolean) => {
+    void triggerSelectionHaptic();
     if (value && hasPermission === false) {
       // Se l'utente vuole abilitare ma non ha i permessi, richiedili
       const granted = await requestPermission();

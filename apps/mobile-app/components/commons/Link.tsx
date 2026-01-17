@@ -10,6 +10,7 @@ import {
   TextStyle,
   TouchableOpacity,
 } from "react-native";
+import { triggerConfirmHaptic } from "@/utils/haptics";
 
 interface LinkProps {
   to?: string;
@@ -31,6 +32,7 @@ export default function Link({
   const router = useRouter();
 
   const handlePress = () => {
+    void triggerConfirmHaptic();
     if (onPress) {
       onPress();
       return;
