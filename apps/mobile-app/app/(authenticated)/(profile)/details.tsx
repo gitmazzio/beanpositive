@@ -43,14 +43,16 @@ export default function ProfileDetails() {
       Toast.show({
         type: "hintSuccess",
         text1: "Le modifiche sono state salvate!",
-        position: "bottom",
+        position: "top",
         visibilityTime: 2000,
       });
     } catch (err: any) {
       void triggerErrorHaptic();
       Toast.show({
         type: "error",
-        text1: err.message || "Errore aggiornamento",
+        text1: err.message || "Errore aggiornamento",   
+        position: "top",
+        visibilityTime: 2000,
       });
       setError("firstName", { message: err.message || "Errore aggiornamento" });
     }

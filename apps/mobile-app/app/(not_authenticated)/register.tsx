@@ -9,6 +9,7 @@ import TextInput from "@/components/commons/TextInput";
 import { PageView } from "@/components/Themed";
 import { useOpenBrowser } from "@/hooks/useOpenBrowser";
 import { useAuth } from "@/providers";
+import { triggerErrorHaptic } from "@/utils/haptics";
 import {
   IT_ERROR_CODES,
   SupabaseErrorCode,
@@ -16,6 +17,7 @@ import {
 import { useRouter } from "expo-router";
 import { FormProvider, useForm } from "react-hook-form";
 import { ScrollView, StyleSheet } from "react-native";
+import Toast from "react-native-toast-message";
 
 export default function Register() {
   const { openBrowser } = useOpenBrowser();
@@ -57,6 +59,13 @@ export default function Register() {
 
       router.push("/(not_authenticated)/email-verification");
     } catch (err: any) {
+      void triggerErrorHaptic();
+      Toast.show({
+        type: "error",
+        text1: err.message || "Errore durante la registrazione",
+        position: "top",
+        visibilityTime: 2000,
+      });
       const errorMessage =
         IT_ERROR_CODES[err.code as SupabaseErrorCode] ??
         err.message ??

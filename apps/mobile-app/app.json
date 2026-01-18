@@ -24,7 +24,7 @@
           "Default"
         ]
       },
-      "buildNumber": "11"
+      "buildNumber": "13"
     },
     "android": {
       "googleServicesFile": "./services/google-services.json",

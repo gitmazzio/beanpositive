@@ -9,7 +9,7 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "prebuild": "expo prebuild --clean",
-    "build:ios": "eas build --platform ios --profile production --auto-submit"
+    "build:ios": "eas build --platform ios --auto-submit"
   },
   "jest": {
     "preset": "jest-expo"

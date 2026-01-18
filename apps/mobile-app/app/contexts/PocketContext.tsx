@@ -102,7 +102,7 @@ export default function PocketProvider({ children }: PocketProviderProps) {
       Toast.show({
         type: "hintSuccess",
         text1: "Hai aggiunto un fagiolo. Grande!",
-        position: "bottom",
+        position: "top",
         visibilityTime: 2000,
       })
     } catch (err: any) {

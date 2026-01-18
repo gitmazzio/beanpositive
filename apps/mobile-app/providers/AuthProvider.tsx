@@ -126,6 +126,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
 
         try {
+          console.log("🔗 Callback URL ricevuta:", result.url)
+
           // Estrai i parametri dalla URL di callback
           const url = new URL(result.url)
           
@@ -139,78 +141,141 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           const accessToken = searchParams.get("access_token") || hashParams.get("access_token")
           const refreshToken = searchParams.get("refresh_token") || hashParams.get("refresh_token")
 
+          console.log("📋 Parametri estratti:", {
+            hasCode: !!code,
+            hasError: !!errorParam,
+            hasAccessToken: !!accessToken,
+            hasRefreshToken: !!refreshToken,
+            hasHash: !!url.hash,
+          })
+
           if (errorParam) {
             throw new Error(`OAuth error: ${errorParam}`)
           }
 
-          // Se l'URL contiene token nell'hash, Supabase potrebbe aver già processato l'autenticazione
-          // In questo caso, verifica semplicemente la sessione
-          if (accessToken || refreshToken || url.hash.includes("access_token")) {
-            // Aspetta un momento per permettere a Supabase di processare il callback
-            await new Promise((resolve) => setTimeout(resolve, 200))
+          // PRIORITÀ 1: Flusso PKCE standard con codice
+          if (code && code.trim() !== "") {
+            console.log("✅ Trovato codice OAuth, uso flusso PKCE")
             
-            // Verifica la sessione
-            const { data: sessionData, error: sessionError } =
-              await supabase.auth.getSession()
+            // Scambia il codice con la sessione
+            const { data: sessionData, error: exchangeError } =
+              await supabase.auth.exchangeCodeForSession(code)
 
-            if (sessionError) throw sessionError
-
-            // Se la sessione esiste, l'autenticazione è completata
-            if (sessionData.session) {
-              // Chiudi la modale del browser
-              WebBrowser.maybeCompleteAuthSession()
-              // Fallback: chiudi esplicitamente la modale se necessario
-              try {
-                await WebBrowser.dismissBrowser()
-              } catch (dismissError) {
-                // Ignora errori se la modale è già chiusa
-                console.log("Browser already dismissed or not dismissible")
-              }
-              return
-            } else {
-              // Se non c'è sessione ma abbiamo token, potrebbe essere necessario processarli
-              // In questo caso, Supabase dovrebbe gestirli automaticamente tramite onAuthStateChange
-              // Aspettiamo un po' di più e riproviamo
-              await new Promise((resolve) => setTimeout(resolve, 1000))
-              const { data: retrySessionData } = await supabase.auth.getSession()
-              if (retrySessionData.session) {
-                WebBrowser.maybeCompleteAuthSession()
-                try {
-                  await WebBrowser.dismissBrowser()
-                } catch (dismissError) {
-                  console.log("Browser already dismissed or not dismissible")
-                }
-                return
-              }
-              throw new Error("Session not found after OAuth callback")
+            if (exchangeError) {
+              console.error("❌ Errore nello scambio del codice:", exchangeError)
+              // NON chiudere il browser se c'è un errore
+              throw exchangeError
             }
+
+            // La sessione viene gestita automaticamente da onAuthStateChange
+            if (!sessionData.session) {
+              console.error("❌ Nessuna sessione restituita dopo lo scambio del codice")
+              // NON chiudere il browser se non c'è sessione
+              throw new Error("No session returned after code exchange")
+            }
+
+            console.log("✅ Sessione creata con successo, aspetto che onAuthStateChange la processi...")
+            
+            // Aspetta un momento per permettere a onAuthStateChange di processare la sessione
+            // e aggiornare lo stato dell'app
+            await new Promise((resolve) => setTimeout(resolve, 300))
+            
+            // Verifica che la sessione sia ancora disponibile
+            const { data: verifySession, error: verifyError } = await supabase.auth.getSession()
+            if (verifyError) {
+              console.error("❌ Errore nella verifica della sessione:", verifyError)
+              throw verifyError
+            }
+            
+            if (!verifySession.session) {
+              console.error("❌ Sessione persa dopo lo scambio del codice")
+              throw new Error("Session lost after code exchange")
+            }
+            
+            console.log("✅ Sessione verificata, chiudo il browser")
+            
+            // Chiudi la modale del browser SOLO dopo aver verificato che tutto è OK
+            WebBrowser.maybeCompleteAuthSession()
+            // Fallback: chiudi esplicitamente la modale se necessario
+            try {
+              await WebBrowser.dismissBrowser()
+            } catch (dismissError) {
+              // Ignora errori se la modale è già chiusa
+              console.log("Browser already dismissed or not dismissible")
+            }
+            return
           }
 
-          // Flusso PKCE standard
-          if (!code || code.trim() === "") {
-            throw new Error("Invalid or empty authorization code")
+          // PRIORITÀ 2: Se ci sono token nell'hash/URL, processali manualmente
+          if (accessToken || refreshToken || url.hash.includes("access_token")) {
+            console.log("⚠️ Token trovati nell'URL, processo manualmente la sessione")
+            
+            // Estrai tutti i parametri necessari dall'URL
+            const extractedAccessToken = accessToken || hashParams.get("access_token")
+            const extractedRefreshToken = refreshToken || hashParams.get("refresh_token")
+            const expiresIn = searchParams.get("expires_in") || hashParams.get("expires_in")
+            const tokenType = searchParams.get("token_type") || hashParams.get("token_type") || "bearer"
+            
+            console.log("📋 Token estratti:", {
+              hasAccessToken: !!extractedAccessToken,
+              hasRefreshToken: !!extractedRefreshToken,
+              expiresIn,
+              tokenType,
+            })
+
+            if (!extractedAccessToken || !extractedRefreshToken) {
+              console.error("❌ Token mancanti nell'URL")
+              throw new Error("Access token or refresh token missing in OAuth callback URL")
+            }
+
+            // Imposta la sessione manualmente usando i token estratti
+            console.log("🔐 Imposto la sessione con i token estratti...")
+            const { data: sessionData, error: setSessionError } = await supabase.auth.setSession({
+              access_token: extractedAccessToken,
+              refresh_token: extractedRefreshToken,
+            })
+
+            if (setSessionError) {
+              console.error("❌ Errore nell'impostazione della sessione:", setSessionError)
+              throw setSessionError
+            }
+
+            if (!sessionData.session) {
+              console.error("❌ Nessuna sessione restituita dopo setSession")
+              throw new Error("No session returned after setSession")
+            }
+
+            console.log("✅ Sessione impostata con successo, aspetto che onAuthStateChange la processi...")
+            
+            // Aspetta un momento per permettere a onAuthStateChange di processare la sessione
+            await new Promise((resolve) => setTimeout(resolve, 300))
+            
+            // Verifica che la sessione sia ancora disponibile
+            const { data: verifySession, error: verifyError } = await supabase.auth.getSession()
+            if (verifyError) {
+              console.error("❌ Errore nella verifica della sessione:", verifyError)
+              throw verifyError
+            }
+            
+            if (!verifySession.session) {
+              console.error("❌ Sessione persa dopo setSession")
+              throw new Error("Session lost after setSession")
+            }
+            
+            console.log("✅ Sessione verificata, chiudo il browser")
+            
+            // Chiudi la modale del browser SOLO dopo aver verificato che tutto è OK
+            WebBrowser.maybeCompleteAuthSession()
+            try {
+              await WebBrowser.dismissBrowser()
+            } catch (dismissError) {
+              console.log("Browser already dismissed or not dismissible")
+            }
+            return
           }
 
-          // Scambia il codice con la sessione
-          const { data: sessionData, error: exchangeError } =
-            await supabase.auth.exchangeCodeForSession(code)
-
-          if (exchangeError) throw exchangeError
-
-          // La sessione viene gestita automaticamente da onAuthStateChange
-          if (!sessionData.session) {
-            throw new Error("No session returned after code exchange")
-          }
-
-          // Chiudi la modale del browser dopo il successo
-          WebBrowser.maybeCompleteAuthSession()
-          // Fallback: chiudi esplicitamente la modale se necessario
-          try {
-            await WebBrowser.dismissBrowser()
-          } catch (dismissError) {
-            // Ignora errori se la modale è già chiusa
-            console.log("Browser already dismissed or not dismissible")
-          }
+          // Se non c'è né codice né token, c'è un problema
+          throw new Error("Invalid OAuth callback: no code or token found in URL")
         } catch (urlError: any) {
           if (urlError instanceof TypeError) {
             throw new Error("Invalid callback URL received from OAuth provider")

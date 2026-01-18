@@ -4,12 +4,14 @@ import HorizontalLine from "@/components/commons/HorizontalLine"
 import Link from "@/components/commons/Link"
 import StyledText from "@/components/commons/StyledText"
 import { PageView } from "@/components/Themed"
+import { useNotificationPermissionFlow } from "@/hooks/useNotificationPermissionFlow"
+import { useAuth } from "@/providers"
+import { triggerErrorHaptic } from "@/utils/haptics"
 import { FontAwesome6 } from "@expo/vector-icons"
 import { useRouter } from "expo-router"
 import { useState } from "react"
 import { Alert, Image, Platform, StyleSheet } from "react-native"
-import { useAuth } from "@/providers"
-import { useNotificationPermissionFlow } from "@/hooks/useNotificationPermissionFlow"
+import Toast from "react-native-toast-message"
 
 export default function Login() {
   const [error, setError] = useState("")
@@ -38,8 +40,15 @@ export default function Login() {
       // Controlla i permessi delle notifiche e naviga di conseguenza
       await checkAndNavigateAfterLogin()
     } catch (err: any) {
+      void triggerErrorHaptic();
+      Toast.show({
+        type: "error",
+        text1: err.message || "Login con Google fallito",
+        position: "top",
+        visibilityTime: 2000,
+      });
       const errorMessage = err.message || "Login con Google fallito"
-      setError(errorMessage)
+      // setError(errorMessage)
       // Non mostrare alert per cancellazione utente
       if (!errorMessage.includes("cancelled")) {
         Alert.alert("Errore", errorMessage)
@@ -69,7 +78,7 @@ export default function Login() {
       await checkAndNavigateAfterLogin()
     } catch (err: any) {
       const errorMessage = err.message || "Login con Apple fallito"
-      setError(errorMessage)
+      // setError(errorMessage)
       // Non mostrare alert per cancellazione utente
       if (!errorMessage.includes("cancelled")) {
         Alert.alert("Errore", errorMessage)
@@ -107,16 +116,16 @@ export default function Login() {
         title="Continua con Google"
         onPress={handleGoogleLogin}
         disabled={isGoogleLoading}
+      />
+      {Platform.OS === "ios" ? (
+        <Button
+          kind="tertiary"
+          prefixIcon={<FontAwesome6 name="apple" size={20} color={"#686260"} />}
+          title="Continua con Apple"
+          onPress={handleAppleLogin}
+          disabled={isAppleLoading}
         />
-        {Platform.OS === "ios" ? (
-          <Button
-            kind="tertiary"
-            prefixIcon={<FontAwesome6 name="apple" size={20} color={"#686260"} />}
-            title="Continua con Apple"
-            onPress={handleAppleLogin}
-            disabled={isAppleLoading}
-          />
-        ) : null}
+      ) : null}
       {error && (
         <StyledText kind="body" style={{ color: "red", textAlign: "center" }}>
           {error}

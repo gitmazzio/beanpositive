@@ -54,6 +54,8 @@ export default function Account() {
       Toast.show({
         type: "error",
         text1: err.message || "Errore aggiornamento",
+        position: "top",
+        visibilityTime: 2000,
       });
       setError("newPassword", {
         message: err.message || "Errore aggiornamento",

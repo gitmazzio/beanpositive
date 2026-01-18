@@ -16,6 +16,8 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ActivityIndicator, ScrollView, StyleSheet } from "react-native";
+import Toast from "react-native-toast-message";
+import { triggerErrorHaptic } from "@/utils/haptics";
 
 export default function SignIn() {
   const { loading, login } = useAuth();
@@ -43,10 +45,17 @@ export default function SignIn() {
       // Controlla i permessi delle notifiche e naviga di conseguenza
       await checkAndNavigateAfterLogin();
     } catch (err: any) {
+      void triggerErrorHaptic();
+      Toast.show({
+        type: "error",
+        text1: err.message || "Errore durante l'accesso",
+        position: "top",
+        visibilityTime: 2000,
+      });
       setError(
         IT_ERROR_CODES[err.code as SupabaseErrorCode] ??
-          err.message ??
-          "Errore durante l'accesso. Riprova."
+        err.message ??
+        "Errore durante l'accesso. Riprova."
       );
     }
   };
