@@ -6,13 +6,17 @@ import {
 import { useAuth } from "@/providers"
 import { useAddHit } from "@/queries/mutations/useAddHit"
 import { useLocation } from "@/hooks/useLocation"
-import { createContext, useCallback, useMemo, useRef } from "react"
+import { createContext, useCallback, useMemo, useRef, useState } from "react"
 import { Animated } from "react-native"
 import Toast from "react-native-toast-message"
 
 // Context per comunicare con Pocket
 export type PocketContextType = {
   addNewHint: () => void
+  isCameraVisible: boolean
+  openCamera: () => void
+  closeCamera: () => void
+  onCameraSuccess: () => void
   rotationPrimaryAnim: Animated.Value
   scalePrimaryAnim: Animated.Value
   movePrimaryAnim: Animated.Value
@@ -50,11 +54,30 @@ export default function PocketProvider({ children }: PocketProviderProps) {
   const opacityBean = useRef(new Animated.Value(0)).current
 
   const { mutate: addHit, status } = useAddHit()
+  const [isCameraVisible, setIsCameraVisible] = useState(false)
 
-  const handleAddRow = useCallback(async () => {
+  /**
+   * Apre la camera per scattare una foto
+   */
+  const openCamera = useCallback(() => {
     if (!user) {
       return
     }
+    setIsCameraVisible(true)
+  }, [user])
+
+  /**
+   * Chiude la camera
+   */
+  const closeCamera = useCallback(() => {
+    setIsCameraVisible(false)
+  }, [])
+
+  /**
+   * Gestisce il successo della creazione hit dalla camera
+   * Esegue le animazioni e invalida le query
+   */
+  const handleCameraSuccess = useCallback(() => {
     animationPrimaryPocket({
       rotation: rotationPrimaryAnim,
       scale: scalePrimaryAnim,
@@ -71,49 +94,37 @@ export default function PocketProvider({ children }: PocketProviderProps) {
       translateY: translateBeanY,
       opacity: opacityBean,
     })
-    try {
-      // Prova a ottenere la posizione corrente
-      const location = await getCurrentLocation()
-      let address: string | undefined
-      let locationData: { lat: number; lng: number } | undefined
+  }, [
+    rotationPrimaryAnim,
+    scalePrimaryAnim,
+    movePrimaryAnim,
+    rotationSecondaryAnim,
+    scaleSecondaryAnim,
+    moveSecondaryAnim,
+    animatedBeanValue,
+    translateBeanX,
+    translateBeanY,
+    opacityBean,
+  ])
 
-      if (location) {
-        const { latitude, longitude } = location.coords
-        locationData = { lat: latitude, lng: longitude }
-
-        // Prova a ottenere l'indirizzo dalle coordinate
-        const addressFromCoords = await getAddressFromCoordinates(
-          latitude,
-          longitude
-        )
-        address = addressFromCoords || undefined
-      }
-
-      // Se non abbiamo l'indirizzo, usa un valore di default
-      if (!address) {
-        address = "Posizione non disponibile"
-      }
-
-      await addHit({
-        address,
-        location: locationData,
-      })
-
-      Toast.show({
-        type: "hintSuccess",
-        text1: "Hai aggiunto un fagiolo. Grande!",
-        position: "top",
-        visibilityTime: 2000,
-      })
-    } catch (err: any) {
-      console.error("Error adding hit:", err)
-      // alert("Error: " + err.message);
+  /**
+   * Handler principale per aggiungere un hit
+   * Ora apre la camera invece di creare direttamente l'hit
+   */
+  const handleAddRow = useCallback(() => {
+    if (!user) {
+      return
     }
-  }, [user, getCurrentLocation, getAddressFromCoordinates, addHit])
+    openCamera()
+  }, [user, openCamera])
 
   const contextValue: PocketContextType = useMemo(
     () => ({
       addNewHint: handleAddRow,
+      isCameraVisible,
+      openCamera,
+      closeCamera,
+      onCameraSuccess: handleCameraSuccess,
       rotationPrimaryAnim,
       scalePrimaryAnim,
       movePrimaryAnim,
@@ -126,7 +137,24 @@ export default function PocketProvider({ children }: PocketProviderProps) {
       opacityBean,
       isLoadingMutation: status === "pending",
     }),
-    [handleAddRow, status]
+    [
+      handleAddRow,
+      isCameraVisible,
+      openCamera,
+      closeCamera,
+      handleCameraSuccess,
+      rotationPrimaryAnim,
+      scalePrimaryAnim,
+      movePrimaryAnim,
+      rotationSecondaryAnim,
+      scaleSecondaryAnim,
+      moveSecondaryAnim,
+      animatedBeanValue,
+      translateBeanX,
+      translateBeanY,
+      opacityBean,
+      status,
+    ]
   )
 
   return (

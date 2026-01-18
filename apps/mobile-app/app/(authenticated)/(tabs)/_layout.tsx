@@ -1,14 +1,17 @@
 import PocketProvider from "@/app/contexts/PocketContext"
 import { CustomTabBar } from "@/components/CustomTabBar"
+import { CameraScreen } from "@/components/CameraScreen"
 import { useColorScheme } from "@/components/useColorScheme"
 import Colors from "@/constants/Colors"
 import { Tabs } from "expo-router"
+import usePocketContext from "@/app/hooks/usePocketContext"
 
-export default function TabLayout() {
+function TabsWithCamera() {
   const colorScheme = useColorScheme()
+  const { isCameraVisible, closeCamera } = usePocketContext()
 
   return (
-    <PocketProvider>
+    <>
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
@@ -32,6 +35,18 @@ export default function TabLayout() {
           }}
         />
       </Tabs>
+      <CameraScreen
+        visible={isCameraVisible}
+        onClose={closeCamera}
+      />
+    </>
+  )
+}
+
+export default function TabLayout() {
+  return (
+    <PocketProvider>
+      <TabsWithCamera />
     </PocketProvider>
   )
 }

@@ -2,6 +2,7 @@ import { supabase } from "@/services/supabase";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export interface AddHitPayload {
+  image_url?: string;
   address?: string;
   location?: {
     lat: number;
