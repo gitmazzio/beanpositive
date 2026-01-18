@@ -21,7 +21,7 @@ export const Button = ({
   kind = "primary",
   prefixIcon,
   suffixIcon,
-  haptics = true,
+  haptics = false,
 }: ButtonProps) => {
   let textStyle = styles.buttonText;
   let buttonStyle = styles.primary;

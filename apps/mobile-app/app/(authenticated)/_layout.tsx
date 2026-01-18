@@ -22,6 +22,10 @@ export default function AuthLayout() {
           name="notification-request"
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="location-request"
+          options={{ headerShown: false }}
+        />
         {/* Profile screen as a modal */}
         <Stack.Screen
           name="(profile)"

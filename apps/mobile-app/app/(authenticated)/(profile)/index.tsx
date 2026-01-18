@@ -6,10 +6,10 @@ import { Button } from "@/components/commons/Button";
 import Flex from "@/components/commons/Flex";
 import StyledText from "@/components/commons/StyledText";
 import { useAuth } from "@/providers";
+import { triggerConfirmHaptic } from "@/utils/haptics";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { ScrollView, TouchableOpacity } from "react-native";
-import { triggerConfirmHaptic } from "@/utils/haptics";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -50,11 +50,6 @@ export default function ProfileScreen() {
           title="Account"
           icon="gear"
           url={"/(authenticated)/(profile)/account"}
-        />
-        <SectionButton
-          title="Haptics (demo)"
-          icon="bolt"
-          url={"/(authenticated)/(profile)/haptics"}
         />
         <StyledText kind="headline">Supporto e Community</StyledText>
         <SectionButton

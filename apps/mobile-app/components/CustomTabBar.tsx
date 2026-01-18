@@ -1,4 +1,5 @@
 import usePocketContext from "@/app/hooks/usePocketContext";
+import { triggerConfirmHaptic } from "@/utils/haptics";
 import { FontAwesome6, Ionicons } from "@expo/vector-icons";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import {
@@ -11,7 +12,6 @@ import React from "react";
 import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import StyledText from "./commons/StyledText";
 import { BeanSimple } from "./svg/BeanSimple";
-import { triggerConfirmHaptic } from "@/utils/haptics";
 
 // Definizione dei tipi per le rotte
 type RootTabParamList = {
@@ -81,16 +81,16 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
     }
   };
 
-  const getIconName = (routeName: keyof RootTabParamList): IconName => {
-    switch (routeName) {
-      case "Pocket":
-        return "home";
-      case "Diary":
-        return "book";
-      default:
-        return "home";
-    }
-  };
+  // const getIconName = (routeName: keyof RootTabParamList): IconName => {
+  //   switch (routeName) {
+  //     case "Pocket":
+  //       return "home";
+  //     case "Diary":
+  //       return "book";
+  //     default:
+  //       return "home";
+  //   }
+  // };
 
   return (
     <View style={{ backgroundColor: "#FEF5E6" }}>
@@ -103,7 +103,6 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
           // const isFocusedPocket = state.index === 0;
 
           const onPress = (): void => {
-            void triggerConfirmHaptic();
             const event = navigation.emit({
               type: "tabPress",
               target: route.key,

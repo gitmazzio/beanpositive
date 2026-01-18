@@ -106,7 +106,7 @@ export default function Calendar({
         align="center"
         style={styles.header}
       >
-          <TouchableOpacity onPress={onPreviousMonth} disabled={!canGoPrevious}>
+          <TouchableOpacity onPress={onPreviousMonth} disabled={!canGoPrevious} hitSlop={15}>
             <FontAwesome6
               name="chevron-left"
               color={!canGoPrevious ? "#ccc" : "#404B35"}
@@ -118,7 +118,7 @@ export default function Calendar({
           {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
         </StyledText>
 
-          <TouchableOpacity onPress={onNextMonth} disabled={!canGoNext}>
+          <TouchableOpacity onPress={onNextMonth} disabled={!canGoNext} hitSlop={15}>
             <FontAwesome6
               name="chevron-right"
               color={!canGoNext ? "#ccc" : "#404B35"}

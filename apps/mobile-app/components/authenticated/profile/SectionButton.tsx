@@ -20,7 +20,7 @@ export const SectionButton = ({
   icon,
   rightIcon,
   disabled = false,
-  haptics = true,
+  haptics = false,
 }: Props) => {
   const handlePress = () => {
     if (disabled) {

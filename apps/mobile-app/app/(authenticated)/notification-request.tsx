@@ -17,20 +17,19 @@ export default function NotificationRequest() {
 
     await AsyncStorage.setItem("notificationRequested", "true");
 
-    router.replace("/(authenticated)/(tabs)");
+    router.replace("/(authenticated)/location-request");
   };
 
   const handlePermissionDenied = async () => {
     await AsyncStorage.setItem("notificationRequested", "true");
 
-    router.replace("/(authenticated)/(tabs)");
+    router.replace("/(authenticated)/location-request");
   };
 
   const handleSkip = async () => {
     await AsyncStorage.setItem("notificationRequested", "true");
 
-    // Naviga alle tabs
-    router.replace("/(authenticated)/(tabs)");
+    router.replace("/(authenticated)/location-request");
   };
 
   return (

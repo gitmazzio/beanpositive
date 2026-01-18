@@ -31,12 +31,6 @@ export default function ProfileLayout() {
           headerShown: false,
         }}
       />
-        <Stack.Screen
-          name="haptics"
-          options={{
-            headerShown: false,
-          }}
-        />
     </Stack>
   );
 }
