@@ -30,10 +30,12 @@ export default function NotAuthenticatedLayout() {
       <Stack.Screen name="signin" options={{ headerShown: false }} />
       <Stack.Screen name="register" options={{ headerShown: false }} />
       <Stack.Screen name="recover-password" options={{ headerShown: false }} />
+      <Stack.Screen name="reset-password" options={{ headerShown: false }} />
       <Stack.Screen
         name="email-verification"
         options={{ headerShown: false }}
       />
+      <Stack.Screen name="check-email" options={{ headerShown: false }} />
     </Stack>
   );
 }
