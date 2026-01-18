@@ -1,33 +1,29 @@
 import Flex from "@/components/commons/Flex";
 import { Header } from "@/components/commons/Header";
-import { NotificationPermissionPrompt } from "@/components/commons/NotificationPermissionPrompt";
+import { LocationPermissionPrompt } from "@/components/commons/LocationPermissionPrompt";
 import StyledText from "@/components/commons/StyledText";
 import { PageView } from "@/components/Themed";
-import { oneSignalService } from "@/services/onesignal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { Image, StyleSheet } from "react-native";
 
-export default function NotificationRequest() {
+export default function LocationRequest() {
   const router = useRouter();
 
   const handlePermissionGranted = async () => {
-    await oneSignalService.scheduleDailyNotification("daily_one", 8, 30);
-    await oneSignalService.scheduleDailyNotification("daily_two", 21, 0);
-
-    await AsyncStorage.setItem("notificationRequested", "true");
+    await AsyncStorage.setItem("locationRequested", "true");
 
     router.replace("/(authenticated)/(tabs)");
   };
 
   const handlePermissionDenied = async () => {
-    await AsyncStorage.setItem("notificationRequested", "true");
+    await AsyncStorage.setItem("locationRequested", "true");
 
     router.replace("/(authenticated)/(tabs)");
   };
 
   const handleSkip = async () => {
-    await AsyncStorage.setItem("notificationRequested", "true");
+    await AsyncStorage.setItem("locationRequested", "true");
 
     // Naviga alle tabs
     router.replace("/(authenticated)/(tabs)");
@@ -55,20 +51,20 @@ export default function NotificationRequest() {
         style={styles.content}
       >
         <Image
-          source={require("../../assets/images/ask_notifications.png")}
+          source={require("../../assets/images/ask_geolocation.png")}
           style={styles.logo}
         />
 
         <StyledText kind="h1" textAlign="center" style={styles.title}>
-          Attiva le notifiche
+          Attiva la posizione
         </StyledText>
 
         <StyledText kind="body" textAlign="center" style={styles.description}>
-          Se abiliti gli avvisi, possiamo ricordarti noi quando mettere da parte
-          i tuoi fagioli durante la settimana
+          Per poter salvare i tuoi fagioli in modo corretto, abbiamo bisogno di
+          accedere alla tua posizione.
         </StyledText>
 
-        <NotificationPermissionPrompt
+        <LocationPermissionPrompt
           onPermissionGranted={handlePermissionGranted}
           onPermissionDenied={handlePermissionDenied}
           showOnlyIfNeeded={false}
@@ -85,11 +81,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
   },
+  title: {
+  },
   logo: {
     width: 300,
     height: 300,
-  },
-  title: {
   },
   description: {
     marginTop: 16,

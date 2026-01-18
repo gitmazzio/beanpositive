@@ -15,13 +15,16 @@
       "deploymentTarget": "15.1",
       "googleServicesFile": "./services/GoogleService-Info.plist",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "Per poter salvare i tuoi fagioli in modo corretto, abbiamo bisogno di accedere alla tua posizione."
       },
       "entitlements": {
         "aps-environment": "production",
-        "com.apple.developer.applesignin": ["Default"]
+        "com.apple.developer.applesignin": [
+          "Default"
+        ]
       },
-      "buildNumber": "10"
+      "buildNumber": "11"
     },
     "android": {
       "googleServicesFile": "./services/google-services.json",
@@ -48,7 +51,9 @@
           "resizeMode": "contain"
         }
       ],
-      ["expo-router"],
+      [
+        "expo-router"
+      ],
       "expo-notifications",
       [
         "@sentry/react-native/expo",
@@ -65,7 +70,15 @@
         }
       ],
       "expo-web-browser",
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Per poter salvare i tuoi fagioli in modo corretto, abbiamo bisogno di accedere alla tua posizione.",
+          "locationAlwaysPermission": "Per poter salvare i tuoi fagioli in modo corretto, abbiamo bisogno di accedere alla tua posizione.",
+          "locationWhenInUsePermission": "Per poter salvare i tuoi fagioli in modo corretto, abbiamo bisogno di accedere alla tua posizione."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

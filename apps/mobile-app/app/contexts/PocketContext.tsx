@@ -5,6 +5,7 @@ import {
 } from "@/components/pocket/animations"
 import { useAuth } from "@/providers"
 import { useAddHit } from "@/queries/mutations/useAddHit"
+import { useLocation } from "@/hooks/useLocation"
 import { createContext, useCallback, useMemo, useRef } from "react"
 import { Animated } from "react-native"
 import Toast from "react-native-toast-message"
@@ -35,6 +36,7 @@ interface PocketProviderProps {
 
 export default function PocketProvider({ children }: PocketProviderProps) {
   const { user } = useAuth()
+  const { getCurrentLocation, getAddressFromCoordinates } = useLocation()
   const rotationPrimaryAnim = useRef(new Animated.Value(0)).current
   const scalePrimaryAnim = useRef(new Animated.Value(0)).current
   const movePrimaryAnim = useRef(new Animated.Value(0)).current
@@ -70,7 +72,32 @@ export default function PocketProvider({ children }: PocketProviderProps) {
       opacity: opacityBean,
     })
     try {
-      await addHit({ address: "Via Monte Napoleone" })
+      // Prova a ottenere la posizione corrente
+      const location = await getCurrentLocation()
+      let address: string | undefined
+      let locationData: { lat: number; lng: number } | undefined
+
+      if (location) {
+        const { latitude, longitude } = location.coords
+        locationData = { lat: latitude, lng: longitude }
+
+        // Prova a ottenere l'indirizzo dalle coordinate
+        const addressFromCoords = await getAddressFromCoordinates(
+          latitude,
+          longitude
+        )
+        address = addressFromCoords || undefined
+      }
+
+      // Se non abbiamo l'indirizzo, usa un valore di default
+      if (!address) {
+        address = "Posizione non disponibile"
+      }
+
+      await addHit({
+        address,
+        location: locationData,
+      })
 
       Toast.show({
         type: "hintSuccess",
@@ -79,9 +106,10 @@ export default function PocketProvider({ children }: PocketProviderProps) {
         visibilityTime: 2000,
       })
     } catch (err: any) {
+      console.error("Error adding hit:", err)
       // alert("Error: " + err.message);
     }
-  }, [user])
+  }, [user, getCurrentLocation, getAddressFromCoordinates, addHit])
 
   const contextValue: PocketContextType = useMemo(
     () => ({
