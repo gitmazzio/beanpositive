@@ -99,9 +99,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const loginWithGoogle = async () => {
     try {
       const redirectTo = AuthSession.makeRedirectUri({
-        scheme: "beanpositiveapp",
+        scheme: "beanpositive",
         path: "auth/callback",
       })
+
+      console.log("🔗 Redirect URL generato:", redirectTo)
 
       // Crea la richiesta OAuth
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -126,13 +128,65 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         try {
           // Estrai i parametri dalla URL di callback
           const url = new URL(result.url)
-          const code = url.searchParams.get("code")
-          const errorParam = url.searchParams.get("error")
+          
+          // Gestisci sia query parameters (?) che hash (#)
+          const searchParams = url.searchParams
+          const hashParams = new URLSearchParams(url.hash.substring(1))
+          
+          // Prova prima nei query parameters, poi nell'hash
+          const code = searchParams.get("code") || hashParams.get("code")
+          const errorParam = searchParams.get("error") || hashParams.get("error")
+          const accessToken = searchParams.get("access_token") || hashParams.get("access_token")
+          const refreshToken = searchParams.get("refresh_token") || hashParams.get("refresh_token")
 
           if (errorParam) {
             throw new Error(`OAuth error: ${errorParam}`)
           }
 
+          // Se l'URL contiene token nell'hash, Supabase potrebbe aver già processato l'autenticazione
+          // In questo caso, verifica semplicemente la sessione
+          if (accessToken || refreshToken || url.hash.includes("access_token")) {
+            // Aspetta un momento per permettere a Supabase di processare il callback
+            await new Promise((resolve) => setTimeout(resolve, 200))
+            
+            // Verifica la sessione
+            const { data: sessionData, error: sessionError } =
+              await supabase.auth.getSession()
+
+            if (sessionError) throw sessionError
+
+            // Se la sessione esiste, l'autenticazione è completata
+            if (sessionData.session) {
+              // Chiudi la modale del browser
+              WebBrowser.maybeCompleteAuthSession()
+              // Fallback: chiudi esplicitamente la modale se necessario
+              try {
+                await WebBrowser.dismissBrowser()
+              } catch (dismissError) {
+                // Ignora errori se la modale è già chiusa
+                console.log("Browser already dismissed or not dismissible")
+              }
+              return
+            } else {
+              // Se non c'è sessione ma abbiamo token, potrebbe essere necessario processarli
+              // In questo caso, Supabase dovrebbe gestirli automaticamente tramite onAuthStateChange
+              // Aspettiamo un po' di più e riproviamo
+              await new Promise((resolve) => setTimeout(resolve, 1000))
+              const { data: retrySessionData } = await supabase.auth.getSession()
+              if (retrySessionData.session) {
+                WebBrowser.maybeCompleteAuthSession()
+                try {
+                  await WebBrowser.dismissBrowser()
+                } catch (dismissError) {
+                  console.log("Browser already dismissed or not dismissible")
+                }
+                return
+              }
+              throw new Error("Session not found after OAuth callback")
+            }
+          }
+
+          // Flusso PKCE standard
           if (!code || code.trim() === "") {
             throw new Error("Invalid or empty authorization code")
           }
@@ -146,6 +200,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           // La sessione viene gestita automaticamente da onAuthStateChange
           if (!sessionData.session) {
             throw new Error("No session returned after code exchange")
+          }
+
+          // Chiudi la modale del browser dopo il successo
+          WebBrowser.maybeCompleteAuthSession()
+          // Fallback: chiudi esplicitamente la modale se necessario
+          try {
+            await WebBrowser.dismissBrowser()
+          } catch (dismissError) {
+            // Ignora errori se la modale è già chiusa
+            console.log("Browser already dismissed or not dismissible")
           }
         } catch (urlError: any) {
           if (urlError instanceof TypeError) {

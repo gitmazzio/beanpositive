@@ -31,7 +31,7 @@ export default function RecoverPassword() {
     setError(null);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: "beanpositiveapp://reset-password",
+        redirectTo: "beanpositive://reset-password",
       });
 
       if (error) throw error;
