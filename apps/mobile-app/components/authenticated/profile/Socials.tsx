@@ -2,7 +2,7 @@ import Flex from "@/components/commons/Flex";
 import HorizontalLine from "@/components/commons/HorizontalLine";
 import StyledText from "@/components/commons/StyledText";
 import { useOpenBrowser } from "@/hooks/useOpenBrowser";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 const SOCIALS = [
   {
@@ -25,7 +25,7 @@ export const Socials = () => {
       {SOCIALS?.map((social, index) => {
         const isLast = index === SOCIALS.length - 1;
         return (
-          <>
+          <View key={index}>
             <TouchableOpacity onPress={() => openBrowser(social.link)}>
               <Flex direction="row" justify="space-between" align="center">
                 <Flex
@@ -56,7 +56,7 @@ export const Socials = () => {
               </Flex>
             </TouchableOpacity>
             {!isLast && <HorizontalLine />}
-          </>
+          </View>
         );
       })}
     </Flex>

@@ -96,6 +96,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     if (error) throw error
   }
 
+  // Helper function per salvare il firstName dopo il login con Google
+  const saveGoogleFirstName = async (user: AuthUser) => {
+    try {
+      // Controlla se il firstName è già presente nei metadata
+      if (user.user_metadata?.firstName) {
+        return // Già presente, non serve aggiornare
+      }
+
+      // Prova a recuperare il firstName dai metadata di Google
+      const metadata = user.user_metadata || {}
+
+      // Google può fornire il nome in diversi campi
+      const fullName = metadata.full_name || metadata.name
+      const givenName = metadata.given_name
+
+      // Estrai il firstName dal fullName o usa il givenName
+      let firstName = givenName
+
+      if (!firstName && fullName) {
+        // Se abbiamo solo il fullName, prendi la prima parola come firstName
+        firstName = fullName.split(" ")[0]
+      }
+
+      // Salva il firstName se disponibile
+      if (firstName && firstName.trim() !== "") {
+        await supabase.auth.updateUser({
+          data: {
+            firstName: firstName.trim(),
+          },
+        })
+        console.log("✅ firstName salvato per utente Google:", firstName)
+      }
+    } catch (updateError) {
+      // Non bloccare il flusso se l'aggiornamento del nome fallisce
+      console.error("Error updating Google user firstName (non-blocking):", updateError)
+    }
+  }
+
   const loginWithGoogle = async () => {
     try {
       const redirectTo = AuthSession.makeRedirectUri({
@@ -130,11 +168,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
           // Estrai i parametri dalla URL di callback
           const url = new URL(result.url)
-          
+
           // Gestisci sia query parameters (?) che hash (#)
           const searchParams = url.searchParams
           const hashParams = new URLSearchParams(url.hash.substring(1))
-          
+
           // Prova prima nei query parameters, poi nell'hash
           const code = searchParams.get("code") || hashParams.get("code")
           const errorParam = searchParams.get("error") || hashParams.get("error")
@@ -156,7 +194,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           // PRIORITÀ 1: Flusso PKCE standard con codice
           if (code && code.trim() !== "") {
             console.log("✅ Trovato codice OAuth, uso flusso PKCE")
-            
+
             // Scambia il codice con la sessione
             const { data: sessionData, error: exchangeError } =
               await supabase.auth.exchangeCodeForSession(code)
@@ -175,25 +213,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             }
 
             console.log("✅ Sessione creata con successo, aspetto che onAuthStateChange la processi...")
-            
+
             // Aspetta un momento per permettere a onAuthStateChange di processare la sessione
             // e aggiornare lo stato dell'app
             await new Promise((resolve) => setTimeout(resolve, 300))
-            
+
             // Verifica che la sessione sia ancora disponibile
             const { data: verifySession, error: verifyError } = await supabase.auth.getSession()
             if (verifyError) {
               console.error("❌ Errore nella verifica della sessione:", verifyError)
               throw verifyError
             }
-            
+
             if (!verifySession.session) {
               console.error("❌ Sessione persa dopo lo scambio del codice")
               throw new Error("Session lost after code exchange")
             }
-            
+
+            // Salva il firstName se disponibile
+            if (verifySession.session.user) {
+              await saveGoogleFirstName(verifySession.session.user)
+            }
+
             console.log("✅ Sessione verificata, chiudo il browser")
-            
+
             // Chiudi la modale del browser SOLO dopo aver verificato che tutto è OK
             WebBrowser.maybeCompleteAuthSession()
             // Fallback: chiudi esplicitamente la modale se necessario
@@ -209,13 +252,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           // PRIORITÀ 2: Se ci sono token nell'hash/URL, processali manualmente
           if (accessToken || refreshToken || url.hash.includes("access_token")) {
             console.log("⚠️ Token trovati nell'URL, processo manualmente la sessione")
-            
+
             // Estrai tutti i parametri necessari dall'URL
             const extractedAccessToken = accessToken || hashParams.get("access_token")
             const extractedRefreshToken = refreshToken || hashParams.get("refresh_token")
             const expiresIn = searchParams.get("expires_in") || hashParams.get("expires_in")
             const tokenType = searchParams.get("token_type") || hashParams.get("token_type") || "bearer"
-            
+
             console.log("📋 Token estratti:", {
               hasAccessToken: !!extractedAccessToken,
               hasRefreshToken: !!extractedRefreshToken,
@@ -246,24 +289,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             }
 
             console.log("✅ Sessione impostata con successo, aspetto che onAuthStateChange la processi...")
-            
+
             // Aspetta un momento per permettere a onAuthStateChange di processare la sessione
             await new Promise((resolve) => setTimeout(resolve, 300))
-            
+
             // Verifica che la sessione sia ancora disponibile
             const { data: verifySession, error: verifyError } = await supabase.auth.getSession()
             if (verifyError) {
               console.error("❌ Errore nella verifica della sessione:", verifyError)
               throw verifyError
             }
-            
+
             if (!verifySession.session) {
               console.error("❌ Sessione persa dopo setSession")
               throw new Error("Session lost after setSession")
             }
-            
+
+            // Salva il firstName se disponibile
+            if (verifySession.session.user) {
+              await saveGoogleFirstName(verifySession.session.user)
+            }
+
             console.log("✅ Sessione verificata, chiudo il browser")
-            
+
             // Chiudi la modale del browser SOLO dopo aver verificato che tutto è OK
             WebBrowser.maybeCompleteAuthSession()
             try {
@@ -341,6 +389,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                 full_name: fullName,
                 given_name: credential.fullName.givenName || undefined,
                 family_name: credential.fullName.familyName || undefined,
+                firstName: credential.fullName.givenName || undefined,
               },
             })
           } catch (updateError) {
