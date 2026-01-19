@@ -99,12 +99,12 @@ export default function PocketProvider({ children }: PocketProviderProps) {
         location: locationData,
       })
 
-      Toast.show({
-        type: "hintSuccess",
-        text1: "Hai aggiunto un fagiolo. Grande!",
-        position: "top",
-        visibilityTime: 2000,
-      })
+      // Toast.show({
+      //   type: "hintSuccess",
+      //   text1: "Hai aggiunto un fagiolo. Grande!",
+      //   position: "top",
+      //   visibilityTime: 2000,
+      // })
     } catch (err: any) {
       console.error("Error adding hit:", err)
       // alert("Error: " + err.message);
