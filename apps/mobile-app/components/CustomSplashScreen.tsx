@@ -1,15 +1,10 @@
-import React, { useEffect, useRef } from "react";
-import {
-  View,
-  Image,
-  StyleSheet,
-  Animated,
-  Dimensions,
-  Text,
-} from "react-native";
 import LottieView from "lottie-react-native";
+import { useEffect, useRef } from "react";
+import {
+  Animated,
+  StyleSheet
+} from "react-native";
 
-const { width, height } = Dimensions.get("window");
 
 export default function CustomSplashScreen({
   onFinish,
@@ -54,7 +49,7 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
   lottie: {
-    // marginTop: 50,
+    marginTop: 22,
     width: 375,
     height: 375,
   },
