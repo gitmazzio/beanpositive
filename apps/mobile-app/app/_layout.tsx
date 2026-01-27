@@ -16,11 +16,13 @@ import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 // import { LogLevel, OneSignal } from "react-native-onesignal";
+import RootDeepLinkHandler from "@/components/RootDeepLinkHandler";
+import { toastConfig } from "@/utils/toastConfig";
 import * as Sentry from "@sentry/react-native";
 import "react-native-reanimated";
-import CustomSplashScreen from "../components/CustomSplashScreen";
 import Toast from "react-native-toast-message";
-import { toastConfig } from "@/utils/toastConfig";
+import CustomSplashScreen from "../components/CustomSplashScreen";
+import PendingDeepLinkProvider from "./contexts/PendingDeepLinkContext";
 
 Sentry.init({
   enabled: process.env.NODE_ENV === "production",
@@ -44,7 +46,7 @@ Sentry.init({
 
 export {
   // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
+  ErrorBoundary
 } from "expo-router";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -103,9 +105,12 @@ export default Sentry.wrap(function RootLayout() {
     <AppSafeAreaView isSplashShowing={showSplash}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          {showSplash && <CustomSplashScreen onFinish={handleSplashFinish} />}
-          {!showSplash && <RootLayoutNav />}
-          <Toast config={toastConfig} />
+          <PendingDeepLinkProvider>
+            {showSplash && <CustomSplashScreen onFinish={handleSplashFinish} />}
+            {!showSplash && <RootDeepLinkHandler />}
+            {!showSplash && <RootLayoutNav />}
+            <Toast config={toastConfig} />
+          </PendingDeepLinkProvider>
           <StatusBar
             style={"dark"}
             networkActivityIndicatorVisible={false}
@@ -120,7 +125,7 @@ export default Sentry.wrap(function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -130,7 +135,7 @@ function RootLayoutNav() {
     })();
   }, []);
 
-  if (/* loading || */ showOnboarding == null) {
+  if (loading || showOnboarding == null) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text>Loading...</Text>
@@ -145,7 +150,7 @@ function RootLayoutNav() {
           {showOnboarding && <Stack.Screen name="onboarding" />}
           <Stack.Screen name="(not_authenticated)" />
         </Stack.Protected>
-        <Stack.Protected guard={user}>
+        <Stack.Protected guard={!!user}>
           <Stack.Screen name="(authenticated)" />
         </Stack.Protected>
       </Stack>

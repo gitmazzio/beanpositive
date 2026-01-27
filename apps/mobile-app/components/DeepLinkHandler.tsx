@@ -1,62 +1,41 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import * as Linking from "expo-linking";
+import { router } from "expo-router";
 import { useAuth } from "@/providers";
 import usePocketContext from "@/app/hooks/usePocketContext";
-import { router } from "expo-router";
+import { usePendingDeepLink } from "@/app/contexts/PendingDeepLinkContext";
+import { isAddHitUrl } from "@/constants/deepLinks";
 
+/**
+ * Gestisce addHit nelle tab autenticate: consuma pending (cold start) e ascolta
+ * gli URL in tempo reale. Unica azione concreta: addNewHint + navigazione a tabs.
+ */
 export default function DeepLinkHandler() {
   const { user } = useAuth();
   const { addNewHint } = usePocketContext();
+  const { consumePendingAction } = usePendingDeepLink();
+
+  const executeAddHit = useCallback(() => {
+    if (!user) return;
+    addNewHint();
+    router.push("/(authenticated)/(tabs)");
+  }, [user, addNewHint]);
 
   useEffect(() => {
-    const handleDeepLink = async (url: string) => {
-      try {
-        console.log("🔗 Deep link ricevuto:", url);
+    const pending = consumePendingAction();
+    if (pending === "addHit" && user) {
+      executeAddHit();
+    }
 
-        // Verifica se è il deep link per aggiungere un hit
-        if (url === "beanpositive://addHit" || url.includes("beanpositive://addHit")) {
-          // Verifica che l'utente sia autenticato
-          if (!user) {
-            console.log("⚠️ Utente non autenticato, navigo al login");
-            router.push("/(not_authenticated)/login");
-            return;
-          }
-
-          console.log("✅ Eseguo addHit dal widget");
-          // Chiama addNewHint che gestisce l'aggiunta del fagiolo
-          addNewHint();
-
-          // Naviga alla schermata principale se non ci siamo già
-          router.push("/(authenticated)/(tabs)");
-        }
-      } catch (error) {
-        console.error("❌ Errore nella gestione del deep link:", error);
+    const subscription = Linking.addEventListener("url", (event) => {
+      if (!isAddHitUrl(event.url)) return;
+      if (user) {
+        executeAddHit();
       }
-    };
-
-    // Gestisci il deep link quando l'app viene aperta
-    const checkInitialUrl = async () => {
-      try {
-        const initialUrl = await Linking.getInitialURL();
-        if (initialUrl) {
-          await handleDeepLink(initialUrl);
-        }
-      } catch (error) {
-        console.error("Errore nel controllo dell'URL iniziale:", error);
-      }
-    };
-
-    // Gestisci i deep link quando l'app è già aperta
-    const subscription = Linking.addEventListener("url", async (event) => {
-      await handleDeepLink(event.url);
     });
 
-    checkInitialUrl();
-
-    return () => {
-      subscription.remove();
-    };
-  }, [user, addNewHint]);
+    return () => subscription.remove();
+  }, [user, executeAddHit, consumePendingAction]);
 
   return null;
 }
