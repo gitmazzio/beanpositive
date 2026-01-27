@@ -22,85 +22,96 @@ export const NotificationPermissionPrompt: React.FC<
   showOnlyIfNeeded = true,
   skip,
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [hasPermission, setHasPermission] = useState<boolean | null>(null);
 
-  useEffect(() => {
-    checkPermissionStatus();
-  }, []);
+    useEffect(() => {
+      checkPermissionStatus();
+    }, []);
 
-  const checkPermissionStatus = async () => {
-    try {
-      const permission = await oneSignalService.areNotificationsEnabled();
-      setHasPermission(permission);
-    } catch (error) {
-      console.error("Error checking permission status:", error);
-    }
-  };
+    const checkPermissionStatus = async () => {
+      try {
+        const permission = await oneSignalService.areNotificationsEnabled();
+        setHasPermission(permission);
+      } catch (error) {
+        console.error("Error checking permission status:", error);
+      }
+    };
 
-  const handleRequestPermission = async () => {
-    try {
-      setIsLoading(true);
-      const granted = await oneSignalService.requestPermissions();
+    const handleRequestPermission = async () => {
+      try {
+        setIsLoading(true);
+        const granted = await oneSignalService.requestPermissions();
 
-      if (granted) {
-        setHasPermission(true);
-        onPermissionGranted?.();
-      } else {
-        setHasPermission(false);
+        if (granted) {
+          // Verifica nuovamente i permessi per assicurarsi che siano stati concessi
+          const hasPermission = await oneSignalService.areNotificationsEnabled();
+
+          if (hasPermission) {
+            setHasPermission(true);
+            // Piccolo delay per assicurarsi che i permessi siano completamente applicati
+            await new Promise((resolve) => setTimeout(resolve, 100));
+            onPermissionGranted?.();
+          } else {
+            setHasPermission(false);
+            void triggerErrorHaptic();
+            onPermissionDenied?.();
+          }
+        } else {
+          setHasPermission(false);
+          void triggerErrorHaptic();
+          onPermissionDenied?.();
+        }
+      } catch (error) {
+        console.error("Error requesting notification permission:", error);
         void triggerErrorHaptic();
         onPermissionDenied?.();
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Error requesting notification permission:", error);
-      void triggerErrorHaptic();
-      onPermissionDenied?.();
-    } finally {
-      setIsLoading(false);
+    };
+
+    // const handleOpenSettings = () => {
+    //   Alert.alert(
+    //     "Abilita le notifiche",
+    //     "Per ricevere le notifiche, vai nelle Impostazioni e abilita le notifiche per Bean Positive.",
+    //     [
+    //       { text: "Annulla", style: "cancel" },
+    //       {
+    //         text: "Apri Impostazioni",
+    //         onPress: () => {
+    //           // Apre le impostazioni del dispositivo
+    //           import("expo-linking").then(({ openSettings }) => {
+    //             openSettings();
+    //           });
+    //         },
+    //       },
+    //     ]
+    //   );
+    // };
+
+    // Se showOnlyIfNeeded è true e l'utente ha già i permessi, non mostrare nulla
+    if (showOnlyIfNeeded && hasPermission === true) {
+      return null;
     }
-  };
 
-  // const handleOpenSettings = () => {
-  //   Alert.alert(
-  //     "Abilita le notifiche",
-  //     "Per ricevere le notifiche, vai nelle Impostazioni e abilita le notifiche per Bean Positive.",
-  //     [
-  //       { text: "Annulla", style: "cancel" },
-  //       {
-  //         text: "Apri Impostazioni",
-  //         onPress: () => {
-  //           // Apre le impostazioni del dispositivo
-  //           import("expo-linking").then(({ openSettings }) => {
-  //             openSettings();
-  //           });
-  //         },
-  //       },
-  //     ]
-  //   );
-  // };
+    // Se showOnlyIfNeeded è true e stiamo ancora controllando i permessi, non mostrare nulla
+    if (showOnlyIfNeeded && hasPermission === null) {
+      return null;
+    }
 
-  // Se showOnlyIfNeeded è true e l'utente ha già i permessi, non mostrare nulla
-  if (showOnlyIfNeeded && hasPermission === true) {
-    return null;
-  }
+    return (
+      <View style={[style]}>
+        <View style={styles.buttonContainer}>
+          <Button
+            kind="primary"
+            title={isLoading ? "Caricamento..." : "Abilita notifiche"}
+            onPress={handleRequestPermission}
+            disabled={isLoading}
+            style={styles.primaryButton}
+          />
 
-  // Se showOnlyIfNeeded è true e stiamo ancora controllando i permessi, non mostrare nulla
-  if (showOnlyIfNeeded && hasPermission === null) {
-    return null;
-  }
-
-  return (
-    <View style={[style]}>
-      <View style={styles.buttonContainer}>
-        <Button
-          kind="primary"
-          title={isLoading ? "Caricamento..." : "Abilita notifiche"}
-          onPress={handleRequestPermission}
-          disabled={isLoading}
-          style={styles.primaryButton}
-        />
-
-        {/* {hasPermission === false && (
+          {/* {hasPermission === false && (
           <Button
             kind="tertiary"
             title="Apri Impostazioni"
@@ -108,16 +119,16 @@ export const NotificationPermissionPrompt: React.FC<
             style={styles.secondaryButton}
           />
         )} */}
-        <Button
-          kind="secondary"
-          title={"Salta per ora"}
-          onPress={() => skip?.()}
-          disabled={isLoading}
-        />
+          <Button
+            kind="secondary"
+            title={"Salta per ora"}
+            onPress={() => skip?.()}
+            disabled={isLoading}
+          />
+        </View>
       </View>
-    </View>
-  );
-};
+    );
+  };
 
 const styles = StyleSheet.create({
   title: {

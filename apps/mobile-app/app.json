@@ -22,8 +22,12 @@
         "aps-environment": "production",
         "com.apple.developer.applesignin": [
           "Default"
+        ],
+        "com.apple.security.application-groups": [
+          "group.com.beanpositive.app"
         ]
       },
+      "appleTeamId": "B2UMD85VN6",
       "buildNumber": "14"
     },
     "android": {
@@ -78,7 +82,8 @@
           "locationAlwaysPermission": "Per poter salvare i tuoi fagioli in modo corretto, abbiamo bisogno di accedere alla tua posizione.",
           "locationWhenInUsePermission": "Per poter salvare i tuoi fagioli in modo corretto, abbiamo bisogno di accedere alla tua posizione."
         }
-      ]
+      ],
+      "@bacons/apple-targets"
     ],
     "experiments": {
       "typedRoutes": true

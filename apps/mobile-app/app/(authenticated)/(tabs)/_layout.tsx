@@ -3,12 +3,14 @@ import { CustomTabBar } from "@/components/CustomTabBar"
 import { useColorScheme } from "@/components/useColorScheme"
 import Colors from "@/constants/Colors"
 import { Tabs } from "expo-router"
+import DeepLinkHandler from "@/components/DeepLinkHandler"
 
 export default function TabLayout() {
   const colorScheme = useColorScheme()
 
   return (
     <PocketProvider>
+      <DeepLinkHandler />
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,

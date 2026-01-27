@@ -6,12 +6,13 @@ import * as AppleAuthentication from "expo-apple-authentication"
 import * as AuthSession from "expo-auth-session"
 import * as WebBrowser from "expo-web-browser"
 import * as Notifications from "expo-notifications"
-import { Platform } from "react-native"
+import { AppState, Platform, type AppStateStatus } from "react-native"
 import React, {
   createContext,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react"
 
@@ -42,17 +43,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
+  const appState = useRef<AppStateStatus>(AppState.currentState)
 
   useEffect(() => {
     // Inizializza OneSignal
     oneSignalService.initialize().catch(console.error)
 
+    // Carica la sessione iniziale
     supabase.auth.getSession().then(({ data }) => {
       setUser(data.session?.user ?? null)
       setLoading(false)
     })
+
+    // Configura il listener per i cambiamenti di stato dell'autenticazione
     const { data: listener } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      async (event, session) => {
+        console.log("🔐 Auth state changed:", event, session?.user?.email || "no user")
+
+        // Gestisci gli eventi specifici
+        if (event === "TOKEN_REFRESHED") {
+          console.log("✅ Token refreshed successfully")
+          // Il token è stato aggiornato, la sessione è ancora valida
+        } else if (event === "SIGNED_OUT") {
+          console.log("⚠️ User signed out")
+          setUser(null)
+          setLoading(false)
+          return
+        } else if (event === "SIGNED_IN" || event === "USER_UPDATED") {
+          console.log("✅ User signed in or updated")
+        }
+
         setUser(session?.user ?? null)
         setLoading(false)
 
@@ -80,8 +100,82 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       }
     )
+
+    // Gestisci il refresh automatico del token basato sullo stato dell'app
+    // Solo su mobile (non web)
+    if (Platform.OS !== "web") {
+      const handleAppStateChange = async (nextAppState: AppStateStatus) => {
+        if (
+          appState.current.match(/inactive|background/) &&
+          nextAppState === "active"
+        ) {
+          // App è tornata in foreground
+          console.log("📱 App returned to foreground, checking session...")
+          
+          try {
+            // Verifica e refresha la sessione se necessario
+            const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+            
+            if (sessionError) {
+              console.error("❌ Error getting session:", sessionError)
+              // Se c'è un errore, potrebbe essere che il token è scaduto
+              // Prova a fare un refresh manuale
+              try {
+                const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession()
+                if (refreshError) {
+                  console.error("❌ Error refreshing session:", refreshError)
+                  // Se anche il refresh fallisce, l'utente deve fare login di nuovo
+                  setUser(null)
+                } else if (refreshData.session) {
+                  console.log("✅ Session refreshed successfully")
+                  setUser(refreshData.session.user)
+                }
+              } catch (refreshErr) {
+                console.error("❌ Failed to refresh session:", refreshErr)
+                setUser(null)
+              }
+            } else if (sessionData.session) {
+              // Sessione valida, avvia il refresh automatico
+              console.log("✅ Valid session found, starting auto refresh")
+              supabase.auth.startAutoRefresh()
+            } else {
+              // Nessuna sessione
+              console.log("⚠️ No session found")
+              setUser(null)
+            }
+          } catch (error) {
+            console.error("❌ Error in app state change handler:", error)
+          }
+        } else if (
+          appState.current === "active" &&
+          nextAppState.match(/inactive|background/)
+        ) {
+          // App è andata in background
+          console.log("📱 App went to background, stopping auto refresh")
+          supabase.auth.stopAutoRefresh()
+        }
+
+        appState.current = nextAppState
+      }
+
+      // Avvia il refresh automatico quando l'app è attiva
+      supabase.auth.startAutoRefresh()
+
+      // Aggiungi il listener per i cambiamenti di stato dell'app
+      const subscription = AppState.addEventListener("change", handleAppStateChange)
+
+      return () => {
+        listener?.subscription.unsubscribe()
+        subscription.remove()
+        supabase.auth.stopAutoRefresh()
+      }
+    }
+
     return () => {
       listener?.subscription.unsubscribe()
+      if (Platform.OS !== "web") {
+        supabase.auth.stopAutoRefresh()
+      }
     }
   }, [])
 
@@ -144,11 +238,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       console.log("🔗 Redirect URL generato:", redirectTo)
 
       // Crea la richiesta OAuth
+      // Nota: Supabase gestisce automaticamente i refresh token
+      // La durata della sessione è controllata dalle impostazioni nel Dashboard Supabase
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo,
           skipBrowserRedirect: true,
+          // Assicurati che Supabase richieda un refresh token persistente
+          // (questo è il comportamento di default, ma lo esplicitiamo)
         },
       })
 

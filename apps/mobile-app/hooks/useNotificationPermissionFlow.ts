@@ -37,6 +37,9 @@ export const useNotificationPermissionFlow =
         // Controlla se abbiamo già richiesto i permessi prima
         const requested = await AsyncStorage.getItem("notificationRequested");
 
+
+        console.log("requested notifications", requested);
+
         if (requested === "true") {
           // se ha notifiche attive allora schedulo
           await oneSignalService.refreshDailyStateFromSystem();
@@ -49,6 +52,8 @@ export const useNotificationPermissionFlow =
 
         // Controlla se l'utente ha già i permessi
         const hasPermission = await oneSignalService.areNotificationsEnabled();
+
+        console.log("hasPermission", hasPermission);
 
         if (hasPermission) {
           await oneSignalService.refreshDailyStateFromSystem();

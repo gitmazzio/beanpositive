@@ -14,82 +14,82 @@ const DAILY_ONE_MESSAGES: Array<{
   body: string
   sound?: string
 }> = [
-  {
-    title: "Oggi, fai caso ai bei momenti ✨",
-    body: "Anche solo un attimo può diventare un fagiolo da custodire",
-    sound: "default",
-  },
-  {
-    title: "Buongiorno! 🌅",
-    body: "Inizia la giornata con un sorriso e cerca i piccoli momenti di gioia",
-    sound: "default",
-  },
-  {
-    title: "Un nuovo giorno, nuove possibilità 🌱",
-    body: "Cosa ti renderà felice oggi? Tieni gli occhi aperti per i bei momenti",
-    sound: "default",
-  },
-  {
-    title: "Inizia con positività ☀️",
-    body: "Ogni giorno è un'opportunità per raccogliere fagioli positivi",
-    sound: "default",
-  },
-  {
-    title: "Buongiorno! 💫",
-    body: "Oggi cerca almeno un momento che ti faccia sorridere",
-    sound: "default",
-  },
-  {
-    title: "Un nuovo inizio 🌸",
-    body: "Quale bel momento vuoi custodire oggi?",
-    sound: "default",
-  },
-  {
-    title: "Buongiorno! 🌺",
-    body: "Inizia la giornata con gratitudine per i piccoli piaceri",
-    sound: "default",
-  },
-  {
-    title: "Oggi è il giorno perfetto ✨",
-    body: "Cerca i momenti che ti fanno sentire grato",
-    sound: "default",
-  },
-  {
-    title: "Buongiorno! 🦋",
-    body: "Ogni giorno porta con sé qualcosa di bello da notare",
-    sound: "default",
-  },
-  {
-    title: "Inizia con un sorriso 😊",
-    body: "Quale momento positivo vuoi ricordare oggi?",
-    sound: "default",
-  },
-  {
-    title: "Buongiorno! 🌈",
-    body: "Cerca la bellezza nelle piccole cose di oggi",
-    sound: "default",
-  },
-  {
-    title: "Un nuovo giorno da vivere 🌟",
-    body: "Tieni il cuore aperto ai momenti di gioia",
-    sound: "default",
-  },
-  {
-    title: "Buongiorno! 🍀",
-    body: "Oggi, fai attenzione a ciò che ti rende felice",
-    sound: "default",
-  },
-  {
-    title: "Inizia con gratitudine 🙏",
-    body: "Quale bel momento vuoi aggiungere alla tua tasca oggi?",
-    sound: "default",
-  },
-  {
-    title: "Buongiorno! 🌻",
-    body: "Ogni giorno è una nuova opportunità per essere felici",
-    sound: "default",
-  },
-]
+    {
+      title: "Oggi, fai caso ai bei momenti ✨",
+      body: "Anche solo un attimo può diventare un fagiolo da custodire",
+      sound: "default",
+    },
+    {
+      title: "Buongiorno! 🌅",
+      body: "Inizia la giornata con un sorriso e cerca i piccoli momenti di gioia",
+      sound: "default",
+    },
+    {
+      title: "Un nuovo giorno, nuove possibilità 🌱",
+      body: "Cosa ti renderà felice oggi? Tieni gli occhi aperti per i bei momenti",
+      sound: "default",
+    },
+    {
+      title: "Inizia con positività ☀️",
+      body: "Ogni giorno è un'opportunità per raccogliere fagioli positivi",
+      sound: "default",
+    },
+    {
+      title: "Buongiorno! 💫",
+      body: "Oggi cerca almeno un momento che ti faccia sorridere",
+      sound: "default",
+    },
+    {
+      title: "Un nuovo inizio 🌸",
+      body: "Quale bel momento vuoi custodire oggi?",
+      sound: "default",
+    },
+    {
+      title: "Buongiorno! 🌺",
+      body: "Inizia la giornata con gratitudine per i piccoli piaceri",
+      sound: "default",
+    },
+    {
+      title: "Oggi è il giorno perfetto ✨",
+      body: "Cerca i momenti che ti fanno sentire grato",
+      sound: "default",
+    },
+    {
+      title: "Buongiorno! 🦋",
+      body: "Ogni giorno porta con sé qualcosa di bello da notare",
+      sound: "default",
+    },
+    {
+      title: "Inizia con un sorriso 😊",
+      body: "Quale momento positivo vuoi ricordare oggi?",
+      sound: "default",
+    },
+    {
+      title: "Buongiorno! 🌈",
+      body: "Cerca la bellezza nelle piccole cose di oggi",
+      sound: "default",
+    },
+    {
+      title: "Un nuovo giorno da vivere 🌟",
+      body: "Tieni il cuore aperto ai momenti di gioia",
+      sound: "default",
+    },
+    {
+      title: "Buongiorno! 🍀",
+      body: "Oggi, fai attenzione a ciò che ti rende felice",
+      sound: "default",
+    },
+    {
+      title: "Inizia con gratitudine 🙏",
+      body: "Quale bel momento vuoi aggiungere alla tua tasca oggi?",
+      sound: "default",
+    },
+    {
+      title: "Buongiorno! 🌻",
+      body: "Ogni giorno è una nuova opportunità per essere felici",
+      sound: "default",
+    },
+  ]
 
 // Messaggi per la sera (daily_two)
 const DAILY_TWO_MESSAGES: Array<{
@@ -97,82 +97,82 @@ const DAILY_TWO_MESSAGES: Array<{
   body: string
   sound?: string
 }> = [
-  {
-    title: "Cos'è andato bene oggi? 🫘",
-    body: "Prima di andare a dormire… pensa a quel momento che oggi ti ha fatto sorridere",
-    sound: "default",
-  },
-  {
-    title: "Rifletti sulla giornata 🌙",
-    body: "Quale momento positivo vuoi ricordare prima di dormire?",
-    sound: "default",
-  },
-  {
-    title: "Buonanotte! ✨",
-    body: "Pensa a qualcosa di bello che è successo oggi",
-    sound: "default",
-  },
-  {
-    title: "Raccogli i tuoi fagioli 🌙",
-    body: "Quale bel momento vuoi custodire prima di dormire?",
-    sound: "default",
-  },
-  {
-    title: "Fine giornata 💫",
-    body: "Ripensa a un momento che ti ha reso felice oggi",
-    sound: "default",
-  },
-  {
-    title: "Buonanotte! 🌟",
-    body: "Prima di dormire, pensa a qualcosa per cui sei grato",
-    sound: "default",
-  },
-  {
-    title: "Rifletti con gratitudine 🙏",
-    body: "Quale momento positivo vuoi portare con te nel sonno?",
-    sound: "default",
-  },
-  {
-    title: "Buonanotte! 🌸",
-    body: "Pensa a un bel momento di oggi da custodire",
-    sound: "default",
-  },
-  {
-    title: "Fine giornata con positività ☀️",
-    body: "Quale fagiolo positivo vuoi aggiungere alla tua tasca?",
-    sound: "default",
-  },
-  {
-    title: "Buonanotte! 🌺",
-    body: "Ripensa a qualcosa di bello che è successo oggi",
-    sound: "default",
-  },
-  {
-    title: "Raccogli i momenti positivi 🌙",
-    body: "Prima di dormire, pensa a un momento che ti ha fatto sorridere",
-    sound: "default",
-  },
-  {
-    title: "Buonanotte! 🦋",
-    body: "Quale bel momento vuoi ricordare di questa giornata?",
-    sound: "default",
-  },
-  {
-    title: "Fine giornata con gratitudine 🌈",
-    body: "Pensa a qualcosa per cui essere grato oggi",
-    sound: "default",
-  },
-  {
-    title: "Buonanotte! 🌟",
-    body: "Ripensa a un momento positivo che vuoi custodire",
-    sound: "default",
-  },
-  {
-    title: "Rifletti sulla giornata 🍀",
-    body: "Quale fagiolo positivo vuoi aggiungere prima di dormire?",
-    sound: "default",
-  },
-]
+    {
+      title: "Cos'è andato bene oggi? 🫘",
+      body: "Prima di andare a dormire… pensa a quel momento che oggi ti ha fatto sorridere",
+      sound: "default",
+    },
+    {
+      title: "Rifletti sulla giornata 🌙",
+      body: "Quale momento positivo vuoi ricordare prima di dormire?",
+      sound: "default",
+    },
+    {
+      title: "Buonanotte! ✨",
+      body: "Pensa a qualcosa di bello che è successo oggi",
+      sound: "default",
+    },
+    {
+      title: "Raccogli i tuoi fagioli 🌙",
+      body: "Quale bel momento vuoi custodire prima di dormire?",
+      sound: "default",
+    },
+    {
+      title: "Fine giornata 💫",
+      body: "Ripensa a un momento che ti ha reso felice oggi",
+      sound: "default",
+    },
+    {
+      title: "Buonanotte! 🌟",
+      body: "Prima di dormire, pensa a qualcosa per cui sei grato",
+      sound: "default",
+    },
+    {
+      title: "Rifletti con gratitudine 🙏",
+      body: "Quale momento positivo vuoi portare con te nel sonno?",
+      sound: "default",
+    },
+    {
+      title: "Buonanotte! 🌸",
+      body: "Pensa a un bel momento di oggi da custodire",
+      sound: "default",
+    },
+    {
+      title: "Fine giornata con positività ☀️",
+      body: "Quale fagiolo positivo vuoi aggiungere alla tua tasca?",
+      sound: "default",
+    },
+    {
+      title: "Buonanotte! 🌺",
+      body: "Ripensa a qualcosa di bello che è successo oggi",
+      sound: "default",
+    },
+    {
+      title: "Raccogli i momenti positivi 🌙",
+      body: "Prima di dormire, pensa a un momento che ti ha fatto sorridere",
+      sound: "default",
+    },
+    {
+      title: "Buonanotte! 🦋",
+      body: "Quale bel momento vuoi ricordare di questa giornata?",
+      sound: "default",
+    },
+    {
+      title: "Fine giornata con gratitudine 🌈",
+      body: "Pensa a qualcosa per cui essere grato oggi",
+      sound: "default",
+    },
+    {
+      title: "Buonanotte! 🌟",
+      body: "Ripensa a un momento positivo che vuoi custodire",
+      sound: "default",
+    },
+    {
+      title: "Rifletti sulla giornata 🍀",
+      body: "Quale fagiolo positivo vuoi aggiungere prima di dormire?",
+      sound: "default",
+    },
+  ]
 
 /**
  * Seleziona un messaggio basato sulla data del giorno
@@ -220,7 +220,7 @@ export class OneSignalService {
     daily_two: null,
   }
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): OneSignalService {
     if (!OneSignalService.instance) {
@@ -252,17 +252,18 @@ export class OneSignalService {
    */
   public async requestPermissions(): Promise<boolean> {
     try {
-      if (Platform.OS === "ios") {
-        const { status: existingStatus } =
-          await Notifications.getPermissionsAsync()
-        let finalStatus = existingStatus
+      // Richiede i permessi di Expo Notifications (necessari per lo scheduling)
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync()
+      let finalStatus = existingStatus
 
-        if (existingStatus !== "granted") {
-          const { status } = await Notifications.requestPermissionsAsync()
-          finalStatus = status
-        }
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync()
+        finalStatus = status
+      }
 
-        if (finalStatus !== "granted") {
+      if (finalStatus !== "granted") {
+        if (Platform.OS === "ios") {
           Alert.alert(
             "Permessi notifiche",
             "Le notifiche sono necessarie per ricevere aggiornamenti importanti. Puoi abilitarle nelle impostazioni.",
@@ -274,14 +275,23 @@ export class OneSignalService {
               },
             ]
           )
-          return false
         }
+        console.warn("Expo Notifications permission not granted:", finalStatus)
+        return false
       }
 
       // Richiede i permessi OneSignal
-      const permission = await OneSignal.Notifications.requestPermission(true)
+      const oneSignalPermission =
+        await OneSignal.Notifications.requestPermission(true)
 
-      return permission
+      if (!oneSignalPermission) {
+        console.warn("OneSignal permission not granted")
+        // Restituisce comunque true se Expo Notifications è stato concesso,
+        // perché quello è necessario per lo scheduling locale
+        return finalStatus === "granted"
+      }
+
+      return oneSignalPermission && finalStatus === "granted"
     } catch (error) {
       console.error("Error requesting notification permissions:", error)
       return false
@@ -300,6 +310,24 @@ export class OneSignalService {
     data?: Notifications.NotificationContentInput["data"]
   ): Promise<string | null> {
     try {
+      // Verifica che i permessi siano stati concessi prima di schedulare
+      const hasPermission = await this.areNotificationsEnabled()
+      if (!hasPermission) {
+        console.warn(
+          `Cannot schedule notification ${id}: permissions not granted`
+        )
+        return null
+      }
+
+      // Verifica anche i permessi di Expo Notifications (usati per lo scheduling)
+      const expoPermissions = await Notifications.getPermissionsAsync()
+      if (expoPermissions.status !== "granted") {
+        console.warn(
+          `Cannot schedule notification ${id}: Expo notifications permission not granted`
+        )
+        return null
+      }
+
       // Cancella tutte le notifiche precedenti con lo stesso slot
       await this.cancelDailyNotification(id)
 
@@ -315,8 +343,10 @@ export class OneSignalService {
 
       // Programma le notifiche per i prossimi 60 giorni
       let lastIdentifier: string | null = null
+      let scheduledCount = 0
 
       for (let day = 0; day < DAYS_TO_SCHEDULE; day++) {
+        console.log("scheduling notification for day", day, "of", DAYS_TO_SCHEDULE, id, hour, minute)
         const notificationDate = new Date(today)
         // Aggiungi giorni usando millisecondi per garantire date consecutive corrette
         notificationDate.setTime(today.getTime() + day * 24 * 60 * 60 * 1000)
@@ -334,13 +364,28 @@ export class OneSignalService {
           data: { ...(data as any), slot: id },
         }
 
-        const identifier = await Notifications.scheduleNotificationAsync({
-          content: contentWithId,
-          trigger,
-        })
+        try {
+          const identifier = await Notifications.scheduleNotificationAsync({
+            content: contentWithId,
+            trigger,
+          })
 
-        lastIdentifier = identifier
+          console.log("scheduled notification for day", day, "of", DAYS_TO_SCHEDULE, "with identifier", identifier)
+
+          lastIdentifier = identifier
+          scheduledCount++
+        } catch (scheduleError) {
+          console.error(
+            `Error scheduling notification for day ${day} (${id}):`,
+            scheduleError
+          )
+          // Continua con le altre notifiche anche se una fallisce
+        }
       }
+
+      console.log(
+        `Scheduled ${scheduledCount}/${DAYS_TO_SCHEDULE} notifications for ${id}`
+      )
 
       // Salva l'ultimo identifier per riferimento
       this.scheduledNotificationIds[id] = lastIdentifier
@@ -372,7 +417,7 @@ export class OneSignalService {
             await Notifications.cancelScheduledNotificationAsync(
               (n as any).identifier
             )
-          } catch {}
+          } catch { }
         }
       }
     } catch (error) {
@@ -426,6 +471,99 @@ export class OneSignalService {
     } catch (error) {
       console.error("Error refreshing daily notifications state:", error)
       return this.getDailyNotificationsState()
+    }
+  }
+
+  /**
+   * Ottiene tutte le notifiche schedulate con i dettagli
+   */
+  public async getAllScheduledNotifications(): Promise<
+    Array<{
+      identifier: string
+      title: string
+      body: string
+      trigger: any
+      slot?: string
+      scheduledDate: Date | null
+    }>
+  > {
+    try {
+      const all = await Notifications.getAllScheduledNotificationsAsync()
+
+      return all.map((notification: any) => {
+        const slot = notification?.content?.data?.slot
+        let scheduledDate: Date | null = null
+
+        if (notification.trigger?.type === "date") {
+          scheduledDate = new Date(notification.trigger.date)
+        }
+
+        return {
+          identifier: notification.identifier,
+          title: notification.content?.title || "Nessun titolo",
+          body: notification.content?.body || "Nessun messaggio",
+          trigger: notification.trigger,
+          slot: slot || undefined,
+          scheduledDate,
+        }
+      })
+    } catch (error) {
+      console.error("Error getting all scheduled notifications:", error)
+      return []
+    }
+  }
+
+  /**
+   * Ottiene solo le notifiche giornaliere schedulate (daily_one e daily_two)
+   */
+  public async getDailyScheduledNotifications(): Promise<{
+    daily_one: Array<{
+      identifier: string
+      title: string
+      body: string
+      scheduledDate: Date | null
+    }>
+    daily_two: Array<{
+      identifier: string
+      title: string
+      body: string
+      scheduledDate: Date | null
+    }>
+    total: number
+  }> {
+    try {
+      const all = await this.getAllScheduledNotifications()
+
+      const daily_one = all
+        .filter((n) => n.slot === "daily_one")
+        .map((n) => ({
+          identifier: n.identifier,
+          title: n.title,
+          body: n.body,
+          scheduledDate: n.scheduledDate,
+        }))
+
+      const daily_two = all
+        .filter((n) => n.slot === "daily_two")
+        .map((n) => ({
+          identifier: n.identifier,
+          title: n.title,
+          body: n.body,
+          scheduledDate: n.scheduledDate,
+        }))
+
+      return {
+        daily_one,
+        daily_two,
+        total: daily_one.length + daily_two.length,
+      }
+    } catch (error) {
+      console.error("Error getting daily scheduled notifications:", error)
+      return {
+        daily_one: [],
+        daily_two: [],
+        total: 0,
+      }
     }
   }
 
@@ -574,11 +712,28 @@ export class OneSignalService {
 
   /**
    * Controlla se le notifiche sono abilitate
+   * Verifica sia i permessi OneSignal che quelli di Expo Notifications
    */
   public async areNotificationsEnabled(): Promise<boolean> {
     try {
-      const permission = await OneSignal.Notifications.getPermissionAsync()
-      return permission
+      // Verifica i permessi di Expo Notifications (necessari per lo scheduling)
+      const expoPermissions = await Notifications.getPermissionsAsync()
+      const expoGranted = expoPermissions.status === "granted"
+
+      // Verifica i permessi OneSignal
+      const oneSignalPermission =
+        await OneSignal.Notifications.getPermissionAsync()
+
+      // Entrambi i permessi devono essere concessi
+      const bothGranted = expoGranted && oneSignalPermission
+
+      if (!bothGranted) {
+        console.log(
+          `Notification permissions: Expo=${expoGranted}, OneSignal=${oneSignalPermission}`
+        )
+      }
+
+      return bothGranted
     } catch (error) {
       console.error("Error checking notification permission:", error)
       return false

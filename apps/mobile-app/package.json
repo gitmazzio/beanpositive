@@ -53,6 +53,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@bacons/apple-targets": "^3.0.7",
     "@types/react": "~19.0.10",
     "jest": "^26.5.3",
     "jest-expo": "^47.0.1",
