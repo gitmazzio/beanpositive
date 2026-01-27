@@ -46,7 +46,7 @@ struct widgetEntryView : View {
             BeanPatternView(color: beanPattern)
             
             // Pocket centrale
-            VStack(spacing: 4) {
+            VStack(spacing: 0) {
                 // Icona +
                 Text("+")
                     .font(.system(size: 48, weight: .bold))
@@ -64,11 +64,19 @@ struct widgetEntryView : View {
                 PocketShape()
                     .fill(pocketGreen)
                     .overlay(
-                        PocketShape()
-                            .stroke(
-                                Color.black.opacity(0.25),
-                                style: StrokeStyle(lineWidth: 2, dash: [6, 4])
-                            )
+                        // Linea interna tratteggiata
+                        GeometryReader { geometry in
+                            PocketShape()
+                                .stroke(
+                                    Color.black.opacity(0.3),
+                                    style: StrokeStyle(lineWidth: 1, dash: [8, 5])
+                                )
+                                .scaleEffect(0.8) // Scala al 85% per renderla interna
+                                // .offset(
+                                //     x: geometry.size.width * 0.05, // Centra la forma scalata
+                                //     y: geometry.size.height * 0.05
+                                // )
+                        }
                     )
             )
             .padding(8)
@@ -81,11 +89,11 @@ struct widgetEntryView : View {
 struct PocketShape: Shape {
     func path(in rect: CGRect) -> Path {
         let w = rect.width
-        let h = rect.height
+        let h = rect.height + 15
         
         let topRadius: CGFloat = w * 0.08
         let bottomRadius: CGFloat = w * 0.12
-        let tipHeight: CGFloat = h * 0.18
+        let tipHeight: CGFloat = h * 0.25
         
         let tipY = h
         let sideBottomY = h - tipHeight
@@ -103,22 +111,20 @@ struct PocketShape: Shape {
         // MARK: Right side
         path.addLine(to: CGPoint(x: w, y: sideBottomY - bottomRadius))
         
-        // MARK: Bottom right curve
+        // MARK: Bottom right curve (più morbida)
         path.addQuadCurve(
-            to: CGPoint(x: w / 2 + bottomRadius, y: tipY - bottomRadius),
-            control: CGPoint(x: w, y: sideBottomY)
+            to: CGPoint(x: w / 2 + bottomRadius * 0.4, y: tipY - bottomRadius * 0.4),
+            control: CGPoint(x: w * 0.85, y: sideBottomY * 0.9)  // Punto di controllo più morbido
         )
         
-        // MARK: Tip (punta centrale morbida)
-        path.addQuadCurve(
-            to: CGPoint(x: w / 2 - bottomRadius, y: tipY - bottomRadius),
-            control: CGPoint(x: w / 2, y: tipY)
-        )
+        // MARK: Tip (punta appuntita - senza rigonfiamento)
+        // Usa una linea diretta verso il punto più basso per una punta più appuntita
+        path.addLine(to: CGPoint(x: w / 2, y: tipY))
         
-        // MARK: Bottom left curve
+        // MARK: Bottom left curve (più morbida)
         path.addQuadCurve(
             to: CGPoint(x: 0, y: sideBottomY - bottomRadius),
-            control: CGPoint(x: 0, y: sideBottomY)
+            control: CGPoint(x: w * 0.15, y: sideBottomY * 0.9)  // Punto di controllo più morbido
         )
         
         // MARK: Left side
@@ -142,15 +148,15 @@ struct BeanPatternView: View {
     // Pattern: 3 prima fila, 2 ai lati, 1 in fondo, 2 ai lati, 3 in fila
     private let beanData: [(x: CGFloat, y: CGFloat, angle: Double)] = [
         // 3 prima fila (in alto)
-        (40, 25, 15), (77.5, 20, -25), (115, 25, 30),
+        (-10, 0, 15), (65, 5, -75), (130, 5, 30),
         // 2 ai lati (sinistra e destra, parte alta)
-        (15, 50, -35), (140, 50, 40),
+        (10, 45, -35), (135, 45, 40),
         // 1 in fondo (centro)
-        (77.5, 77.5, 20),
+        (5, 70, 20),
         // 2 ai lati (sinistra e destra, parte bassa)
-        (15, 105, 25), (140, 105, -30),
+        (0, 95, 25), (135, 95, -30),
         // 3 in fila (in basso)
-        (40, 130, -15), (77.5, 135, 35), (115, 130, -20),
+        (30, 200, 15), (60, 205, 76), (115, 200, 10),
     ]
     
     // Colore verde per il bordo
