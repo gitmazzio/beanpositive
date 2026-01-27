@@ -111,20 +111,20 @@ struct PocketShape: Shape {
         // MARK: Right side
         path.addLine(to: CGPoint(x: w, y: sideBottomY - bottomRadius))
         
-        // MARK: Bottom right curve (più morbida)
+        // MARK: Bottom right curve
         path.addQuadCurve(
-            to: CGPoint(x: w / 2 + bottomRadius * 0.4, y: tipY - bottomRadius * 0.4),
-            control: CGPoint(x: w * 0.85, y: sideBottomY * 0.9)  // Punto di controllo più morbido
+            to: CGPoint(x: w / 2 + bottomRadius * 0.5, y: tipY - bottomRadius * 0.3),
+            control: CGPoint(x: w, y: sideBottomY * 1.05)  // Punto di controllo più morbido
         )
         
         // MARK: Tip (punta appuntita - senza rigonfiamento)
         // Usa una linea diretta verso il punto più basso per una punta più appuntita
         path.addLine(to: CGPoint(x: w / 2, y: tipY))
         
-        // MARK: Bottom left curve (più morbida)
+        // MARK: Bottom left curve
         path.addQuadCurve(
             to: CGPoint(x: 0, y: sideBottomY - bottomRadius),
-            control: CGPoint(x: w * 0.15, y: sideBottomY * 0.9)  // Punto di controllo più morbido
+            control: CGPoint(x: 0, y: sideBottomY * 1.05)  // Punto di controllo più morbido
         )
         
         // MARK: Left side
