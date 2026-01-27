@@ -6,7 +6,7 @@ import { router } from "expo-router"
 // Configurazione OneSignal
 OneSignal.initialize(process.env.EXPO_PUBLIC_ONESIGNAL_APP_ID!)
 
-const DAYS_TO_SCHEDULE = 60
+const DAYS_TO_SCHEDULE = 30
 
 // Messaggi per il mattino (daily_one)
 const DAILY_ONE_MESSAGES: Array<{
@@ -346,7 +346,6 @@ export class OneSignalService {
       let scheduledCount = 0
 
       for (let day = 0; day < DAYS_TO_SCHEDULE; day++) {
-        console.log("scheduling notification for day", day, "of", DAYS_TO_SCHEDULE, id, hour, minute)
         const notificationDate = new Date(today)
         // Aggiungi giorni usando millisecondi per garantire date consecutive corrette
         notificationDate.setTime(today.getTime() + day * 24 * 60 * 60 * 1000)
@@ -471,6 +470,19 @@ export class OneSignalService {
     } catch (error) {
       console.error("Error refreshing daily notifications state:", error)
       return this.getDailyNotificationsState()
+    }
+  }
+
+  public async scheduleDailyNotificationIfNeeded(): Promise<void> {
+    const scheduledState = await this.getDailyScheduledNotifications();
+    const refreshedState = await this.refreshDailyStateFromSystem();
+
+    if (refreshedState.daily_one && scheduledState.daily_one.length <= 20) {
+      await this.scheduleDailyNotification("daily_one", 8, 30);
+    }
+
+    if (refreshedState.daily_two && scheduledState.daily_two.length <= 20) {
+      await this.scheduleDailyNotification("daily_two", 21, 0);
     }
   }
 

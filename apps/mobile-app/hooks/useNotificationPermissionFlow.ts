@@ -34,32 +34,14 @@ export const useNotificationPermissionFlow =
       try {
         setIsLoading(true);
 
-        // Controlla se abbiamo già richiesto i permessi prima
         const requested = await AsyncStorage.getItem("notificationRequested");
 
-
-        console.log("requested notifications", requested);
-
         if (requested === "true") {
-          // se ha notifiche attive allora schedulo
-          await oneSignalService.refreshDailyStateFromSystem();
-          await oneSignalService.scheduleDailyNotification("daily_one", 8, 30);
-          await oneSignalService.scheduleDailyNotification("daily_two", 21, 0);
-          // Abbiamo già richiesto i permessi, naviga direttamente alle tabs
-          router.replace("/(authenticated)/(tabs)");
-          return;
-        }
+          const hasPermission = await oneSignalService.areNotificationsEnabled();
 
-        // Controlla se l'utente ha già i permessi
-        const hasPermission = await oneSignalService.areNotificationsEnabled();
-
-        console.log("hasPermission", hasPermission);
-
-        if (hasPermission) {
-          await oneSignalService.refreshDailyStateFromSystem();
-          await oneSignalService.scheduleDailyNotification("daily_one", 8, 30);
-          await oneSignalService.scheduleDailyNotification("daily_two", 21, 0);
-
+          if (hasPermission) {
+            await oneSignalService.scheduleDailyNotificationIfNeeded();
+          }
           // L'utente ha già i permessi, salva che abbiamo controllato e naviga
           await AsyncStorage.setItem("notificationRequested", "true");
           router.replace("/(authenticated)/(tabs)");
