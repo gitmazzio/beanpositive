@@ -9,7 +9,7 @@ import { useAuth } from "@/providers"
 import { triggerErrorHaptic } from "@/utils/haptics"
 import { FontAwesome6 } from "@expo/vector-icons"
 import { useRouter } from "expo-router"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Alert, Image, Platform, StyleSheet } from "react-native"
 import Toast from "react-native-toast-message"
 
@@ -19,8 +19,56 @@ export default function Login() {
   const [isAppleLoading, setIsAppleLoading] = useState(false)
   const [isAuthenticating, setIsAuthenticating] = useState(false)
   const router = useRouter()
-  const { user, loginWithGoogle, loginWithApple } = useAuth()
+  const { user, loginWithGoogle, loginWithApple, loading } = useAuth()
   const { checkAndNavigateAfterLogin } = useNotificationPermissionFlow()
+  const [pendingLoginCheck, setPendingLoginCheck] = useState(false)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Gestisce la navigazione dopo il login: aspetta che l'utente sia disponibile
+  useEffect(() => {
+    if (!pendingLoginCheck) {
+      // Pulisci il timeout se non c'è più un login in attesa
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+      return
+    }
+
+    // Se l'utente è disponibile e non stiamo più caricando, procedi
+    if (user && !loading) {
+      setPendingLoginCheck(false)
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+      checkAndNavigateAfterLogin()
+      return
+    }
+
+    // Timeout di sicurezza: se l'utente non diventa disponibile entro 5 secondi
+    if (!timeoutRef.current) {
+      timeoutRef.current = setTimeout(async () => {
+        console.warn("⚠️ Timeout: utente non disponibile dopo 5 secondi, forzo la navigazione")
+        setPendingLoginCheck(false)
+        timeoutRef.current = null
+
+        if (user) {
+          await checkAndNavigateAfterLogin()
+        } else {
+          const { router } = await import("expo-router")
+          router.replace("/(authenticated)/(tabs)")
+        }
+      }, 5000)
+    }
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+    }
+  }, [pendingLoginCheck, user, loading, checkAndNavigateAfterLogin])
 
   const handleGoogleLogin = async () => {
     // Prevenire login simultanei
@@ -37,9 +85,11 @@ export default function Login() {
     setIsAuthenticating(true)
     try {
       await loginWithGoogle()
-      // Controlla i permessi delle notifiche e naviga di conseguenza
-      await checkAndNavigateAfterLogin()
+      // Imposta il flag per indicare che dobbiamo aspettare che l'utente sia disponibile
+      // Il useEffect gestirà la chiamata a checkAndNavigateAfterLogin quando l'utente sarà disponibile
+      setPendingLoginCheck(true)
     } catch (err: any) {
+      setPendingLoginCheck(false)
       void triggerErrorHaptic();
       Toast.show({
         type: "error",
@@ -74,9 +124,11 @@ export default function Login() {
     setIsAuthenticating(true)
     try {
       await loginWithApple()
-      // Controlla i permessi delle notifiche e naviga di conseguenza
-      await checkAndNavigateAfterLogin()
+      // Imposta il flag per indicare che dobbiamo aspettare che l'utente sia disponibile
+      // Il useEffect gestirà la chiamata a checkAndNavigateAfterLogin quando l'utente sarà disponibile
+      setPendingLoginCheck(true)
     } catch (err: any) {
+      setPendingLoginCheck(false)
       const errorMessage = err.message || "Login con Apple fallito"
       // setError(errorMessage)
       // Non mostrare alert per cancellazione utente
