@@ -44,15 +44,118 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
   const appState = useRef<AppStateStatus>(AppState.currentState)
+  const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
     // Inizializza OneSignal
     oneSignalService.initialize().catch(console.error)
 
-    // Carica la sessione iniziale
-    supabase.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user ?? null)
+    // Funzione per verificare e refreshare il token se necessario
+    const checkAndRefreshToken = async () => {
+      try {
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+        
+        if (sessionError) {
+          console.error("❌ Error getting session:", sessionError)
+          return
+        }
+
+        if (!sessionData.session) {
+          return
+        }
+
+        const session = sessionData.session
+        const expiresAt = session.expires_at
+        const now = Math.floor(Date.now() / 1000)
+        
+        // Se il token scade entro 5 minuti, refreshato preventivamente
+        if (expiresAt && expiresAt - now < 300) {
+          console.log("🔄 Token sta per scadere, refresho preventivamente...")
+          const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession()
+          
+          if (refreshError) {
+            console.error("❌ Error refreshing session:", refreshError)
+            // Se il refresh fallisce, potrebbe essere che il refresh token è scaduto
+            // In questo caso, l'utente dovrà fare login di nuovo
+            if (refreshError.message?.includes("refresh_token_not_found") || 
+                refreshError.message?.includes("invalid_grant")) {
+              console.log("⚠️ Refresh token scaduto, richiedo nuovo login")
+              setUser(null)
+            }
+          } else if (refreshData.session) {
+            console.log("✅ Token refreshed successfully")
+          }
+        }
+      } catch (error) {
+        console.error("❌ Error in token check:", error)
+      }
+    }
+
+    // Carica la sessione iniziale e avvia il refresh automatico
+    supabase.auth.getSession().then(async ({ data, error }) => {
+      if (error) {
+        console.error("❌ Error getting initial session:", error)
+        setUser(null)
+        setLoading(false)
+        return
+      }
+
+      if (!data.session) {
+        console.log("⚠️ No session found on app start")
+        setUser(null)
+        setLoading(false)
+        return
+      }
+
+      const session = data.session
+      const expiresAt = session.expires_at
+      const now = Math.floor(Date.now() / 1000)
+      
+      // Se il token è già scaduto o sta per scadere, refreshato immediatamente
+      if (expiresAt && expiresAt <= now + 300) {
+        console.log("🔄 Token scaduto o sta per scadere al caricamento iniziale, refresho...")
+        try {
+          const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession()
+          
+          if (refreshError) {
+            console.error("❌ Error refreshing expired token:", refreshError)
+            // Se il refresh fallisce, potrebbe essere che il refresh token è scaduto
+            if (refreshError.message?.includes("refresh_token_not_found") || 
+                refreshError.message?.includes("invalid_grant")) {
+              console.log("⚠️ Refresh token scaduto, richiedo nuovo login")
+              setUser(null)
+              setLoading(false)
+              return
+            }
+          } else if (refreshData.session) {
+            console.log("✅ Expired token refreshed successfully on app start")
+            setUser(refreshData.session.user)
+            setLoading(false)
+            // Avvia il refresh automatico dopo il refresh riuscito
+            supabase.auth.startAutoRefresh()
+            if (!refreshIntervalRef.current) {
+              refreshIntervalRef.current = setInterval(checkAndRefreshToken, 5 * 60 * 1000)
+            }
+            return
+          }
+        } catch (refreshErr) {
+          console.error("❌ Failed to refresh expired token:", refreshErr)
+          setUser(null)
+          setLoading(false)
+          return
+        }
+      }
+
+      // Token valido, imposta l'utente e avvia il refresh automatico
+      setUser(session.user)
       setLoading(false)
+      console.log("✅ Valid session found, starting auto refresh")
+      supabase.auth.startAutoRefresh()
+      
+      // Avvia anche un controllo periodico ogni 5 minuti per refreshare preventivamente
+      if (!refreshIntervalRef.current) {
+        refreshIntervalRef.current = setInterval(checkAndRefreshToken, 5 * 60 * 1000) // 5 minuti
+      }
     })
 
     // Configura il listener per i cambiamenti di stato dell'autenticazione
@@ -68,9 +171,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           console.log("⚠️ User signed out")
           setUser(null)
           setLoading(false)
+          // Ferma il refresh automatico e il controllo periodico
+          supabase.auth.stopAutoRefresh()
+          if (refreshIntervalRef.current) {
+            clearInterval(refreshIntervalRef.current)
+            refreshIntervalRef.current = null
+          }
           return
         } else if (event === "SIGNED_IN" || event === "USER_UPDATED") {
           console.log("✅ User signed in or updated")
+          // Avvia il refresh automatico quando l'utente fa login
+          if (session) {
+            supabase.auth.startAutoRefresh()
+            // Avvia il controllo periodico se non è già attivo
+            if (!refreshIntervalRef.current) {
+              refreshIntervalRef.current = setInterval(checkAndRefreshToken, 5 * 60 * 1000)
+            }
+          }
         }
 
         setUser(session?.user ?? null)
@@ -101,43 +218,84 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     )
 
-    // Gestisci il refresh automatico del token basato sullo stato dell'app
-    // Solo su mobile (non web)
+    // Gestisci il refresh quando l'app torna in foreground (solo su mobile)
     if (Platform.OS !== "web") {
       const handleAppStateChange = async (nextAppState: AppStateStatus) => {
         if (
           appState.current.match(/inactive|background/) &&
           nextAppState === "active"
         ) {
-          // App è tornata in foreground
+          // App è tornata in foreground - verifica e refresha la sessione
           console.log("📱 App returned to foreground, checking session...")
           
           try {
-            // Verifica e refresha la sessione se necessario
             const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
             
             if (sessionError) {
               console.error("❌ Error getting session:", sessionError)
-              // Se c'è un errore, potrebbe essere che il token è scaduto
               // Prova a fare un refresh manuale
               try {
                 const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession()
                 if (refreshError) {
                   console.error("❌ Error refreshing session:", refreshError)
-                  // Se anche il refresh fallisce, l'utente deve fare login di nuovo
                   setUser(null)
                 } else if (refreshData.session) {
                   console.log("✅ Session refreshed successfully")
                   setUser(refreshData.session.user)
+                  // Riavvia il refresh automatico
+                  supabase.auth.startAutoRefresh()
+                  if (!refreshIntervalRef.current) {
+                    refreshIntervalRef.current = setInterval(checkAndRefreshToken, 5 * 60 * 1000)
+                  }
                 }
               } catch (refreshErr) {
                 console.error("❌ Failed to refresh session:", refreshErr)
                 setUser(null)
               }
             } else if (sessionData.session) {
-              // Sessione valida, avvia il refresh automatico
-              console.log("✅ Valid session found, starting auto refresh")
+              // Verifica se il token è scaduto o sta per scadere
+              const session = sessionData.session
+              const expiresAt = session.expires_at
+              const now = Math.floor(Date.now() / 1000)
+              
+              if (expiresAt && expiresAt <= now + 300) {
+                // Token scaduto o sta per scadere, refreshato immediatamente
+                console.log("🔄 Token scaduto o sta per scadere al ritorno in foreground, refresho...")
+                try {
+                  const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession()
+                  
+                  if (refreshError) {
+                    console.error("❌ Error refreshing expired token:", refreshError)
+                    if (refreshError.message?.includes("refresh_token_not_found") || 
+                        refreshError.message?.includes("invalid_grant")) {
+                      console.log("⚠️ Refresh token scaduto, richiedo nuovo login")
+                      setUser(null)
+                      return
+                    }
+                  } else if (refreshData.session) {
+                    console.log("✅ Expired token refreshed successfully on foreground")
+                    setUser(refreshData.session.user)
+                    supabase.auth.startAutoRefresh()
+                    if (!refreshIntervalRef.current) {
+                      refreshIntervalRef.current = setInterval(checkAndRefreshToken, 5 * 60 * 1000)
+                    }
+                    return
+                  }
+                } catch (refreshErr) {
+                  console.error("❌ Failed to refresh expired token:", refreshErr)
+                  setUser(null)
+                  return
+                }
+              }
+              
+              // Token valido, assicurati che il refresh automatico sia attivo
+              console.log("✅ Valid session found, ensuring auto refresh is active")
               supabase.auth.startAutoRefresh()
+              if (!refreshIntervalRef.current) {
+                refreshIntervalRef.current = setInterval(checkAndRefreshToken, 5 * 60 * 1000)
+              }
+              // Controlla immediatamente se il token sta per scadere
+              await checkAndRefreshToken()
             } else {
               // Nessuna sessione
               console.log("⚠️ No session found")
@@ -146,20 +304,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           } catch (error) {
             console.error("❌ Error in app state change handler:", error)
           }
-        } else if (
-          appState.current === "active" &&
-          nextAppState.match(/inactive|background/)
-        ) {
-          // App è andata in background
-          console.log("📱 App went to background, stopping auto refresh")
-          supabase.auth.stopAutoRefresh()
         }
 
         appState.current = nextAppState
       }
-
-      // Avvia il refresh automatico quando l'app è attiva
-      supabase.auth.startAutoRefresh()
 
       // Aggiungi il listener per i cambiamenti di stato dell'app
       const subscription = AppState.addEventListener("change", handleAppStateChange)
@@ -167,14 +315,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       return () => {
         listener?.subscription.unsubscribe()
         subscription.remove()
-        supabase.auth.stopAutoRefresh()
+        // NON fermare il refresh automatico quando il componente si smonta
+        // Il refresh deve rimanere attivo finché c'è una sessione valida
+        if (refreshIntervalRef.current) {
+          clearInterval(refreshIntervalRef.current)
+          refreshIntervalRef.current = null
+        }
       }
     }
 
     return () => {
       listener?.subscription.unsubscribe()
-      if (Platform.OS !== "web") {
-        supabase.auth.stopAutoRefresh()
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current)
+        refreshIntervalRef.current = null
       }
     }
   }, [])
