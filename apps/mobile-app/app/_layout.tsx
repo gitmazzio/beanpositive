@@ -107,7 +107,7 @@ export default Sentry.wrap(function RootLayout() {
         <AuthProvider>
           <PendingDeepLinkProvider>
             {showSplash && <CustomSplashScreen onFinish={handleSplashFinish} />}
-            {!showSplash && <RootDeepLinkHandler />}
+            <RootDeepLinkHandler />
             {!showSplash && <RootLayoutNav />}
             <Toast config={toastConfig} />
           </PendingDeepLinkProvider>

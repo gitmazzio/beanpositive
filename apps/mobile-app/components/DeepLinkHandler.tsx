@@ -13,7 +13,10 @@ import { isAddHitUrl } from "@/constants/deepLinks";
 export default function DeepLinkHandler() {
   const { user } = useAuth();
   const { addNewHint } = usePocketContext();
-  const { consumePendingAction } = usePendingDeepLink();
+  const {
+    consumePendingAction,
+    pendingAction,
+  } = usePendingDeepLink();
 
   const executeAddHit = useCallback(() => {
     if (!user) return;
@@ -22,8 +25,11 @@ export default function DeepLinkHandler() {
   }, [user, addNewHint]);
 
   useEffect(() => {
+    if (!user) return;
+
     const pending = consumePendingAction();
-    if (pending === "addHit" && user) {
+    const shouldExecute = pending === "addHit" || pendingAction === "addHit";
+    if (shouldExecute) {
       executeAddHit();
     }
 
@@ -35,7 +41,7 @@ export default function DeepLinkHandler() {
     });
 
     return () => subscription.remove();
-  }, [user, executeAddHit, consumePendingAction]);
+  }, [user, executeAddHit, consumePendingAction, pendingAction]);
 
   return null;
 }
