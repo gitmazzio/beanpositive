@@ -49,15 +49,19 @@ export default function Login() {
     // Timeout di sicurezza: se l'utente non diventa disponibile entro 5 secondi
     if (!timeoutRef.current) {
       timeoutRef.current = setTimeout(async () => {
-        console.warn("⚠️ Timeout: utente non disponibile dopo 5 secondi, forzo la navigazione")
+        console.warn("⚠️ Timeout: utente non disponibile dopo 5 secondi")
         setPendingLoginCheck(false)
         timeoutRef.current = null
 
         if (user) {
           await checkAndNavigateAfterLogin()
         } else {
-          const { router } = await import("expo-router")
-          router.replace("/(authenticated)/(tabs)")
+          Toast.show({
+            type: "error",
+            text1: "Login in attesa. Riprova tra qualche secondo.",
+            position: "top",
+            visibilityTime: 3000,
+          })
         }
       }, 5000)
     }
@@ -100,7 +104,7 @@ export default function Login() {
       const errorMessage = err.message || "Login con Google fallito"
       // setError(errorMessage)
       // Non mostrare alert per cancellazione utente
-      if (!errorMessage.includes("cancelled")) {
+      if (!errorMessage.toLowerCase().includes("cancel")) {
         Alert.alert("Errore", errorMessage)
       }
     } finally {
@@ -129,10 +133,15 @@ export default function Login() {
       setPendingLoginCheck(true)
     } catch (err: any) {
       setPendingLoginCheck(false)
+      void triggerErrorHaptic()
+      Toast.show({
+        type: "error",
+        text1: err.message || "Login con Apple fallito",
+        position: "top",
+        visibilityTime: 2000,
+      })
       const errorMessage = err.message || "Login con Apple fallito"
-      // setError(errorMessage)
-      // Non mostrare alert per cancellazione utente
-      if (!errorMessage.includes("cancelled")) {
+      if (!errorMessage.toLowerCase().includes("cancel")) {
         Alert.alert("Errore", errorMessage)
       }
     } finally {

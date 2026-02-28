@@ -312,12 +312,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         try {
           console.log("🔗 Callback URL ricevuta:", result.url)
 
-          // Estrai i parametri dalla URL di callback
-          const url = new URL(result.url)
+          let url: URL
+          try {
+            url = new URL(result.url)
+          } catch (urlParseError) {
+            throw new Error("Invalid callback URL received from OAuth provider")
+          }
 
-          // Gestisci sia query parameters (?) che hash (#)
           const searchParams = url.searchParams
-          const hashParams = new URLSearchParams(url.hash.substring(1))
+          const hashParams = new URLSearchParams((url.hash || "").substring(1))
 
           // Prova prima nei query parameters, poi nell'hash
           const code = searchParams.get("code") || hashParams.get("code")
@@ -470,11 +473,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
           // Se non c'è né codice né token, c'è un problema
           throw new Error("Invalid OAuth callback: no code or token found in URL")
-        } catch (urlError: any) {
-          if (urlError instanceof TypeError) {
-            throw new Error("Invalid callback URL received from OAuth provider")
+        } catch (urlError: unknown) {
+          if (urlError instanceof Error) {
+            throw urlError
           }
-          throw urlError
+          throw new Error("Invalid callback URL received from OAuth provider")
         }
       } else if (result.type === "cancel") {
         throw new Error("Authentication cancelled by user")
@@ -560,21 +563,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = async () => {
     setLoading(true)
-    await Notifications.cancelAllScheduledNotificationsAsync()
-
-    // Rimuovi l'ID esterno da OneSignal
-    await oneSignalService.removeExternalUserId()
-
-    // Reset del flag per richiedere nuovamente i permessi notifiche
     try {
-      await AsyncStorage.removeItem("notificationRequested")
-    } catch (error) {
-      console.error("Error removing notification request flag:", error)
-    }
+      await Notifications.cancelAllScheduledNotificationsAsync()
+      await oneSignalService.removeExternalUserId()
+      try {
+        await AsyncStorage.removeItem("notificationRequested")
+      } catch (storageError) {
+        console.error("Error removing notification request flag:", storageError)
+      }
 
-    const { error } = await supabase.auth.signOut()
-    setLoading(false)
-    if (error) throw error
+      const { error } = await supabase.auth.signOut()
+      if (error) throw error
+    } finally {
+      setLoading(false)
+    }
   }
 
   const register = async (
@@ -585,15 +587,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   ) => {
     setLoading(true)
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: data || {}, // Add any custom fields here
-      },
-    })
-
-    if (error) throw error
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: data || {},
+        },
+      })
+      if (error) throw error
+    } finally {
+      setLoading(false)
+    }
   }
 
   const value = useMemo(

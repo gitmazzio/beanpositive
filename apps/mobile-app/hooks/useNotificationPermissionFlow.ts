@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { oneSignalService } from "../services/onesignal";
@@ -30,7 +30,7 @@ export const useNotificationPermissionFlow =
       }
     };
 
-    const checkAndNavigateAfterLogin = async () => {
+    const checkAndNavigateAfterLogin = useCallback(async () => {
       try {
         setIsLoading(true);
 
@@ -42,21 +42,18 @@ export const useNotificationPermissionFlow =
           if (hasPermission) {
             await oneSignalService.scheduleDailyNotificationIfNeeded();
           }
-          // L'utente ha già i permessi, salva che abbiamo controllato e naviga
           await AsyncStorage.setItem("notificationRequested", "true");
           router.replace("/(authenticated)/(tabs)");
         } else {
-          // L'utente non ha i permessi, naviga alla pagina di richiesta
-          return router.push("/(authenticated)/notification-request");
+          router.push("/(authenticated)/notification-request");
         }
       } catch (error) {
         console.error("Error in notification permission flow:", error);
-        // In caso di errore, naviga comunque alle tabs
         router.replace("/(authenticated)/(tabs)");
       } finally {
         setIsLoading(false);
       }
-    };
+    }, []);
 
     return {
       isLoading,
