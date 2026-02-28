@@ -3,11 +3,11 @@ import Flex from "@/components/commons/Flex";
 import StyledText from "@/components/commons/StyledText";
 import { PageView } from "@/components/Themed";
 import { router } from "expo-router";
-import { Dimensions, Image } from "react-native";
-
-const { width } = Dimensions.get("window");
+import { Image, useWindowDimensions } from "react-native";
 
 export default function EmailVerification() {
+  const { width } = useWindowDimensions();
+
   return (
     <PageView>
       <Flex

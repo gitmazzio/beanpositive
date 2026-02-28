@@ -1,4 +1,4 @@
-import { usePendingDeepLink } from "@/app/contexts/PendingDeepLinkContext";
+import { usePendingDeepLink } from "@/contexts/PendingDeepLinkContext";
 import { isAddHitUrl } from "@/constants/deepLinks";
 import { useAuth } from "@/providers";
 import * as Linking from "expo-linking";

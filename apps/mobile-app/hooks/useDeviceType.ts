@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Dimensions, Platform } from "react-native";
+import { Platform, useWindowDimensions } from "react-native";
 
 type DeviceType =
   | "iphone-se"
@@ -28,13 +28,16 @@ const IPHONE_X_HEIGHTS = [812, 844, 852, 896, 926, 932];
 const IPHONE_SE_HEIGHTS = [568, 667];
 
 function useDeviceType(): UseDeviceTypeResult {
-  const { height, width } = Dimensions.get("window");
+  const { height, width } = useWindowDimensions();
   const h = Math.max(height, width); // per coprire portrait e landscape
 
-  const isIOS = Platform.OS === "ios";
-  const isAndroid = Platform.OS === "android";
+  const isIOS = process.env.EXPO_OS === "ios";
+  const isAndroid = process.env.EXPO_OS === "android";
 
-  const isIPhone = isIOS && !Platform.isPad && !Platform.isTV;
+  const isIPhone =
+    isIOS &&
+    !(Platform as { isPad?: boolean; isTV?: boolean }).isPad &&
+    !(Platform as { isPad?: boolean; isTV?: boolean }).isTV;
 
   const deviceType: DeviceType = useMemo(() => {
     if (isIPhone) {

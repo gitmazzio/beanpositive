@@ -1,7 +1,6 @@
-import {
+import React, {
   createContext,
   useCallback,
-  useContext,
   useRef,
   useState,
 } from "react";
@@ -18,7 +17,7 @@ export const PendingDeepLinkContext =
   createContext<PendingDeepLinkContextType | undefined>(undefined);
 
 export const usePendingDeepLink = () => {
-  const context = useContext(PendingDeepLinkContext);
+  const context = React.use(PendingDeepLinkContext);
   if (!context) {
     throw new Error(
       "usePendingDeepLink must be used within PendingDeepLinkProvider"

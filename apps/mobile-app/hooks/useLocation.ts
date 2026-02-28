@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import * as Location from "expo-location";
-import { Alert, Linking, Platform } from "react-native";
+import { Alert, Linking } from "react-native";
 
 export interface UseLocationReturn {
   hasPermission: boolean | null;
@@ -48,7 +48,7 @@ export const useLocation = (): UseLocationReturn => {
       const granted = status === "granted";
       setHasPermission(granted);
       
-      if (!granted && Platform.OS === "ios") {
+      if (!granted && process.env.EXPO_OS === "ios") {
         Alert.alert(
           "Permessi posizione",
           "La posizione è necessaria per salvare correttamente i tuoi fagioli. Puoi abilitarla nelle impostazioni.",

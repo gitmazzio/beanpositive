@@ -1,4 +1,4 @@
-import usePocketContext from "@/app/hooks/usePocketContext";
+import usePocketContext from "@/hooks/usePocketContext";
 import { triggerConfirmHaptic } from "@/utils/haptics";
 import { FontAwesome6, Ionicons } from "@expo/vector-icons";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
@@ -211,14 +211,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#FEF5E6",
     height: 80,
-    shadowColor: "#404B35",
-    shadowOffset: {
-      width: 0,
-      height: -2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 0.5,
-    elevation: 5,
+    boxShadow: "0 -2px 0.5px rgba(64, 75, 53, 0.2)",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
@@ -243,14 +236,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#D57E3A",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    boxShadow: "0 2px 3.84px rgba(0, 0, 0, 0.25)",
     position: "absolute",
     top: -40,
   },

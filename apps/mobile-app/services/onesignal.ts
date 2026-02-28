@@ -1,5 +1,5 @@
 import * as Notifications from "expo-notifications"
-import { Alert, Linking, Platform } from "react-native"
+import { Alert, Linking } from "react-native"
 import { OneSignal } from "react-native-onesignal"
 import { router } from "expo-router"
 
@@ -263,7 +263,7 @@ export class OneSignalService {
       }
 
       if (finalStatus !== "granted") {
-        if (Platform.OS === "ios") {
+        if (process.env.EXPO_OS === "ios") {
           Alert.alert(
             "Permessi notifiche",
             "Le notifiche sono necessarie per ricevere aggiornamenti importanti. Puoi abilitarle nelle impostazioni.",

@@ -10,7 +10,7 @@ import { triggerErrorHaptic } from "@/utils/haptics"
 import { FontAwesome6 } from "@expo/vector-icons"
 import { useRouter } from "expo-router"
 import { useEffect, useRef, useState } from "react"
-import { Alert, Image, Platform, StyleSheet } from "react-native"
+import { Alert, Image, StyleSheet } from "react-native"
 import Toast from "react-native-toast-message"
 
 export default function Login() {
@@ -169,7 +169,7 @@ export default function Login() {
         onPress={handleGoogleLogin}
         disabled={isGoogleLoading}
       />
-      {Platform.OS === "ios" ? (
+      {process.env.EXPO_OS === "ios" ? (
         <Button
           kind="tertiary"
           prefixIcon={<FontAwesome6 name="apple" size={20} color={"#686260"} />}

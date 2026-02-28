@@ -124,11 +124,7 @@ const styles = StyleSheet.create({
   },
   inputFocused: {
     borderColor: "#404B35",
-    shadowColor: "#D08553",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 10,
-    shadowRadius: 1,
-    elevation: 2,
+    boxShadow: "0 0 1px rgba(208, 133, 83, 0.6)",
   },
   rightIcon: {
     position: "absolute",

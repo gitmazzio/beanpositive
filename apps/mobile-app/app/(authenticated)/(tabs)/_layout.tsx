@@ -1,4 +1,4 @@
-import PocketProvider from "@/app/contexts/PocketContext"
+import PocketProvider from "@/contexts/PocketContext"
 import { CustomTabBar } from "@/components/CustomTabBar"
 import { useColorScheme } from "@/components/useColorScheme"
 import Colors from "@/constants/Colors"

@@ -1,4 +1,3 @@
-import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 
@@ -95,7 +94,7 @@ export const triggerNotificationHaptic = async (
 };
 
 export const triggerAndroidHaptic = async (type: HapticsAndroidType) => {
-  if (Platform.OS !== "android") {
+  if (process.env.EXPO_OS !== "android") {
     return;
   }
 
@@ -103,7 +102,7 @@ export const triggerAndroidHaptic = async (type: HapticsAndroidType) => {
 };
 
 export const triggerConfirmHaptic = async () => {
-  if (Platform.OS === "android") {
+  if (process.env.EXPO_OS === "android") {
     await runHaptic(() =>
       Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Confirm)
     );

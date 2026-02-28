@@ -1,9 +1,8 @@
-import { useContext } from "react";
-import { PocketContext, PocketContextType } from "../contexts/PocketContext";
+import React from "react";
+import { PocketContext, PocketContextType } from "@/contexts/PocketContext";
 
-// Hook per usare il context
 const usePocketContext = (): PocketContextType => {
-  const context = useContext(PocketContext);
+  const context = React.use(PocketContext);
   if (!context) {
     throw new Error("usePocketContext must be used within PocketProvider");
   }

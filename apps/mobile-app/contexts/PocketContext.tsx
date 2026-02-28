@@ -8,7 +8,6 @@ import { useAddHit } from "@/queries/mutations/useAddHit"
 import { useLocation } from "@/hooks/useLocation"
 import { createContext, useCallback, useMemo, useRef } from "react"
 import { Animated } from "react-native"
-import Toast from "react-native-toast-message"
 
 // Context per comunicare con Pocket
 export type PocketContextType = {
@@ -98,16 +97,8 @@ export default function PocketProvider({ children }: PocketProviderProps) {
         address,
         location: locationData,
       })
-
-      // Toast.show({
-      //   type: "hintSuccess",
-      //   text1: "Hai aggiunto un fagiolo. Grande!",
-      //   position: "top",
-      //   visibilityTime: 2000,
-      // })
     } catch (err: any) {
       console.error("Error adding hit:", err)
-      // alert("Error: " + err.message);
     }
   }, [user, getCurrentLocation, getAddressFromCoordinates, addHit])
 

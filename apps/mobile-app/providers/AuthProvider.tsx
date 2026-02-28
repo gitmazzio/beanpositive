@@ -6,10 +6,9 @@ import * as AppleAuthentication from "expo-apple-authentication"
 import * as AuthSession from "expo-auth-session"
 import * as WebBrowser from "expo-web-browser"
 import * as Notifications from "expo-notifications"
-import { AppState, Platform, type AppStateStatus } from "react-native"
+import { AppState, type AppStateStatus } from "react-native"
 import React, {
   createContext,
-  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -219,7 +218,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     )
 
     // Gestisci il refresh quando l'app torna in foreground (solo su mobile)
-    if (Platform.OS !== "web") {
+    if (process.env.EXPO_OS !== "web") {
       const handleAppStateChange = async (nextAppState: AppStateStatus) => {
         if (
           appState.current.match(/inactive|background/) &&
@@ -720,7 +719,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }
 
 export const useAuth = () => {
-  const context = useContext(AuthContext)
+  const context = React.use(AuthContext)
   if (!context) throw new Error("useAuth must be used within an AuthProvider")
   return context
 }

@@ -9,15 +9,13 @@ import { useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
-  Dimensions,
   Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
-
-const { width, height } = Dimensions.get("window");
 
 const onboardingData = [
   {
@@ -52,6 +50,7 @@ const onboardingData = [
 
 export default function OnboardingScreen({ onFinish }) {
   const router = useRouter();
+  const { width } = useWindowDimensions();
   const [currentStep, setCurrentStep] = useState(0);
 
   const progressAnimation = useRef(new Animated.Value(0)).current;
@@ -145,7 +144,10 @@ export default function OnboardingScreen({ onFinish }) {
         </Flex>
 
         <View style={styles.imageContainer}>
-          <Image source={currentData.image} style={styles.image} />
+          <Image
+            source={currentData.image}
+            style={[styles.image, { width: width * 0.75, height: width * 0.75 }]}
+          />
         </View>
 
         {currentData.subtitle != null && (
@@ -242,8 +244,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   image: {
-    width: width * 0.75,
-    height: width * 0.75,
     borderRadius: 20,
   },
   loginContainer: {
@@ -267,14 +267,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginHorizontal: 20,
     marginBottom: 15,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
   },
   continueButtonText: {
     fontSize: 18,

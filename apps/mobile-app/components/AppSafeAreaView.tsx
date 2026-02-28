@@ -1,18 +1,7 @@
 import React, { ReactNode } from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  StatusBar,
-  View,
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { KeyboardAvoidingView, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { KeyboardDismiss } from "./commons/KeyboardDismiss";
-// import styled from 'styled-components/native'
-// import { colors } from '~/constants/colors'
-
-const safeAreaPaddingTop =
-  Platform.OS === "android" ? StatusBar.currentHeight : 0;
 
 type Attrs = {
   isSplashShowing?: boolean;
@@ -37,7 +26,7 @@ export const AppSafeAreaView: React.FC<Attrs> = ({
       }}
     >
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={process.env.EXPO_OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         <KeyboardDismiss>

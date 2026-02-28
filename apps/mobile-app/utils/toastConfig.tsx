@@ -1,20 +1,8 @@
 import Flex from "@/components/commons/Flex";
 import StyledText from "@/components/commons/StyledText";
 import { FontAwesome5, FontAwesome6 } from "@expo/vector-icons";
-import {
-  Dimensions,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import Toast, {
-  BaseToast,
-  BaseToastProps,
-  ErrorToast,
-} from "react-native-toast-message";
-
-const { width } = Dimensions.get("window");
+import { StyleSheet, TouchableOpacity } from "react-native";
+import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 
 export const toastConfig = {
   /*
@@ -88,7 +76,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F5F0",
     borderColor: "#DEE0E3",
     borderWidth: 1,
-    width: width - 40,
+    width: "100%",
+    marginHorizontal: 20,
+    alignSelf: "center",
     padding: 16,
   },
   hintSuccessText: {

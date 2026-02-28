@@ -22,7 +22,7 @@ import * as Sentry from "@sentry/react-native";
 import "react-native-reanimated";
 import Toast from "react-native-toast-message";
 import CustomSplashScreen from "../components/CustomSplashScreen";
-import PendingDeepLinkProvider from "./contexts/PendingDeepLinkContext";
+import PendingDeepLinkProvider from "@/contexts/PendingDeepLinkContext";
 
 Sentry.init({
   enabled: process.env.NODE_ENV === "production",

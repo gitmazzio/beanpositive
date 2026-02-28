@@ -1,8 +1,6 @@
 import { useEffect } from "react";
-import { Animated, Dimensions, StyleSheet, View } from "react-native";
+import { Animated, StyleSheet, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
-
-const { width, height } = Dimensions.get("window");
 
 const BeanShape = ({ width = 200 }) => {
   return (
@@ -111,14 +109,7 @@ const styles = StyleSheet.create({
   },
   dot: {
     position: "absolute",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    boxShadow: "0 2px 3.84px rgba(0, 0, 0, 0.25)",
   },
   controls: {
     position: "absolute",

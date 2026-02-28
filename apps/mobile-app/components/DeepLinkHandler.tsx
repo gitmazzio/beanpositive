@@ -2,8 +2,8 @@ import { useCallback, useEffect } from "react";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
 import { useAuth } from "@/providers";
-import usePocketContext from "@/app/hooks/usePocketContext";
-import { usePendingDeepLink } from "@/app/contexts/PendingDeepLinkContext";
+import usePocketContext from "@/hooks/usePocketContext";
+import { usePendingDeepLink } from "@/contexts/PendingDeepLinkContext";
 import { isAddHitUrl } from "@/constants/deepLinks";
 
 /**
