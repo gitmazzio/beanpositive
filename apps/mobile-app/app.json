@@ -7,7 +7,6 @@
     "icon": "./assets/images/adaptive.png",
     "scheme": "beanpositive",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "jsEngine": "jsc",
     "ios": {
       "supportsTablet": true,
@@ -36,16 +35,10 @@
         "foregroundImage": "./assets/images/adaptive.png",
         "backgroundColor": "#7D8557"
       },
-      "edgeToEdgeEnabled": true,
       "package": "com.beanpositive.app"
     },
     "plugins": [
-      [
-        "expo-web-browser",
-        {
-          "experimentalLauncherActivity": true
-        }
-      ],
+      "expo-web-browser",
       [
         "expo-splash-screen",
         {
@@ -73,7 +66,6 @@
           "mode": "production"
         }
       ],
-      "expo-web-browser",
       "expo-apple-authentication",
       [
         "expo-location",
@@ -83,10 +75,13 @@
           "locationWhenInUsePermission": "Per poter salvare i tuoi fagioli in modo corretto, abbiamo bisogno di accedere alla tua posizione."
         }
       ],
-      "@bacons/apple-targets"
+      "@bacons/apple-targets",
+      "@sentry/react-native",
+      "expo-font"
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "reactCompiler": true
     },
     "extra": {
       "eas": {

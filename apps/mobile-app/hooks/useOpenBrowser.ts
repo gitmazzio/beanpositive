@@ -83,6 +83,8 @@ export const useOpenBrowser = () => {
       try {
         const result = await WebBrowser.openBrowserAsync(url, {
           presentationStyle: WebBrowser.WebBrowserPresentationStyle.POPOVER,
+          createTask: true,
+          useProxyActivity: true,
           ...options,
         });
         return result;
