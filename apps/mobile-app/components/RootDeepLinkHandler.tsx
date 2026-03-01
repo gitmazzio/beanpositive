@@ -21,15 +21,19 @@ export default function RootDeepLinkHandler() {
     const processInitialUrl = async () => {
       try {
         const url = await Linking.getInitialURL();
-        if (!url || !isAddHitUrl(url)) return;
+        if (!url || !isAddHitUrl(url)) {
+          initialUrlProcessedRef.current = true;
+          return;
+        }
 
-        initialUrlProcessedRef.current = true;
         if (user) {
+          initialUrlProcessedRef.current = true;
           setPendingAction("addHit");
         }
-        // !user: +native-intent ha già reindirizzato a login, niente da fare qui
+        // !user: non marcare come processato, così riproviamo quando user fa login
       } catch (error) {
         console.error("Errore nel controllo dell'URL iniziale:", error);
+        initialUrlProcessedRef.current = true;
       }
     };
 
