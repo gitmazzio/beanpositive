@@ -71,11 +71,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         const { expires_at: expiresAt } = sessionData.session
         const now = Math.floor(Date.now() / 1000)
-        if (!expiresAt || expiresAt - now >= REFRESH_THRESHOLD_SECONDS) return
+        const timeUntilExpiry = expiresAt - now
 
+        // Skip if token is still valid for longer than threshold
+        if (!expiresAt || timeUntilExpiry >= REFRESH_THRESHOLD_SECONDS) return
+
+        // If token is expired or about to expire, try to refresh
         const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession()
         if (refreshError) {
-          if (isRefreshTokenExpired(refreshError)) setUser(null)
+          if (isRefreshTokenExpired(refreshError)) {
+            setUser(null)
+            stopRefreshMechanism()
+          }
           return
         }
         if (refreshData.session) {

@@ -27,7 +27,7 @@
         ]
       },
       "appleTeamId": "B2UMD85VN6",
-      "buildNumber": "15"
+      "buildNumber": "17"
     },
     "android": {
       "googleServicesFile": "./services/google-services.json",
