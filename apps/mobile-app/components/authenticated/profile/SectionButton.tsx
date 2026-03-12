@@ -48,7 +48,6 @@ export const SectionButton = ({
           <StyledText
             kind="button"
             style={{
-              fontWeight: 600,
               color: "#3A1A10",
             }}
           >
